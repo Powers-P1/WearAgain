@@ -1,20 +1,20 @@
 # WearAgain: project brief
 
 ## Product decision
-Online shops push shoppers to buy more. WearAgain answers a different question: what is the cheapest thing I need to buy to get the outfits I want, given the tops I already own? A shopper photographs 3 tops she owns and picks 3 candidate outerwear items from a shop. The app renders the 9 combinations with YouCam AI Clothes try-on (cloth VTO) on a synthetic model, she marks each as would wear / would not wear / render error, and a deterministic solver computes the cheapest basket that meets her declared needs, which may be zero purchases. The result carries a minimality certificate. Zero LLM calls. The model's face is generated, not a real person's; shoppers never upload faces, and no face or uploaded image is stored on our side.
+Online shops push shoppers to buy more. WearAgain answers a different question: what is the cheapest thing I need to buy to get the outfits I want, given the tops I already own? A shopper photographs 3 tops she owns and picks 3 candidate outerwear items from a shop. The app renders the 6 garments separately with YouCam AI Clothes try-on on the same synthetic base and reuses them in 9 side-by-side pair cards. The team's follow-up probe on 21.10 found that layering does not work: a second garment replaces the first. She rates each pair as would wear / would not wear / render error; a deterministic solver computes the cheapest basket, possibly zero purchases, with a minimality certificate. PR4b adds AI Stylist: AI proposes, the core verifies. Synthetic model images are the default; the later personal-photo path requires explicit consent in live mode, with no application-side image storage.
 
 ## MVP scope
 - Input: 3 owned tops (photos), 3 candidate items (shop catalogue entries with price), declared needs.
-- 9 renders (or fewer, see decision-relevant rendering), rating UI, solver, result page with certificate.
+- 6 item renders (or fewer under conservative selection), 9 pair cards, rating UI, solver, result page with certificate.
 - Demo mode from pre-rendered images; live mode behind a unit cap.
-- Out of scope: lower-body garments, accounts, payments, real shop integration, face photos.
+- Out of scope: lower-body rendering, accounts, payments and real checkout. Personal model photos are limited to the later explicit-consent live path in AI Stylist.
 
 ## Definitions
 - Requirement model: a list of needs, each satisfied by a set of outfits. Example: "at least 2 outfits for work", "at least 1 outfit for rain". An outfit is a (top, outerwear) pair; owned items cost 0.
 - Basket: a subset of the 3 candidates to buy (8 possible, including the empty basket).
 - Satisfies: with the owned tops plus the basket, the outfits rated "would wear" meet every requirement.
-- Minimality certificate: for the returned basket, the list of every cheaper basket together with the requirement it fails and the ratings that cause the failure. Unrated or errored combinations count as not worn, and the certificate says so.
-- Decision-relevant combination: a combination whose rating could change which basket is the cheapest feasible one, given the ratings already known. Others need not be rendered.
+- Minimality certificate: every cheaper basket with failed requirements and supporting ratings. Unrated or errored pairs contribute zero current acceptances but remain unresolved, never confirmed dislikes; the certificate distinguishes provisional and proven minimality.
+- Decision-relevant pair: an unresolved pair that could affect which basket is the cheapest feasible one. PR2 conservatively selects pairs from still-possible contenders and generates only missing element images; it does not claim globally optimal question ordering.
 
 ## Architecture
 - Front end: Cloudflare Pages (static, TypeScript).
@@ -25,18 +25,18 @@ Online shops push shoppers to buy more. WearAgain answers a different question: 
 - Demo mode serves saved renders; live mode calls YouCam and is capped.
 
 ## Constraints
-- Free tier hosting; no paid services.
-- Units: 1 000 total = 100 integration, 240 tests, 120 saved demo scenarios, 440 live (360 jury, 80 public), 100 reserve (split sums to 1 000). Cost is 2 units per result image (AI Clothes V2, V3 and V4; live probe 2026-10-21). The 3x3 matrix is 18 units; a full session with 3 live base renders is 24 units (18 if the bases are pre-rendered), so 440 live units cover about 18 full sessions. The 21.10 probe spent 4 units (balance 996).
+- Free-tier hosting; PR4b adds separately capped paid LLM usage through the team's Worker secret. Numeric LLM/session/day limits remain UNKNOWN until configured.
+- Units: 1 000 total = 100 integration, 240 tests, 120 saved demo scenarios, 440 live (360 jury, 80 public), 100 reserve (split sums to 1 000). Cost is 2 units per successful result image (live probe 2026-10-21). The 3x3 pair matrix requires 6 independent successful images / 12 units on an existing synthetic base, excluding additional successful retries or base preparation. The ledger must use the actual remaining balance; a unit plan does not guarantee session count.
 - YouCam retention (docs, confirmed 2026-10-21): uploads kept 24 h; results kept 24 h after completion; download links may expire after about 2 h. This supersedes the earlier 30-day figure.
 - YouCam rate limit (docs, confirmed 2026-10-21): 250 requests per 300 s and 5 QPS, per IP and per key; excess gets HTTP 429.
 - Synthetic model with a generated face: the try-on base is a SYNTHETIC model image with a generated face, not a real person (licence-free or generated by us). YouCam docs require a visible face in the person image (confirmed 2026-10-21), so a face-free mannequin is not a valid input.
-- Shoppers never upload faces, only garment photos. Our side stores no uploaded images.
+- The default input is garment-only photos. AI Stylist may accept a personal model photo in live mode with explicit consent; our side stores no uploaded images, while provider retention remains as documented above.
 
 ## Division of labour
 ChatGPT/Codex writes code via pull requests; OK Agency side runs live YouCam calls with the key, records fixtures, deploys, reviews and merges. The key never enters the repository.
 
 ## Upgrades
-1. Decision-relevant rendering: render only the combinations needed to decide between cheaper baskets; compare unit use with the full 9-image matrix.
+1. Decision-relevant selection: ask about pairs needed to distinguish possible baskets, reuse per-item images and compare unit use with the 6-image / 12-unit baseline; track pair questions separately.
 2. Physical check: a few real outfits tried in person against the app's verdicts.
 
 ## Acceptance criteria
@@ -74,8 +74,8 @@ Principle: the app is genuinely AI-powered. AI proposes, the deterministic core 
 ## Video outline (60-90 s, English)
 1. Hook (10 s): "Before you buy a jacket, do you check what you already own that goes with it?"
 2. Upload 3 tops, pick 3 jackets (10 s).
-3. Nine renders appear; she rates them (20 s).
+3. Six garment previews populate nine pair cards; she rates the pairs (20 s).
 4. Result: the cheapest basket, possibly "buy nothing" (15 s).
 5. Certificate: why nothing cheaper works (15 s).
 6. Units saved by decision-relevant rendering versus the full matrix, and the YouCam API used (10 s).
-7. Close: fewer returns, fewer impulse buys (5 s).
+7. Close: reuse what you own and explain every suggested purchase (5 s); reduced returns remain unmeasured.
