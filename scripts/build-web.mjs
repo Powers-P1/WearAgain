@@ -82,6 +82,8 @@ for (const file of precache) {
 const version = digest.digest('hex').slice(0, 16);
 const sw = (await readFile(join(root, 'web/public/sw-template.js'), 'utf8')).replace('__PRECACHE_FILES__', JSON.stringify(precache)).replace('__CACHE_VERSION__', version);
 await writeFile(join(destination, 'sw.js'), sw);
-await writeFile(join(destination, '_headers'), `/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n/sw.js\n  Cache-Control: no-cache\n/demo/manifest.json\n  Cache-Control: no-cache\n`);
+// Static bundle, no inline scripts. Inline styles are needed for the cropped illustrations; the Worker is the only connect target.
+const csp = `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' ${api.origin}; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'`;
+await writeFile(join(destination, '_headers'), `/*\n  Content-Security-Policy: ${csp}\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n/sw.js\n  Cache-Control: no-cache\n/demo/manifest.json\n  Cache-Control: no-cache\n`);
 await writeFile(join(destination, '_redirects'), '/app /app/ 301\n/retailers /retailers/ 301\n');
 console.log(`Pages build: web/dist (${precache.length} explicit offline assets; ${manifest.renders.length} recorded YouCam previews).`);
