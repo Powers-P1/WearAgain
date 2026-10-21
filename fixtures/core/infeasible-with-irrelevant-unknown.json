@@ -1,0 +1,64 @@
+{
+  "provenance": "synthetic_hand_authored_no_api_output",
+  "description": "Even accepting the remaining unknown yields only one outfit for a requirement of two.",
+  "scenario": {
+    "schemaVersion": 1,
+    "currency": "PLN",
+    "tops": [
+      {
+        "id": "shirt",
+        "label": "Synthetic shirt"
+      }
+    ],
+    "outerwear": [
+      {
+        "id": "a",
+        "label": "Synthetic a",
+        "kind": "candidate",
+        "priceMinor": 3000
+      },
+      {
+        "id": "b",
+        "label": "Synthetic b",
+        "kind": "candidate",
+        "priceMinor": 4000
+      }
+    ],
+    "outfits": [
+      {
+        "id": "shirt-a",
+        "topId": "shirt",
+        "outerwearId": "a"
+      },
+      {
+        "id": "shirt-b",
+        "topId": "shirt",
+        "outerwearId": "b"
+      }
+    ],
+    "requirements": [
+      {
+        "id": "two-outfits",
+        "label": "Synthetic two-outfits",
+        "minCount": 2,
+        "outfitIds": [
+          "shirt-a",
+          "shirt-b"
+        ]
+      }
+    ],
+    "ratings": [
+      {
+        "outfitId": "shirt-a",
+        "status": "would_not_wear"
+      },
+      {
+        "outfitId": "shirt-b",
+        "status": "unrated"
+      }
+    ]
+  },
+  "expected": {
+    "status": "infeasible"
+  }
+}

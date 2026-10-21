@@ -1,0 +1,85 @@
+{
+  "provenance": "synthetic_hand_authored_no_api_output",
+  "description": "A top-only baseline and an owned coat satisfy positive needs without buying any candidate.",
+  "scenario": {
+    "schemaVersion": 1,
+    "currency": "PLN",
+    "tops": [
+      {
+        "id": "shirt",
+        "label": "Synthetic shirt"
+      }
+    ],
+    "outerwear": [
+      {
+        "id": "old-coat",
+        "label": "Synthetic old-coat",
+        "kind": "owned"
+      },
+      {
+        "id": "new-coat",
+        "label": "Synthetic new-coat",
+        "kind": "candidate",
+        "priceMinor": 8000
+      }
+    ],
+    "outfits": [
+      {
+        "id": "shirt-alone",
+        "topId": "shirt",
+        "outerwearId": null
+      },
+      {
+        "id": "shirt-old-coat",
+        "topId": "shirt",
+        "outerwearId": "old-coat"
+      },
+      {
+        "id": "shirt-new-coat",
+        "topId": "shirt",
+        "outerwearId": "new-coat"
+      }
+    ],
+    "requirements": [
+      {
+        "id": "work",
+        "label": "Synthetic work",
+        "minCount": 1,
+        "outfitIds": [
+          "shirt-alone",
+          "shirt-old-coat"
+        ]
+      },
+      {
+        "id": "rain",
+        "label": "Synthetic rain",
+        "minCount": 1,
+        "outfitIds": [
+          "shirt-old-coat"
+        ]
+      }
+    ],
+    "ratings": [
+      {
+        "outfitId": "shirt-alone",
+        "status": "would_wear"
+      },
+      {
+        "outfitId": "shirt-old-coat",
+        "status": "would_wear"
+      },
+      {
+        "outfitId": "shirt-new-coat",
+        "status": "would_not_wear"
+      }
+    ]
+  },
+  "expected": {
+    "status": "solved",
+    "candidateIds": [],
+    "costMinor": 0,
+    "priceOptimality": "proven",
+    "selectionStability": "stable",
+    "cheaperBasketCount": 0
+  }
+}

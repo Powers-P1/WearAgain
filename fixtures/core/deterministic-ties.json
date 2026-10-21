@@ -1,0 +1,154 @@
+{
+  "provenance": "synthetic_hand_authored_no_api_output",
+  "description": "Equal total price prefers one new item over two, then lexicographically smaller IDs, regardless of input order.",
+  "scenario": {
+    "schemaVersion": 1,
+    "currency": "PLN",
+    "tops": [
+      {
+        "id": "work",
+        "label": "Synthetic work"
+      },
+      {
+        "id": "rain",
+        "label": "Synthetic rain"
+      }
+    ],
+    "outerwear": [
+      {
+        "id": "d",
+        "label": "Synthetic d",
+        "kind": "candidate",
+        "priceMinor": 6000
+      },
+      {
+        "id": "c",
+        "label": "Synthetic c",
+        "kind": "candidate",
+        "priceMinor": 3000
+      },
+      {
+        "id": "b",
+        "label": "Synthetic b",
+        "kind": "candidate",
+        "priceMinor": 3000
+      },
+      {
+        "id": "a",
+        "label": "Synthetic a",
+        "kind": "candidate",
+        "priceMinor": 6000
+      }
+    ],
+    "outfits": [
+      {
+        "id": "work-d",
+        "topId": "work",
+        "outerwearId": "d"
+      },
+      {
+        "id": "work-c",
+        "topId": "work",
+        "outerwearId": "c"
+      },
+      {
+        "id": "work-b",
+        "topId": "work",
+        "outerwearId": "b"
+      },
+      {
+        "id": "work-a",
+        "topId": "work",
+        "outerwearId": "a"
+      },
+      {
+        "id": "rain-d",
+        "topId": "rain",
+        "outerwearId": "d"
+      },
+      {
+        "id": "rain-c",
+        "topId": "rain",
+        "outerwearId": "c"
+      },
+      {
+        "id": "rain-b",
+        "topId": "rain",
+        "outerwearId": "b"
+      },
+      {
+        "id": "rain-a",
+        "topId": "rain",
+        "outerwearId": "a"
+      }
+    ],
+    "requirements": [
+      {
+        "id": "work",
+        "label": "Synthetic work",
+        "minCount": 1,
+        "outfitIds": [
+          "work-d",
+          "work-c",
+          "work-b",
+          "work-a"
+        ]
+      },
+      {
+        "id": "rain",
+        "label": "Synthetic rain",
+        "minCount": 1,
+        "outfitIds": [
+          "rain-d",
+          "rain-c",
+          "rain-b",
+          "rain-a"
+        ]
+      }
+    ],
+    "ratings": [
+      {
+        "outfitId": "work-d",
+        "status": "would_wear"
+      },
+      {
+        "outfitId": "work-c",
+        "status": "would_not_wear"
+      },
+      {
+        "outfitId": "work-b",
+        "status": "would_wear"
+      },
+      {
+        "outfitId": "work-a",
+        "status": "would_wear"
+      },
+      {
+        "outfitId": "rain-d",
+        "status": "would_wear"
+      },
+      {
+        "outfitId": "rain-c",
+        "status": "would_wear"
+      },
+      {
+        "outfitId": "rain-b",
+        "status": "would_not_wear"
+      },
+      {
+        "outfitId": "rain-a",
+        "status": "would_wear"
+      }
+    ]
+  },
+  "expected": {
+    "status": "solved",
+    "candidateIds": [
+      "a"
+    ],
+    "costMinor": 6000,
+    "priceOptimality": "proven",
+    "selectionStability": "stable",
+    "cheaperBasketCount": 3
+  }
+}

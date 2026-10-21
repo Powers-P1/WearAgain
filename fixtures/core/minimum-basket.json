@@ -1,0 +1,169 @@
+{
+  "provenance": "synthetic_hand_authored_no_api_output",
+  "description": "One all-round item costs less than separate individually cheaper choices for the three needs.",
+  "scenario": {
+    "schemaVersion": 1,
+    "currency": "PLN",
+    "tops": [
+      {
+        "id": "work",
+        "label": "Synthetic work"
+      },
+      {
+        "id": "weekend",
+        "label": "Synthetic weekend"
+      },
+      {
+        "id": "evening",
+        "label": "Synthetic evening"
+      }
+    ],
+    "outerwear": [
+      {
+        "id": "cheap-a",
+        "label": "Synthetic cheap-a",
+        "kind": "candidate",
+        "priceMinor": 4000
+      },
+      {
+        "id": "cheap-b",
+        "label": "Synthetic cheap-b",
+        "kind": "candidate",
+        "priceMinor": 6000
+      },
+      {
+        "id": "all-round",
+        "label": "Synthetic all-round",
+        "kind": "candidate",
+        "priceMinor": 9000
+      }
+    ],
+    "outfits": [
+      {
+        "id": "work-cheap-a",
+        "topId": "work",
+        "outerwearId": "cheap-a"
+      },
+      {
+        "id": "work-cheap-b",
+        "topId": "work",
+        "outerwearId": "cheap-b"
+      },
+      {
+        "id": "work-all-round",
+        "topId": "work",
+        "outerwearId": "all-round"
+      },
+      {
+        "id": "weekend-cheap-a",
+        "topId": "weekend",
+        "outerwearId": "cheap-a"
+      },
+      {
+        "id": "weekend-cheap-b",
+        "topId": "weekend",
+        "outerwearId": "cheap-b"
+      },
+      {
+        "id": "weekend-all-round",
+        "topId": "weekend",
+        "outerwearId": "all-round"
+      },
+      {
+        "id": "evening-cheap-a",
+        "topId": "evening",
+        "outerwearId": "cheap-a"
+      },
+      {
+        "id": "evening-cheap-b",
+        "topId": "evening",
+        "outerwearId": "cheap-b"
+      },
+      {
+        "id": "evening-all-round",
+        "topId": "evening",
+        "outerwearId": "all-round"
+      }
+    ],
+    "requirements": [
+      {
+        "id": "work",
+        "label": "Synthetic work",
+        "minCount": 1,
+        "outfitIds": [
+          "work-cheap-a",
+          "work-cheap-b",
+          "work-all-round"
+        ]
+      },
+      {
+        "id": "weekend",
+        "label": "Synthetic weekend",
+        "minCount": 1,
+        "outfitIds": [
+          "weekend-cheap-a",
+          "weekend-cheap-b",
+          "weekend-all-round"
+        ]
+      },
+      {
+        "id": "evening",
+        "label": "Synthetic evening",
+        "minCount": 1,
+        "outfitIds": [
+          "evening-cheap-a",
+          "evening-cheap-b",
+          "evening-all-round"
+        ]
+      }
+    ],
+    "ratings": [
+      {
+        "outfitId": "work-cheap-a",
+        "status": "would_wear"
+      },
+      {
+        "outfitId": "work-cheap-b",
+        "status": "would_not_wear"
+      },
+      {
+        "outfitId": "work-all-round",
+        "status": "would_wear"
+      },
+      {
+        "outfitId": "weekend-cheap-a",
+        "status": "would_wear"
+      },
+      {
+        "outfitId": "weekend-cheap-b",
+        "status": "would_not_wear"
+      },
+      {
+        "outfitId": "weekend-all-round",
+        "status": "would_wear"
+      },
+      {
+        "outfitId": "evening-cheap-a",
+        "status": "would_not_wear"
+      },
+      {
+        "outfitId": "evening-cheap-b",
+        "status": "would_wear"
+      },
+      {
+        "outfitId": "evening-all-round",
+        "status": "would_wear"
+      }
+    ]
+  },
+  "expected": {
+    "status": "solved",
+    "candidateIds": [
+      "all-round"
+    ],
+    "costMinor": 9000,
+    "priceOptimality": "proven",
+    "selectionStability": "stable",
+    "cheaperBasketCount": 3
+  }
+}
