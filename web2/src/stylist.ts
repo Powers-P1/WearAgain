@@ -41,6 +41,7 @@ export type WorkerAgentHook = (input: {
 const recordedTopElements: Readonly<Record<string, string>> = {
   'recorded-work': 'work',
   'recorded-weekend': 'weekend',
+  'recorded-evening': 'evening',
 };
 export function recordedPreviewForItem(id: string): string | null {
   const elementId = recordedTopElements[id];
@@ -66,7 +67,7 @@ const demoRecipes: readonly Omit<OccasionSuggestion,'heroImagePath'>[] = [
   {
     id: 'relaxed', title: t('stylistLookRelaxed'),
     explanation: t('stylistRelaxedReason'),
-    itemIds: ['recorded-work','trousers','loafers'],
+    itemIds: ['recorded-evening','trousers','loafers'],
   },
 ];
 

@@ -43,6 +43,7 @@ const EXAMPLE_ROWS: readonly Example[] = [
   // board-05 photographs, these have no garment-only product photo.
   ['recorded-work', 'recordedWork', 'recordedWorkDetail', 'tops', 'ready', 0],
   ['recorded-weekend', 'recordedWeekend', 'recordedWeekendDetail', 'tops', 'ready', -1],
+  ['recorded-evening', 'recordedEvening', 'recordedEveningDetail', 'tops', 'ready', -2],
 ];
 const EXAMPLES: readonly WardrobeItem[] = EXAMPLE_ROWS.map(([id, name, detail, category, availability, order]) => ({
   id, name: t(name), detail: t(detail), category, availability, photo: id.startsWith('recorded-') ? null : id, order,

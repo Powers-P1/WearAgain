@@ -109,3 +109,12 @@ test('provider-looking HTML, invalid display-only illustration and unknown ids n
   assert.equal(result.looks[0].heroImagePath,null);
   assert.equal(result.looks[0].title,raw[0].title); // escaped by the view, never inserted as HTML
 });
+
+test('all three demo looks now use distinct manifest-backed upper-body hero garment IDs', async () => {
+  const state=wardrobe.initialState();
+  const looks=stylist.demoLooks(state).looks;
+  assert.equal(looks.length,3);
+  assert.equal(new Set(looks.map(look=>look.heroImagePath)).size,3);
+  assert.match(looks[2].heroImagePath,/top-evening-/);
+  assert.ok(looks[2].itemIds.includes('recorded-evening'));
+});

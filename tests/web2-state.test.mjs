@@ -30,7 +30,7 @@ test('English is default, with a catalogue and fallback for future Polish locale
 test('PR-A sample wardrobe uses English board meanings and stable category IDs', () => {
   const example = state.initialState();
   assert.equal(example.version, 1);
-  assert.equal(example.items.length, 10);
+  assert.equal(example.items.length, 11);
   assert.equal(new Set(example.items.map(item => item.id)).size, example.items.length);
   assert.equal(example.items[0].name, 'Cashmere sweater');
   assert.equal(example.items[7].name, 'Everyday handbag');
@@ -43,7 +43,7 @@ test('PR-A sample wardrobe uses English board meanings and stable category IDs',
 
 test('wardrobe filters and case-insensitive search depend on data, not localized labels', () => {
   const wardrobe = state.initialState();
-  assert.equal(state.itemsForView(wardrobe, 'all', '').length, 10);
+  assert.equal(state.itemsForView(wardrobe, 'all', '').length, 11);
   assert.deepEqual(state.itemsForView(wardrobe, 'bottoms', '').map(item => item.id), ['trousers']);
   assert.deepEqual(state.itemsForView(wardrobe, 'shoes', '').map(item => item.id), ['loafers']);
   assert.deepEqual(state.itemsForView(wardrobe, 'all', 'CASHMERE').map(item => item.id), ['cashmere']);
@@ -73,8 +73,8 @@ test('new own garments remain separate from image board references', () => {
     id: 'own_1', name: '  Rain coat  ', detail: 'Brown · Cotton',
     category: 'tops', availability: 'in_wash',
   });
-  assert.equal(original.items.length, 10);
-  assert.equal(changed.items.length, 11);
+  assert.equal(original.items.length, 11);
+  assert.equal(changed.items.length, 12);
   assert.equal(state.itemsForView(changed, 'all', '')[0].id, 'own_1');
   assert.equal(state.itemsForView(changed, 'all', '')[0].photo, null);
   assert.equal(changed.items.at(-1).name, 'Rain coat');
@@ -138,8 +138,8 @@ test('existing PR-A wardrobe state gains matching recorded example tops on upgra
     .filter(item=>!item.id.startsWith('recorded-'))
     .map(item=>item.id==='blazer'?{...item,availability:'needs_ironing'}:item)};
   const migrated=state.parseStored(legacy);
-  assert.equal(migrated.items.length,10);
-  assert.equal(migrated.items.filter(item=>item.id.startsWith('recorded-')).length,2);
+  assert.equal(migrated.items.length,11);
+  assert.equal(migrated.items.filter(item=>item.id.startsWith('recorded-')).length,3);
   assert.equal(migrated.items.find(item=>item.id==='blazer').availability,'needs_ironing');
   assert.equal(migrated.style,'Personal style');
   assert.deepEqual(state.parseStored(migrated),migrated);

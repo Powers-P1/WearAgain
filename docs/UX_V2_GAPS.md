@@ -28,3 +28,6 @@ and `WearAgain-prompty-hackathon.txt`.
 
 Later PR screens are **not implemented by PR-A**. Preserve missing capabilities
 as explicit gaps instead of fake buttons or unverified product claims.
+
+## PR-D image and readiness corrections
+The v2 stylist now uses three distinct saved YouCam top examples; board 09 morning looks likewise use these existing manifest entries. Full-length model jeans in a single-garment render are **not** the trousers listed in the wardrobe outfit. The hero is intentionally framed on the upper body, with the actual trouser/shoe items listed separately. The mobile Stylist look screen now has a back/occasion/save app bar. No provider compositing is claimed.
