@@ -5,6 +5,11 @@ import {
 } from './state.js';
 import { DEFAULT_LOCALE, t, type TranslationKey } from './i18n.js';
 import { purchasePage, handlePurchaseClick } from './purchase-ui.js';
+import { recordedPreviewForItem } from './stylist.js';
+import { loadDaily, loadDecisions, type DailyState, type DecisionsState } from './daily.js';
+import { morningPage, handleMorningClick, submitMorning } from './morning-ui.js';
+import { overviewPage, reviewItemPage, handleOverviewClick } from './overview-ui.js';
+import { galleryPage, handleGalleryClick, handleGallerySubmit, handleGalleryFile } from './gallery-ui.js';
 import { handleStylistClick, savedPage, stylistPage, submitStylist } from './stylist-ui.js';
 import './style.css';
 
@@ -12,12 +17,14 @@ const root = document.querySelector<HTMLElement>('#app');
 if (!root) throw new Error('Missing app root.');
 document.documentElement.lang = DEFAULT_LOCALE;
 
-type Screen = 'wardrobe' | 'profile' | 'stylist' | 'check' | 'saved' | 'gallery' | 'add' | 'item';
-type NavId = 'wardrobe' | 'stylist' | 'check' | 'profile' | 'saved' | 'gallery';
-const navIds: readonly NavId[] = ['wardrobe', 'stylist', 'check', 'profile', 'saved', 'gallery'];
+type Screen = 'wardrobe' | 'profile' | 'stylist' | 'check' | 'saved' | 'gallery' | 'add' | 'item' | 'morning' | 'overview' | 'review';
+type NavId = 'wardrobe' | 'stylist' | 'check' | 'profile' | 'saved' | 'gallery' | 'morning' | 'overview';
+const navIds: readonly NavId[] = ['wardrobe', 'stylist', 'check', 'profile', 'saved', 'gallery', 'morning', 'overview'];
 let storage: Storage | undefined;
 try { storage = window.localStorage; } catch { /* Browsers may disable persistence. */ }
 let data: WardrobeState = loadState(storage);
+let daily: DailyState = loadDaily(storage);
+let decisions: DecisionsState = loadDecisions(storage);
 let category: Category | 'all' = 'all';
 let search = '';
 let revealMore = false;
@@ -49,7 +56,8 @@ function msg(key: TranslationKey): string { return safe(t(key)); }
 function route(): { screen: Screen; itemId: string } {
   const value = decodeURIComponent(window.location.hash.slice(1));
   if (value.startsWith('item/')) return { screen: 'item', itemId: value.slice(5) };
-  if (['wardrobe', 'profile', 'stylist', 'check', 'saved', 'gallery', 'add'].includes(value))
+  if (value.startsWith('review/')) return { screen: 'review', itemId: value.slice(7) };
+  if (['wardrobe', 'profile', 'stylist', 'check', 'saved', 'gallery', 'add', 'morning', 'overview'].includes(value))
     return { screen: value as Screen, itemId: '' };
   return { screen: 'wardrobe', itemId: '' };
 }
@@ -65,11 +73,11 @@ function persist(next: WardrobeState): void {
 function navButton(id: NavId, desktop: boolean, active: NavId): string {
   const labels: Record<NavId, TranslationKey> = {
     wardrobe: 'wardrobe', stylist: 'stylist', check: desktop ? 'checkPurchase' : 'check', profile: 'profile',
-    saved: 'savedLooks', gallery: 'shoppingGallery',
+    saved: 'savedLooks', gallery: 'shoppingGallery', morning:'morningNav', overview:'overviewNav',
   };
   const symbols: Record<NavId, string> = {
     wardrobe: 'hanger', stylist: 'sparkles', check: 'bag', profile: 'user',
-    saved: 'bookmark', gallery: 'bag',
+    saved: 'bookmark', gallery: 'bag', morning:'sparkles', overview:'hanger',
   };
   return '<button class="navigation-item ' + (active === id ? 'is-current' : '') +
     '" data-nav="' + id + '" type="button" ' + (active === id ? 'aria-current="page"' : '') +
@@ -85,7 +93,7 @@ function sidebar(active: NavId): string {
     '<button class="wordmark wordmark-button sidebar-brand" type="button" data-nav="wardrobe">WearAgain</button>' +
     '<nav class="sidebar-top">' + (['wardrobe', 'stylist', 'check'] as NavId[]).map(id => navButton(id, true, active)).join('') +
     '<div class="sidebar-rule"></div>' +
-    (['saved', 'gallery'] as NavId[]).map(id => navButton(id, true, active)).join('') + '</nav>' +
+    (['saved', 'gallery', 'morning', 'overview'] as NavId[]).map(id => navButton(id, true, active)).join('') + '</nav>' +
     '<button type="button" class="sidebar-profile" data-nav="profile">' +
     '<img src="/assets/demo-portrait.webp" alt="" /><span><strong>Anna</strong><small>' +
     msg('styleLink') + ' ' + icon('arrow') + '</small></span></button></aside>';
@@ -95,8 +103,10 @@ function bottomBar(active: NavId): string {
     (['wardrobe', 'stylist', 'check', 'profile'] as NavId[]).map(id => navButton(id, false, active)).join('') + '</nav>';
 }
 function itemImage(item: WardrobeItem): string {
+  const record = recordedPreviewForItem(item.id);
   return item.photo
     ? '<img src="/assets/items/' + safe(item.photo) + '.webp" alt="' + safe(item.name) + '" loading="lazy" />'
+    : record ? '<img src="' + safe(record) + '" alt="' + safe(item.name) + '" loading="lazy" />'
     : '<div class="no-photo" aria-label="' + msg('noPhoto') + '">' + icon('hanger') + '<span>' + msg('noPhoto') + '</span></div>';
 }
 function itemCard(item: WardrobeItem): string {
@@ -130,6 +140,8 @@ function wardrobe(): string {
     '<button class="mobile-add" type="button" data-nav="add">+ ' + msg('addItem') + '</button></div></div>' +
     '<div class="desktop-header-actions"><button class="button button-outline" type="button" data-nav="stylist">' + msg('styleAnOutfit') + '</button>' +
     '<button class="button button-primary" type="button" data-nav="add">' + icon('plus') + ' ' + msg('addItem') + '</button></div></div>' +
+    '<div class="wardrobe-shortcuts"><button type="button" class="text-link" data-nav="overview">' + msg('overviewNav') + ' →</button>' +
+    '<button type="button" class="text-link" data-nav="morning">' + msg('morningNav') + ' →</button></div>' +
     '<div class="wardrobe-tools"><label class="search-field">' + icon('search') +
     '<input type="search" name="q" id="wardrobe-search" aria-label="' + msg('searchWardrobe') +
     '" placeholder="' + msg('searchWardrobe') + '" value="' + safe(search) + '"/></label>' +
@@ -206,31 +218,75 @@ function placeholder(screen: Screen): string {
     '<button type="button" class="button button-primary" data-nav="wardrobe">' + msg('backToWardrobe') + ' ' + icon('arrow') +
     '</button></section>';
 }
+let previousRoute='';
+/** Preserve focus and expanded certificate through same-screen state rerenders. */
 function render(): void {
+  const routeKey=window.location.hash;
+  const same=previousRoute===routeKey;
+  const focused=same&&root!.contains(document.activeElement)?document.activeElement as HTMLElement:null;
+  const attrs=['data-nav','data-purchase-rating','data-purchase-candidate','data-purchase-top',
+    'data-purchase-choice','data-purchase-demo','data-mall-view','data-mall-decision',
+    'data-mall-filter','data-mall-step','data-mall-undo','data-morning-select',
+    'data-overview-decision','data-status','data-cat','data-look-next','data-look-prev'];
+  let selector='';
+  if(focused?.id&&/^[a-zA-Z0-9_-]+$/.test(focused.id))selector='#'+focused.id;
+  else if(focused){
+    for(const key of attrs){
+      const value=focused.getAttribute(key);
+      if(value!==null&&/^[a-zA-Z0-9_-]+$/.test(value)){
+        selector='['+key+'="'+value+'"]';break;
+      }
+    }
+  }
+  const whyOpen=same&&!!root!.querySelector('.purchase-certificate[open]');
   const current = route();
   const active: NavId = current.screen === 'item' || current.screen === 'add' ? 'wardrobe'
-    : navIds.includes(current.screen as NavId) ? current.screen as NavId : 'wardrobe';
+    : current.screen==='review'?'overview'
+    : navIds.includes(current.screen as NavId)?current.screen as NavId:'wardrobe';
   const page = current.screen === 'wardrobe' ? wardrobe()
     : current.screen === 'stylist' ? stylistPage(data)
     : current.screen === 'check' ? purchasePage()
+    : current.screen === 'morning' ? morningPage(data,daily)
+    : current.screen === 'overview' ? overviewPage(data,daily,decisions)
+    : current.screen === 'review' ? reviewItemPage(current.itemId,data,daily,decisions,storage)
+    : current.screen === 'gallery' ? galleryPage(storage,render)
     : current.screen === 'saved' ? savedPage(storage)
     : current.screen === 'profile' ? profile()
     : current.screen === 'item' ? itemDetail(current.itemId)
     : current.screen === 'add' ? addScreen() : placeholder(current.screen);
   root!.innerHTML = '<div class="app-shell">' + sidebar(active) + '<main id="main-content" class="main-content">' +
     mobileBar() + (message ? '<p role="status" class="notice">' + safe(message) + '</p>' : '') +
-    page + '</main>' + bottomBar(active) + '</div>';
-  document.title = current.screen === 'wardrobe' ? t('wardrobePageTitle')
-    : current.screen === 'profile' ? t('profilePageTitle') : t('generalPageTitle');
-  message = '';
+    page + '</main>' + bottomBar(
+      current.screen==='gallery'?'check':
+      current.screen==='morning'?'stylist':
+      current.screen==='overview'||current.screen==='review'?'wardrobe':active
+    ) + '</div>';
+  if(whyOpen){
+    const details=root!.querySelector<HTMLDetailsElement>('.purchase-certificate');
+    if(details)details.open=true;
+  }
+  if(selector)root!.querySelector<HTMLElement>(selector)?.focus({preventScroll:true});
+  previousRoute=routeKey;
+  document.title=current.screen==='wardrobe'?t('wardrobePageTitle'):
+    current.screen==='profile'?t('profilePageTitle'):
+    current.screen==='morning'?t('morningPageTitle'):
+    current.screen==='overview'||current.screen==='review'?t('overviewPageTitle'):
+    current.screen==='gallery'?t('galleryPageTitle'):
+    current.screen==='check'?t('checkPageTitle'):t('generalPageTitle');
+  message='';
 }
 root.addEventListener('click', event => {
   const target = event.target;
   if (!(target instanceof Element)) return;
-  const control = target.closest<HTMLElement>('[data-nav], [data-cat], [data-item], [data-status], [data-expand], [data-stylist-reset], [data-occasion], [data-look-next], [data-look-prev], [data-save-look], [data-purchase-demo], [data-purchase-candidate], [data-purchase-top], [data-purchase-rating], [data-purchase-clear], [data-purchase-replay], [data-purchase-choice]');
+  const control = target.closest<HTMLElement>('[data-nav], [data-cat], [data-item], [data-status], [data-expand], [data-stylist-reset], [data-occasion], [data-look-next], [data-look-prev], [data-save-look], [data-purchase-demo], [data-purchase-candidate], [data-purchase-top], [data-purchase-rating], [data-purchase-clear], [data-purchase-replay], [data-purchase-choice], [data-purchase-next], [data-purchase-prev], [data-mall-view], [data-mall-filter], [data-mall-step], [data-mall-decision], [data-mall-undo], [data-mall-remove], [data-morning-select], [data-morning-wear], [data-morning-reset], [data-overview-review], [data-overview-decision], [data-overview-save]');
   if (!control) return;
   if (handleStylistClick(control, { wardrobe: data, storage, rerender: render, notice: value => { message = value; } })) return;
   if (handlePurchaseClick(control, { rerender: render, notice: value => { message = value; } })) return;
+  if (handleGalleryClick(control, {storage,rerender:render,notice:value=>{message=value;}})) return;
+  if (handleMorningClick(control, {wardrobe:data,daily,storage,updateDaily:next=>{daily=next;},rerender:render,notice:value=>{message=value;}})) return;
+  if (handleOverviewClick(control, {wardrobe:data,decisions,storage,
+      updateDecisions:next=>{decisions=next;},updateWardrobe:next=>{persist(next);},
+      navigate,rerender:render,notice:value=>{message=value;}})) return;
   if (control.hasAttribute('data-expand')) { revealMore = true; render(); return; }
   if (control.dataset.nav) { navigate(control.dataset.nav); return; }
   if (control.dataset.cat && (control.dataset.cat === 'all' || CATEGORIES.includes(control.dataset.cat as Category))) {
@@ -249,12 +305,20 @@ root.addEventListener('input', event => {
   const grid = root.querySelector('#wardrobe-grid');
   if (grid) grid.innerHTML = gridMarkup();
 });
+root.addEventListener('change', event => {
+  const target=event.target;
+  if(target instanceof HTMLInputElement && handleGalleryFile(target,{storage,rerender:render,notice:value=>{message=value;}}))return;
+});
 root.addEventListener('submit', event => {
   const form = event.target;
   if (!(form instanceof HTMLFormElement)) return;
   event.preventDefault();
   if (form.id === 'stylist-form') {
     submitStylist(form,{ wardrobe:data, storage, rerender:render, notice:value => { message = value; } });
+  } else if (submitMorning(form,{wardrobe:data,daily,storage,updateDaily:next=>{daily=next;},rerender:render,notice:value=>{message=value;}})) {
+    // Morning session handled locally.
+  } else if (handleGallerySubmit(form,{storage,rerender:render,notice:value=>{message=value;}})) {
+    // Mall metadata and link capture handled locally.
   } else if (form.id === 'style-form') {
     persist(setStyle(data, (form.elements.namedItem('style') as HTMLTextAreaElement).value));
     message ||= t('styleSaved'); render();
