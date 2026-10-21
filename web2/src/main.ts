@@ -224,19 +224,17 @@ function render(): void {
   const routeKey=window.location.hash;
   const same=previousRoute===routeKey;
   const focused=same&&root!.contains(document.activeElement)?document.activeElement as HTMLElement:null;
-  const attrs=['data-nav','data-purchase-rating','data-purchase-candidate','data-purchase-top',
-    'data-purchase-choice','data-purchase-demo','data-mall-view','data-mall-decision',
-    'data-mall-filter','data-mall-step','data-mall-undo','data-morning-select',
-    'data-overview-decision','data-status','data-cat','data-look-next','data-look-prev'];
+  const focusScope=focused?.closest('.bottom-nav')?'.bottom-nav ':
+    focused?.closest('.sidebar')?'.sidebar ':focused?.closest('.mobile-bar')?'.mobile-bar ':'';
   let selector='';
   if(focused?.id&&/^[a-zA-Z0-9_-]+$/.test(focused.id))selector='#'+focused.id;
+  else if(focused?.tagName==='SUMMARY'&&focused.closest('.purchase-certificate'))
+    selector='.purchase-certificate summary';
   else if(focused){
-    for(const key of attrs){
-      const value=focused.getAttribute(key);
-      if(value!==null&&/^[a-zA-Z0-9_-]+$/.test(value)){
-        selector='['+key+'="'+value+'"]';break;
-      }
-    }
+    const attribute=Array.from(focused.attributes).find(row=>row.name.startsWith('data-')
+      && /^[a-zA-Z0-9_-]*$/.test(row.value));
+    if(attribute)selector=focusScope+'['+attribute.name+
+      (attribute.value?'="'+attribute.value+'"':'')+']';
   }
   const whyOpen=same&&!!root!.querySelector('.purchase-certificate[open]');
   const current = route();

@@ -197,9 +197,22 @@ export function handleGalleryFile(input:HTMLInputElement,actions:Actions):boolea
   if(!supportedPhoto(file)){actions.notice(t('mallBadPhoto',{size:MAX_PHOTO_BYTES/1_000_000}));actions.rerender();return true;}
   const id='photo_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,10);
   const title=(document.getElementById('mall-capture-title') as HTMLInputElement|null)?.value.trim()||t('mallUnnamedPhoto',{count:model().items.length+1});
-  saving.add(id);actions.rerender(); // The next file capture is immediately available.
+  // Snapshot the shop currently typed, even when the user did not press Save
+  // context. Two photos saved out of order must keep their capture-time shop.
+  let context:Pick<ShoppingSession,'shop'|'floor'>;
+  try{
+    const store=(document.getElementById('mall-shop-name') as HTMLInputElement|null)?.value??model().shop;
+    const floor=(document.getElementById('mall-floor') as HTMLInputElement|null)?.value??model().floor;
+    session=setShop(model(),store,floor);
+    context={shop:session.shop,floor:session.floor};
+    if(!saveShopping(session,actions.storage))actions.notice(t('localStorageDenied'));
+  }catch(e){actions.notice(e instanceof Error?e.message:t('shopInvalidContext'));actions.rerender();return true;}
+  saving.add(id);actions.rerender(); // The next photo need not wait for a model preview.
   void storePhoto(id,file).then(()=>{
-    session=addShopItem(model(),{id,title,source:'photo',photoId:id,date:localISODate(new Date())});
+    const current=model();
+    const added=addShopItem({...current,shop:context.shop,floor:context.floor},
+      {id,title,source:'photo',photoId:id,date:localISODate(new Date())});
+    session={...added,shop:current.shop,floor:current.floor};
     const url=URL.createObjectURL(file);
     urls.set(id,url);requested.add(id);
     if(!saveShopping(session,actions.storage))actions.notice(t('localStorageDenied'));

@@ -349,7 +349,7 @@ export const en = {
   demoModel: 'Demo model',
   ownPhoto: 'My photo',
   ownPhotoUnavailable: 'My photo, not available in the demo',
-  photoPrivacy: 'Only you can see your photo. Delete it with one tap.',
+  photoPrivacy: 'This demo does not upload your personal model photo. Mall photos stay in this browser until removed or browser data is cleared.',
   photoFuture: 'The demo uses an approved synthetic model. A private photo is a future production option.',
   saveMyStyle: 'Save my style',
   styleSaved: 'Your style is saved on this device.',
