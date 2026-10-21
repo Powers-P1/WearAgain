@@ -26,8 +26,7 @@ function garmentTile(kind: 'top' | 'outerwear', id: string, name: string): strin
       esc(t('purchaseSavedAlt',{item:name})) + '" />' :
       '<div class="purchase-image-empty">' + esc(t('purchaseImageMissing')) + '</div>') +
     (saved ? '<span class="purchase-model-label">' + esc(t('demoModel')) + '</span>' +
-      '<span class="purchase-recorded-label">' + esc(t('purchaseSavedSingle')) + '</span>' +
-      '<span class="purchase-fit-overlay">' + esc(t('styleFitDisclaimer')) + '</span>' : '') +
+      '<span class="purchase-recorded-label">' + esc(t('purchaseSavedSingle')) + '</span>' : '') +
     '</div><figcaption><strong>' + esc(name) + '</strong>' +
     '<span>' + esc(kind === 'top' ? t('purchaseOwnedExample') : t('purchaseShopExample')) + '</span></figcaption></figure>';
 }
@@ -46,6 +45,9 @@ function candidateButtons(): string {
         '<small>' + esc(t('purchaseSamplePrice')) + ' · ' + esc(formatMoney(item.priceMinor,session.scenario.currency)) +
         '</small></span></button>';
     }).join('') + '</div>' +
+    '<div class="purchase-candidate-pager"><button type="button" data-purchase-prev aria-label="' + esc(t('purchasePrevItem')) + '">←</button>' +
+    '<span>' + esc(t('purchaseCandidateNumber',{index:Math.max(0,choices.findIndex(item=>item.id===session.candidateId))+1,count:choices.length})) + '</span>' +
+    '<button type="button" data-purchase-next aria-label="' + esc(t('purchaseNextItem')) + '">→</button></div>' +
     '<p class="purchase-smallprint">' + esc(t('purchaseNoStoreStock')) + '</p></section>';
 }
 function formatMoney(minor: number, currency: string): string {
@@ -70,12 +72,14 @@ function previewColumn(): string {
     session.scenario.tops.map(item => '<button type="button" data-purchase-top="' + esc(item.id) +
       '" aria-pressed="' + (session.topId === item.id) + '" class="' + (session.topId === item.id ? 'selected' : '') +
       '">' + esc(item.label) + '</button>').join('') + '</div>' +
-    '<div class="purchase-preview-pair">' +
-    garmentTile('outerwear',candidate.id,candidate.label) + garmentTile('top',top.id,top.label) +
-    '</div><p class="purchase-fit-note">' + esc(t('styleFitDisclaimer')) + '</p>' +
+    (recorded ? '<div class="purchase-preview-pair">' +
+      garmentTile('outerwear',candidate.id,candidate.label) + garmentTile('top',top.id,top.label) + '</div>' :
+      '<div class="purchase-no-recording"><strong>' + esc(t('purchaseImageMissing')) + '</strong>' +
+      '<p>' + esc(t('purchaseMissingEvidence')) + '</p></div>') +
+    (recorded ? '<p class="purchase-fit-note">' + esc(t('styleFitDisclaimer')) + '</p>' : '') +
     '<div class="purchase-rating"><h3>' + esc(t('purchaseWouldCombine')) + '</h3><div class="purchase-rating-buttons">' +
     ratingOptions.map(option => '<button type="button" data-purchase-rating="' + option.key + '" aria-pressed="' +
-      (rating?.status === option.key) + '" class="' + (rating?.status === option.key ? 'selected' : '') +
+      (recorded && rating?.status === option.key) + '" class="' + (recorded && rating?.status === option.key ? 'selected' : '') +
       '" ' + (!pair || (!recorded && option.key !== 'unrated') ? 'disabled title="' + esc(t('purchaseMissingEvidence')) + '"' : '') +
       '>' + esc(t(option.title)) + '</button>').join('') + '</div>' +
     '<p>' + esc(recorded ? t('purchaseRatingsNote') : t('purchaseMissingEvidence')) + '</p></div></section>';
@@ -145,6 +149,8 @@ export function purchasePage(): string {
   return '<section class="page purchase-view" aria-labelledby="purchase-title">' +
     '<div class="purchase-intro"><div><h1 id="purchase-title">' + esc(t('purchaseHeadline')) + '</h1>' +
     '<p>' + esc(t('purchaseSubheading')) + '</p></div>' +
+    '<div class="purchase-import-actions"><button type="button" data-nav="gallery" class="button button-outline">' + esc(t('purchaseAddPhoto')) + '</button>' +
+    '<button type="button" data-nav="gallery" class="button button-primary">' + esc(t('purchasePasteLink')) + '</button></div>' +
     '<div class="purchase-demo-modes" role="group" aria-label="' + esc(t('purchaseChooseDemo')) + '">' +
     (['minimum','zero'] as const).map(mode => '<button type="button" data-purchase-demo="' + mode + '" aria-pressed="' +
       (session.demo === mode) + '" class="' + (session.demo === mode ? 'selected' : '') + '">' +
@@ -162,6 +168,11 @@ export function handlePurchaseClick(button: HTMLElement, actions: Actions): bool
       session = choosePurchaseDemo(session, button.dataset.purchaseDemo as PurchaseDemo);
     } else if (button.dataset.purchaseCandidate) {
       session = selectCandidate(session, button.dataset.purchaseCandidate);
+    } else if (button.hasAttribute('data-purchase-next') || button.hasAttribute('data-purchase-prev')) {
+      const list=session.scenario.outerwear.filter(item=>item.kind==='candidate');
+      const index=list.findIndex(item=>item.id===session.candidateId);
+      const diff=button.hasAttribute('data-purchase-next')?1:list.length-1;
+      if(list.length) session=selectCandidate(session,list[(index+diff)%list.length]!.id);
     } else if (button.dataset.purchaseTop) {
       session = selectTop(session, button.dataset.purchaseTop);
     } else if (button.dataset.purchaseRating) {
