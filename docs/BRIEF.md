@@ -47,19 +47,25 @@ ChatGPT/Codex writes code via pull requests; OK Agency side runs live YouCam cal
 - No key or personal image in the repository.
 - Public live URL and repository link ready for Devpost.
 
-## Event mode (decision by Damian 21.10)
-- Input: a free-text occasion ("dinner at the Ritz, London, 19:00"), a date; weather from the city is optional.
-- Occasion to requirements (formality level, warmth, rain, footwear, colour constraints): a small model on Cloudflare Workers AI (free tier), with a fallback table of about 12 occasion types. This is the ONLY LLM use: bounded (at most 1 call, at most 400 tokens) and always with the template fallback.
-- Deterministic styling: pick the best outfit from the shopper's wardrobe against the requirements and score it 0-100. Render on the synthetic model, or on the shopper's own photo in live mode with explicit consent, never stored by us (YouCam requires a face in the base image).
-- Gaps: if the score is below a threshold, the existing minimum-basket solver proposes the cheapest purchase from the shop catalogue with the minimality certificate, product links, and a choice of "delivery" or "pick up today at store X" taken from shop data.
-- One click = cart in one shop (no real checkout in the demo).
-- Plan: PR4b, after PR4 (front). If it works, it becomes the headline demo scenario.
+## AI Stylist (Event mode) (decision by Damian 21.10)
+Principle: the app is genuinely AI-powered. AI proposes, the deterministic core verifies. The core (constraints, unit ledger, minimum-basket certificate, audit) stays the guardrail; a tool-using LLM agent does judgement and interpretation.
+
+- Agent: Claude Sonnet 5.5 (model id `claude-sonnet-5-5`) called from our Cloudflare Worker; the API key is a Worker secret `ANTHROPIC_API_KEY`, never in the repository or the client. Premium tier may use Claude Opus 5.5 (`claude-opus-5-5`).
+- Tools (pure, typed functions exposed to the agent):
+  - wardrobe inventory: structured items plus garment photos;
+  - shop catalogue search: price, availability, delivery / pick-up;
+  - weather and city lookup;
+  - YouCam render, only through our pipeline and unit ledger;
+  - the deterministic solver (minimum basket with certificate).
+- Flow: occasion text ("dinner at the Ritz, London, 19:00") plus an optional shopper photo (live mode, explicit consent, not stored) -> the agent proposes 2-3 outfits with reasoning -> requests renders (units capped) -> scores them -> identifies gaps -> recommends purchases. The solver's minimality certificate verifies the purchase proposal. One click = cart in one shop (no real checkout in the demo) with a choice of delivery or pick-up taken from shop data.
+- Guardrails: the agent cannot spend units beyond the ledger reservation; it cannot write ratings; it must cite catalogue items by id (unknown ids are rejected); at most N agent sessions per day in live mode; demo mode replays saved transcripts with no key and no calls.
+- Plan: PR4b = AI Stylist, after PR4 (front). PR2 exposes the tools as pure typed functions so the agent can call them. If it works, it becomes the headline demo scenario.
 
 ## Plan
 - 22.10: repo skeleton, core types, solver (PR1).
 - 23.10: certificate and tests; YouCam client against fixtures.
 - 24.10: Worker, Durable Object ledger; integration spike with the key (100 units).
-- 25.10: front end, rating UI (PR4); Event mode as PR4b right after PR4.
+- 25.10: front end, rating UI (PR4); AI Stylist as PR4b right after PR4.
 - 26.10: decision-relevant rendering and unit comparison; saved demo scenarios.
 - 27.10: physical check, polish, deployment.
 - 28.10: freeze, bug fixes.
