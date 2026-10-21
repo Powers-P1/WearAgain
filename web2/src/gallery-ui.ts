@@ -106,6 +106,9 @@ function camera():string{
 }
 /** Snapshot unsent edits immediately, so any legitimate rerender is lossless. */
 export function handleGalleryInput(input:HTMLInputElement):boolean {
+  if(!['mall-shop-name','mall-floor','mall-capture-title','mall-link-name','mall-link-address'].includes(input.id))
+    return false;
+  if(!session)return false;
   const old=draft??initialCaptureDraft(model());
   const updated=updateCaptureDraft(old,input.id,input.value);
   if(updated===old)return false;
