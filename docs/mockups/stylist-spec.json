@@ -1,0 +1,51 @@
+{
+  "feature_name": "Ubierz mnie",
+  "scope": "Three static mockups extending the original five-screen deterministic purchase-review brief",
+  "original_mode": {
+    "name": "Sprawdź zakup",
+    "solver": "deterministic; no LLM",
+    "photos": "garments only; synthetic model"
+  },
+  "stylist_mode": {
+    "ai": true,
+    "personal_photo": "optional explicit consent; all current mockup people are synthetic",
+    "occasion": "free text; includes at-home occasions",
+    "first_recommendation": "owned wardrobe; no forced purchase",
+    "shopping": "optional one-store handoff; pickup or delivery, no real orders"
+  },
+  "fixture": {
+    "occasion": "The Ritz Restaurant London at 19:00",
+    "owned_outfit": [
+      "ecru shirt",
+      "black tailored trousers",
+      "black loafers",
+      "small black bag"
+    ],
+    "wardrobe_count": 12,
+    "optional_item": "black evening blazer",
+    "retailer": "Atelier One, Mayfair - fictional demo",
+    "currency": "GBP",
+    "price": 85,
+    "budget": 100,
+    "pickup": 0,
+    "delivery": 4.95,
+    "demo_now": "17:20 Europe/London",
+    "demo_pickup_estimate": "17:45 Europe/London"
+  },
+  "venue_source": {
+    "url": "https://www.theritzlondon.com/dine-with-us/the-ritz-restaurant/",
+    "checked_date": "2026-10-21",
+    "supported_claim": "Jeans and sportswear not permitted for ladies or gentlemen at lunch/dinner in The Ritz Restaurant. Jacket and tie requirement is for gentlemen.",
+    "inference": "The suggested female outfit is editorial styling, not a venue guarantee"
+  },
+  "not_implemented": [
+    "AI stylist",
+    "personal-photo storage or deletion",
+    "YouCam integration",
+    "live retailer prices/stock",
+    "affiliate agreement",
+    "checkout",
+    "payment",
+    "reservation"
+  ]
+}

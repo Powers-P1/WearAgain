@@ -1,0 +1,152 @@
+{
+  "project": "WearAgain",
+  "source": "Product brief, 21 Oct 2026",
+  "deliverables": "5mobile screens, desktop screen3, plus alternative zero-purchase result4b",
+  "mode": "Static mockups, not an implemented app or live YouCam API output; all data synthetic",
+  "selected_needs": [
+    "ciepło do5°C",
+    "do biura",
+    "na deszcz"
+  ],
+  "unselected_need": "na rower",
+  "budget_eur": 260,
+  "tops": [
+    {
+      "id": "T1",
+      "name": "Koszula ecru",
+      "display": "plain cream shirt, garment-only photo"
+    },
+    {
+      "id": "T2",
+      "name": "Granatowy sweter",
+      "display": "navy knit, garment-only photo"
+    },
+    {
+      "id": "T3",
+      "name": "T-shirt w paski",
+      "display": "cream/navy striped t-shirt, garment-only photo"
+    }
+  ],
+  "coats": [
+    {
+      "id": "A",
+      "name": "Trencz Aster",
+      "price_eur": 129,
+      "colour": "stone beige",
+      "manufacturer_claims": [
+        "do biura",
+        "na deszcz"
+      ],
+      "available": true
+    },
+    {
+      "id": "B",
+      "name": "Płaszcz Mila",
+      "price_eur": 189,
+      "colour": "warm cocoa/camel",
+      "manufacturer_claims": [
+        "ciepło do5°C",
+        "do biura",
+        "na deszcz"
+      ],
+      "available": true
+    },
+    {
+      "id": "C",
+      "name": "Kurtka Nova",
+      "price_eur": 249,
+      "colour": "muted olive",
+      "manufacturer_claims": [
+        "ciepło do5°C",
+        "na deszcz",
+        "na rower"
+      ],
+      "available": true
+    }
+  ],
+  "matrix": {
+    "T1": {
+      "A": "założę",
+      "B": "założę",
+      "C": "skipped_non_decisive"
+    },
+    "T2": {
+      "A": "błąd wizualizacji",
+      "B": "założę",
+      "C": "skipped_non_decisive"
+    },
+    "T3": {
+      "A": "nie założę",
+      "B": "nie założę",
+      "C": "skipped_non_decisive"
+    }
+  },
+  "rating_progress": {
+    "valid_ratings": 5,
+    "visualization_errors": 1,
+    "skipped": 3,
+    "valid_yes": 3,
+    "valid_no": 2
+  },
+  "unit_accounting_demo": {
+    "preparation_units": 6,
+    "units_per_attempt": 2,
+    "attempts": 6,
+    "units_used": 18,
+    "full_matrix_attempts": 9,
+    "full_matrix_units": 24,
+    "saved_units": 6,
+    "used_time_demo": "1:30",
+    "full_matrix_time_demo": "2:10",
+    "not_real_provider_billing": true
+  },
+  "solver": {
+    "deterministic": true,
+    "llm": false,
+    "subsets_checked": 8,
+    "winner": [
+      "B"
+    ],
+    "winner_cost": 189,
+    "cheaper_baskets": [
+      {
+        "basket": [],
+        "price": 0,
+        "unmet": [
+          "ciepło do5°C",
+          "na deszcz"
+        ]
+      },
+      {
+        "basket": [
+          "A"
+        ],
+        "price": 129,
+        "unmet": [
+          "ciepło do5°C"
+        ]
+      }
+    ],
+    "existing_tops_cover_office": true,
+    "accepted_mila_pairs": [
+      "T1+B",
+      "T2+B"
+    ],
+    "all_three_cost": 567,
+    "savings_eur": 378
+  },
+  "zero_purchase_branch": {
+    "selected_needs": [
+      "do biura"
+    ],
+    "existing_coverage": [
+      "T1",
+      "T2"
+    ],
+    "basket": [],
+    "cost": 0,
+    "savings_vs_all_three": 567,
+    "certificate": "no cheaper feasible candidate exists below0 with nonnegative prices"
+  },
+  "footer": "Try-on: YouCam API; solver: deterministyczny; bez LLM"
+}
