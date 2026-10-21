@@ -23,7 +23,7 @@ function database():Promise<IDBDatabase>{
 }
 async function transact<T>(mode:IDBTransactionMode,run:(store:IDBObjectStore,resolve:(value:T)=>void,reject:(reason:unknown)=>void)=>void):Promise<T>{
   const db=await database();
-  return new Promise((resolve,reject)=>{
+  return new Promise<T>((resolve,reject)=>{
     let settled=false;
     function fail(e:unknown){if(!settled){settled=true;reject(e);}}
     function finish(v:T){if(!settled){settled=true;resolve(v);}}
