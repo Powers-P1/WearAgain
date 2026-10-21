@@ -1,21 +1,7 @@
-// Skeleton only: /health plus a SQLite Durable Object placeholder (unit ledger comes later).
-export class UnitLedger {
-  constructor(ctx, env) { this.ctx = ctx; this.env = env; }
-  async fetch() {
-    return Response.json({ ok: true, ledger: 'placeholder' });
-  }
-}
+import { YouCamClient, inspectImage } from '../../src/youcam/index.ts';
+import { createUnitLedgerClass } from './unit-ledger.js';
 
-export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
-    if (url.pathname === '/health') {
-      return Response.json({ ok: true, version: env.VERSION ?? 'unknown' });
-    }
-    if (url.pathname === '/do-check') {
-      const stub = env.UNIT_LEDGER.get(env.UNIT_LEDGER.idFromName('wearagain-global-v1'));
-      return stub.fetch(request);
-    }
-    return Response.json({ ok: false, error: 'not_found' }, { status: 404 });
-  },
-};
+// Wrangler bundles the TypeScript client; Node integration tests inject its
+// compiled equivalent into the same class factory.
+export class UnitLedger extends createUnitLedgerClass({ clientFactory: options => new YouCamClient(options), inspectImage }) {}
+export { default } from './app.js';

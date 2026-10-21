@@ -2,6 +2,24 @@
 
 Status labels: CONFIRMED = read from Perfect Corp public pages by the OK Agency side; REPORTED = stated by a consulting assistant, not yet verified in the docs; UNKNOWN = not established.
 
+## Current implementation contract (PR3, 2026-10-21)
+
+This section and the team's live-probe section below supersede the older reported assumptions. PR3 performs no new key-backed probe.
+
+- Authentication: `Authorization: Bearer <API key>` on the fixed API origin `https://yce-api-01.makeupar.com`. Presigned upload/download requests receive no Bearer key. The [official Clothes overview](https://docs.perfectcorp.com/reference/ai_clothes/section/overview) confirms the host and shows `yce-us.s3-accelerate.amazonaws.com` as the signed asset host; other hosts require explicit trusted configuration.
+- Implemented sequence: POST `/s2s/v2.0/file/cloth` for each image, PUT its bytes to the signed URL, POST `/s2s/v2.0/task/cloth-v4` with `src_file_id`, `ref_file_id`, `garment_category: upper_body`, then GET `/s2s/v2.0/task/cloth-v4/{task_id}` and download `data.results.url`.
+- The original synthetic fixture records a V2 `/task/cloth` example. Its observed response shape is retained unchanged and replayed against the team's separately confirmed V4 path. The public guide's generic `/file` example does not override the successful `/file/cloth` probe.
+- Cost: 2 units per successful output. The implementation automatically releases only for the evidenced create HTTP 400 `InvalidParameters` and matching terminal `error_decode_image`. Other terminal error codes have no charging fixture yet and remain UNKNOWN; an HTTP error during polling does not prove the original task was free.
+- Timeout, lost task response, incomplete polling and expired retention retain the 2-unit reservation. Known task IDs are automatically reconciled. Result download failure after success remains charged.
+- Rate gate: 250/300 seconds and 5/second, shared across the app's provider traffic, conservatively including signed asset I/O. External calls using the same key/IP are not visible to this ledger.
+- Retention: uploads 24 hours, results 24 hours after completion; download links can expire sooner (about 2 hours reported by the team). The Worker stores no image bytes or signed URLs and refreshes a result URL through task GET. This is not a zero-provider-retention claim.
+- Layering is confirmed unsupported by the team's follow-up probe: a second garment replaces the first. Three tops and three outerwear items produce six independent previews, costing 12 units for successful outputs, reused in nine pair cards.
+- The current repo supplies synthetic adult base images, but no saved generated try-on outputs. `demo-manifest.json` therefore reports unavailable recordings until the team supplies approved images. Flat-colour PNGs in offline tests are transport fixtures, not demo assets.
+
+Implementation/API/accounting details: [API.md](API.md). Remaining UNKNOWN: output-publication rights, DPA/region and backup deletion, unprobed error charging, exact available balance, provider concurrency guarantees, new live latency measurements, and any newly observed response or signed-host variants.
+
+## Historical notes (superseded where marked above)
+
 ## Confirmed (public pages, read 2026-10-15)
 - One API key covers the Beauty, Fashion & Retail, and Creators groups; MCP servers and Agent Skills exist (yce.perfectcorp.com/ai-api/agent/mcp-skill).
 - Flow pattern: upload via File API, create a task, poll for the result (documented for Skin Analysis).

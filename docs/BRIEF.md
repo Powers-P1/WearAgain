@@ -7,6 +7,7 @@ Online shops push shoppers to buy more. WearAgain answers a different question: 
 - Input: 3 owned tops (photos), 3 candidate items (shop catalogue entries with price), declared needs.
 - 6 item renders (or fewer under conservative selection), 9 pair cards, rating UI, solver, result page with certificate.
 - Demo mode from pre-rendered images; live mode behind a unit cap.
+- PR4: optional six-step guided tour (start and jury entry points, English text, keyboard/Esc/Skip, localStorage progress, no external tour library) plus deterministic avatar selection with a manual override; full step copy and acceptance criteria are in docs/PRD.md.
 - Out of scope: lower-body rendering, accounts, payments and real checkout. Personal model photos are limited to the later explicit-consent live path in AI Stylist.
 
 ## Definitions
@@ -23,6 +24,7 @@ Online shops push shoppers to buy more. WearAgain answers a different question: 
 - src/core: pure functions (requirements, baskets, solver, certificate) with tests on fixtures.
 - src/youcam: client with recorded-shape fixtures. Fixtures are synthetic; raw API output is not published because the terms may restrict it (UNKNOWN).
 - Demo mode serves saved renders; live mode calls YouCam and is capped.
+- PR3 implementation: 2-unit SQLite reservation per item render, idempotent submission, confirmed-success debit, confirmed-free-error release, timeout held pending with known-task alarm reconciliation, shared daily/total/session limits and rolling provider request gate. The Worker defaults to live disabled until the team allocates its actual remaining budget; API and demo-recording handoff are in docs/API.md.
 
 ## Constraints
 - Free-tier hosting; PR4b adds separately capped paid LLM usage through the team's Worker secret. Numeric LLM/session/day limits remain UNKNOWN until configured.

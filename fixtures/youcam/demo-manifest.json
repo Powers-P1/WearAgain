@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "status": "awaiting_recordings",
+  "note": "No saved YouCam try-on results have been supplied. Base avatars are inputs, not try-on outputs. Add approved synthetic-avatar recordings here before the public demo.",
+  "renders": []
+}

@@ -69,7 +69,7 @@ The result records whether evidence comes from declared attributes or an agent p
 
 The allowlist is `get_wardrobe`, `search_catalogue`, `lookup_city`, `get_weather`, `plan_render` and `solve_basket`. Catalogue products use explicit IDs and map admitted candidates to exactly matching prices/currency; unknown products, shops or city IDs are rejected. Missing prices, availability, delivery dates/fees, pickup details or weather remain explicit UNKNOWN. The solver tool always projects render-bound pair decisions first and returns `commerceVerification: "not_performed"`: its certificate proves current requirement coverage and item-price minimality, not stock, shipping fees or arrival time.
 
-Inventory and query outputs are copies. There is no rating-write tool. Weather is read from an injected snapshot, and rendering returns a plan only; network I/O, access control, atomic reservations, session/day limits and provider execution belong to the Worker adapter in PR3/PR4b. `worker/src/index.js` currently contains only a `UnitLedger` placeholder. Keep the existing `v1` SQLite migration unchanged.
+Inventory and query outputs are copies. There is no rating-write tool. Weather is read from an injected snapshot, and rendering returns a plan only. PR3 supplies the Worker execution boundary, access control, atomic reservations, provider request gate, daily limits and background reconciliation; the agent loop and its separate quotas remain PR4b. The existing `v1` SQLite class migration remains unchanged. See [API.md](API.md) for the implemented endpoint and accounting contract.
 
 ## Solver and certificate semantics
 
@@ -107,8 +107,8 @@ A proven minimum is relative to this catalogue, price snapshot, requirement defi
 | --- | --- | --- |
 | PR1 | TypeScript skeleton, this PRD, domain parsing, exhaustive solver, certificate, synthetic fixtures, independent oracle tests, CI. | `npm run check`; no key or network call needed. |
 | PR2 | Per-element renders, revision-bound pair ratings, conservative selection, requirement source, wardrobe assessment/UNKNOWN, and typed pure agent tools. | Same final basket as complete pair evidence on replay scenarios, including ties; six-image baseline; no stale/unknown pair accepted and no tool rating write. |
-| PR3 | YouCam adapter against synthetic recorded-shape fixtures, Worker, and Durable Object unit ledger. | Contract fixtures from the team's probe; atomic reserve/commit/release and idempotency verified under concurrent requests. |
-| PR4 | Pages frontend, rating UI, certificates, explicit prerecorded demo and capped live modes. | Keyless demo makes no provider calls; live costs are reserved before calls; incomplete/error states are usable on desktop and mobile. |
+| PR3 | YouCam adapter against synthetic recorded-shape fixtures, Worker, and SQLite Durable Object ledger with alarms. | Atomic 2-unit holds, monotone settlement, idempotency, timeouts retained across restart/day rollover, rolling rate limits; network-free tests in actual workerd. |
+| PR4 | Pages frontend, rating UI, certificates, recorded demo/capped live, six-step guided tour and deterministic avatar selection. | Keyless demo makes no provider calls; usable errors/pending states; keyboard-accessible tour; stable avatar selection with manual override and tests. |
 | PR4b | AI Stylist: event interpretation, 2-3 reasoned proposals, bounded tool calls, assessments and single-shop purchase suggestions. | Unknown IDs rejected, agent scores separate from user decisions, reservations and session/day budgets enforced, demo transcript replay makes no calls. |
 | PR5 | Deployment configuration, release and operator instructions, fixture/provenance checks, smoke-test and submission handoff. | OK Agency deploys and confirms the public URL and judging access; no secrets in commits. |
 
@@ -120,7 +120,26 @@ ChatGPT/Codex supplies code through reviewable PRs. The OK Agency/Fable side own
 
 The agreed planning allocation remains 1,000 units: 100 integration, 240 tests, 120 saved scenarios, 440 live (360 judging and 80 public), and 100 reserve. This is a budget allocation, not a guarantee of any number of live sessions. A complete first rendering of the three-by-three matrix uses six successful images / 12 units, excluding preparation of a synthetic base and additional successful retries. A completed live path needs a concurrent-safe ledger and a policy for uncertain outcomes. PR4b adds separate configurable LLM step/token/session/day budgets; their numeric limits remain **UNKNOWN**. It supersedes the earlier single-call Workers AI plan. Secrets, configured provider model IDs and live integration are owned by the team; this PR makes no claim to have tested model availability.
 
+PR3 implements that concurrent-safe ledger and uncertain-outcome policy. Its live allocation defaults to zero until the team configures its actual remaining budget; the old planning allocation is not a balance. Session quotas apply to anonymous tokens, with global caps shared by all tokens. Recorded demo outputs are not yet supplied; the loader reports this explicitly instead of displaying base inputs as try-on results.
+
 Raw provider recordings stay outside the public repository. Commit only synthetic response shapes with invented identifiers/URLs and assets whose publication rights have been established. Personal garments are photographed alone; generated assets use synthetic figures. Cleanup behaviour must be verified against the provider rather than advertised as zero provider retention.
+
+## PR4 scope addendum (Damian, 2026-10-21)
+
+Add a built-in six-step coach-mark tour, with **Start the guided tour** buttons on the start screen and in the judging section. Each step highlights its target and displays one English sentence:
+
+1. "Choose a demo scenario or upload three photos of tops you own, with no faces in the images."
+2. "Choose three outerwear items from the shop to compare with your wardrobe."
+3. "Rate each pair as Would wear, Would not wear, or Render error, and watch which pairs matter and how many units are used."
+4. "Inspect the cheapest basket and its minimality certificate, then try to find a cheaper basket that meets the same needs."
+5. "Ask AI Stylist about an occasion, such as dinner at the Ritz, London, 19:00, and follow the agent's steps."
+6. "Add the missing items to one shop's basket and choose delivery or pickup."
+
+The tour is optional, has Skip and Esc dismissal, previous/next controls and full keyboard operation with meaningful focus restoration. Persist only the versioned tour progress in localStorage, with graceful fallback if storage is unavailable; use no external tour library. Provide a restart action. Highlight actual available UI, handle scrolling/mobile layouts, and label saved AI transcript playback as demo until PR4b is available. The tour must not spend live units or submit an agent request without the corresponding user action.
+
+PR4 also implements pure deterministic `selectAvatar()` over `fixtures/base_models/avatars.json` (ten primary avatars plus one fallback). Filter the declared sex and adult entries, measure distance to normalized height/weight bands using the documented policy in [AVATARS.md](AVATARS.md), and break ties by stable ID. Test input permutations, ties, band edges, filtering and fallback. Provide manual selection. The bands are nominal selection aids, not measured bodies or a garment-size guarantee. No photo-derived avatar matching is added in this scope.
+
+PR4b must reconcile the current requirement-source `interpretation: manual | agent | fallback` with older `workers_ai | fallback` wording. Preserve PR2 compatibility until that explicit change; the approved AI Stylist supersedes the old one-call Workers AI plan.
 
 ## Verification and demonstration
 
