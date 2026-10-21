@@ -47,6 +47,11 @@ ChatGPT/Codex writes code via pull requests; OK Agency side runs live YouCam cal
 - No key or personal image in the repository.
 - Public live URL and repository link ready for Devpost.
 
+## PR4 scope
+
+- Guided tour (decision by Damian 21.10): an in-app coach-marks tutorial with 6 steps: (1) demo scenario or 3 garment photos; (2) 3 candidate outerwear items; (3) rate the renders and see the decisive pairs with the unit counter; (4) the cheapest basket with its minimality certificate, then try to beat it; (5) the AI Stylist occasion flow; (6) add the missing items to the cart with delivery or pick-up. It is skippable with Esc or Skip, keeps its progress in localStorage, uses no external libraries, is keyboard accessible and has English copy.
+- Deterministic `selectAvatar()` over `fixtures/base_models/avatars.json`, with manual override.
+
 ## AI Stylist (Event mode) (decision by Damian 21.10)
 Principle: the app is genuinely AI-powered. AI proposes, the deterministic core verifies. The core (constraints, unit ledger, minimum-basket certificate, audit) stays the guardrail; a tool-using LLM agent does judgement and interpretation.
 
