@@ -28,3 +28,6 @@ manifest-matching example tops appended during v1 parsing. Their own items,
 status edits and style text stay intact. A full 200-item wardrobe is not
 truncated. This fixes the otherwise empty stylist result after upgrading
 from PR-A without reloading demo state.
+
+## Visual comparison guardrails
+The mobile and desktop preview panels use `object-fit: contain` to keep the full saved avatar image visible. The `Demo model`, `Saved YouCam · one garment` and `Style preview, not size fit` captions are DOM overlays, not image pixels. Requirement labels (`For work`, `For weekends`, `For evenings`) are separate from similarly named top IDs so the certificate never mistakes a garment for a need.
