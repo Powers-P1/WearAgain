@@ -73,6 +73,12 @@
   .purchase-image-wrap { aspect-ratio: .62; }
   .purchase-verdict h2 { font-size: 31px; }
 }
+/* Keep 801-1080px desktop/tablet widths usable without page-level overflow. */
+@media (min-width: 801px) and (max-width: 1080px) {
+  .purchase-layout { grid-template-columns: minmax(0, .95fr) minmax(0, 1.25fr); }
+  .purchase-verdict { grid-column: 1 / -1; padding-top: 22px; border-top: 1px solid var(--line); }
+  .purchase-verdict h2 { max-width: none; }
+}
 @media (max-width: 800px) {
   .purchase-view { max-width: 590px; }
   .purchase-intro { display: block; padding: 6px 0 20px; }
