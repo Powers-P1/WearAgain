@@ -9,12 +9,14 @@
     "node": ">=24 <25"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit && tsc -p tsconfig.web.json",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.web.json && tsc -p tsconfig.web2.json",
     "build": "tsc",
     "test": "npm run build && node --test tests/*.test.mjs",
-    "check": "npm run typecheck && npm test && npm run build:web",
+    "check": "npm run typecheck && npm test && npm run build:web && npm run build:web2",
     "build:web": "node scripts/build-web.mjs",
-    "dev:web": "node scripts/serve-web.mjs"
+    "dev:web": "node scripts/serve-web.mjs",
+    "build:web2": "node scripts/build-web2.mjs",
+    "dev:web2": "npm run build:web2 && wrangler pages dev web2/dist"
   },
   "devDependencies": {
     "typescript": "5.9.3",
