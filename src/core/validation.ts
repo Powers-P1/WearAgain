@@ -4,6 +4,7 @@ import type {
   Outerwear,
   OwnedTop,
   Requirement,
+  RequirementSource,
   Scenario,
 } from "./types.js";
 
@@ -27,6 +28,7 @@ function object(
   value: unknown,
   path: string,
   required: readonly string[],
+  optional: readonly string[] = [],
 ): Record<string, unknown> {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     fail(path, "expected an object");
@@ -40,7 +42,7 @@ function object(
     if (!Object.hasOwn(result, key)) fail(`${path}.${key}`, "required field");
   }
   for (const key of Object.keys(result)) {
-    if (!required.includes(key)) fail(`${path}.${key}`, "unknown field");
+    if (!required.includes(key) && !optional.includes(key)) fail(`${path}.${key}`, "unknown field");
   }
   return result;
 }
@@ -82,6 +84,27 @@ function uniqueIds(values: readonly { readonly id: string }[], path: string): Se
 
 function reference(value: string, known: ReadonlySet<string>, path: string): void {
   if (!known.has(value)) fail(path, `unknown ID ${JSON.stringify(value)}`);
+}
+
+/** Validate provenance independently for callers constructing requirement chips. */
+export function parseRequirementSource(input: unknown, path = "source"): RequirementSource {
+  const value = object(input, path, ["kind"], ["eventId", "interpretation"]);
+  if (value.kind === "user_chips") {
+    object(input, path, ["kind"]);
+    return { kind: "user_chips" };
+  }
+  if (value.kind !== "event") fail(`${path}.kind`, "expected user_chips or event");
+  object(input, path, ["kind", "eventId", "interpretation"]);
+  const interpretation = value.interpretation;
+  if (interpretation !== "manual" && interpretation !== "agent" && interpretation !== "fallback") {
+    fail(`${path}.interpretation`, "expected manual, agent, or fallback");
+  }
+  return { kind: "event", eventId: id(value.eventId, `${path}.eventId`), interpretation };
+}
+
+/** Keep legacy JSON round-trippable while giving callers an explicit default. */
+export function getRequirementSource(requirement: Requirement): RequirementSource {
+  return requirement.source === undefined ? { kind: "user_chips" } : parseRequirementSource(requirement.source);
 }
 
 /** Validate and copy JSON input; missing outfit ratings become explicit unrated entries. */
@@ -138,7 +161,7 @@ export function parseScenario(input: unknown): Scenario {
 
   const requirements: Requirement[] = list(root.requirements, "scenario.requirements").map((entry, index) => {
     const path = `scenario.requirements[${index}]`;
-    const value = object(entry, path, ["id", "label", "minCount", "outfitIds"]);
+    const value = object(entry, path, ["id", "label", "minCount", "outfitIds"], ["source"]);
     const members = list(value.outfitIds, `${path}.outfitIds`).map((member, memberIndex) => {
       const memberPath = `${path}.outfitIds[${memberIndex}]`;
       const result = id(member, memberPath);
@@ -151,6 +174,7 @@ export function parseScenario(input: unknown): Scenario {
       label: text(value.label, `${path}.label`),
       minCount: count(value.minCount, `${path}.minCount`),
       outfitIds: members,
+      ...(Object.hasOwn(value, "source") ? { source: parseRequirementSource(value.source, `${path}.source`) } : {}),
     };
   });
   uniqueIds(requirements, "scenario.requirements");

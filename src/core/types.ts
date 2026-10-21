@@ -26,12 +26,23 @@ export interface Outfit {
   readonly outerwearId: string | null;
 }
 
+/** Provenance describes the input, not proof that an inferred requirement is true. */
+export type RequirementSource =
+  | { readonly kind: "user_chips" }
+  | {
+      readonly kind: "event";
+      readonly eventId: string;
+      readonly interpretation: "manual" | "agent" | "fallback";
+    };
+
 export interface Requirement {
   readonly id: string;
   readonly label: string;
   readonly minCount: number;
   /** A set of distinct outfits; one outfit may satisfy multiple requirements. */
   readonly outfitIds: readonly string[];
+  /** Omitted in legacy fixtures means user_chips; never changes solver coverage. */
+  readonly source?: RequirementSource;
 }
 
 export type OutfitRating =
