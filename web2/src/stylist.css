@@ -33,9 +33,14 @@
 .stylist-arrows button { width: 30px; height: 30px; display: grid; place-items: center; background: transparent; border: 1px solid var(--line); }
 .stylist-arrows button:hover { background: var(--olive-soft); }
 .stylist-arrows .icon { width: 16px; height: 16px; }
-.stylist-photo { position: relative; overflow: hidden; background: var(--stone); aspect-ratio: .78; max-height: 560px; }
-.stylist-photo > img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.stylist-photo-label { position: absolute; bottom: 7px; left: 8px; font-size: 10px; background: rgba(248,246,241,.91); padding: 4px 7px; }
+.stylist-photo { position: relative; background: var(--stone); aspect-ratio: 2 / 3; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.stylist-photo > img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; }
+.stylist-photo-label, .stylist-photo-origin, .stylist-photo-fit { position: absolute; padding: 4px 7px; font-size: 10px; line-height: 1.4; background: rgba(248,246,241,.94); color: var(--olive); }
+.stylist-photo-label { top: 9px; left: 9px; }
+.stylist-photo-origin { top: 9px; right: 9px; }
+.stylist-photo-fit { bottom: 9px; left: 9px; }
+.stylist-verified { display: flex; align-items: center; gap: 6px; margin-top: 5px; color: #4b694d; font-size: 12px; font-weight: 600; }
+.stylist-verified .icon { width: 15px; height: 15px; }
 .stylist-no-render { display: flex; flex-direction: column; height: 100%; justify-content: center; align-items: center; gap: 12px; color: var(--muted); text-align: center; padding: 35px; }
 .stylist-no-render .icon { width: 42px; height: 42px; }
 .stylist-caption { margin-top: 10px; font-size: 31px; }
@@ -46,7 +51,7 @@
 .stylist-garment { display: flex; align-items: center; min-height: 68px; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
 .stylist-garment:first-child { border-top: 1px solid var(--line); }
 .stylist-item-photo { flex: 0 0 60px; height: 60px; background: var(--stone); overflow: hidden; }
-.stylist-item-photo img { width: 100%; height: 100%; object-fit: cover; }
+.stylist-item-photo img { width: 100%; height: 100%; object-fit: contain; }
 .stylist-empty-thumbnail { display: grid; place-items: center; width: 100%; height: 100%; color: var(--muted); }
 .stylist-reason { font-size: 13px; line-height: 1.6; margin: 20px 0; }
 .stylist-details .button { min-height: 47px; }
@@ -91,7 +96,7 @@
   .stylist-mobile-back .icon { width: 15px; height: 15px; }
   .stylist-result { display: flex; flex-direction: column; gap: 0; }
   .stylist-progress { margin-top: 11px; }
-  .stylist-photo { aspect-ratio: .84; max-height: 49vh; }
+  .stylist-photo { aspect-ratio: 2 / 3; max-height: none; }
   .stylist-caption { font-size: 32px; margin-top: 10px; }
   .stylist-details { padding: 15px 0 0; }
   .stylist-details h2 { font-size: 26px; }

@@ -31,7 +31,8 @@ test('offline occasion demo yields 3 complete distinct looks from existing ready
   for(const look of plan.looks) {
     assert.ok(look.itemIds.length>=3);
     assert.ok(look.itemIds.every(id => state.items.some(i => i.id===id && i.availability==='ready')));
-    assert.ok(['classic','soft','relaxed'].includes(look.illustration));
+    assert.ok(look.heroImagePath?.startsWith('/demo/renders/top-'));
+    assert.equal(plan.verified,true);
   }
 });
 
@@ -39,7 +40,7 @@ test('in-wash, needs-ironing and repair states exclude unavailable items from pr
   let state=wardrobe.initialState();
   state=wardrobe.setAvailability(state,'blazer','in_wash');
   assert.equal((await stylist.proposeLooks(brief,state)).looks.length,2);
-  state=wardrobe.setAvailability(state,'cashmere','needs_ironing');
+  state=wardrobe.setAvailability(state,'recorded-weekend','needs_ironing');
   assert.equal((await stylist.proposeLooks(brief,state)).looks.length,1);
   state=wardrobe.setAvailability(state,'trousers','needs_repair');
   assert.equal((await stylist.proposeLooks(brief,state)).looks.length,0);
@@ -55,12 +56,12 @@ test('agent hook receives only ready owned ids, and output is verified against i
     assert.ok(!input.readyWardrobe.some(i=>i.id==='blazer'));
     assert.ok(input.readyWardrobe.every(i=>i.category));
     return [{ id:'candidate_1',title:'Soft work look',explanation:'A simple owned look.',
-      itemIds:['cashmere','trousers','loafers'],illustration:'classic' }];
+      itemIds:['recorded-weekend','trousers','loafers'],heroImagePath:'https://evil.example/' }];
   });
   assert.equal(called,1);
   assert.equal(out.source,'agent');
   assert.equal(out.looks.length,1);
-  assert.equal(out.looks[0].illustration,null);
+  assert.equal(out.looks[0].heroImagePath,null);
 });
 
 test('forged worker suggestions cannot fabricate, reuse or mark unavailable garments ready', async () => {
@@ -70,7 +71,7 @@ test('forged worker suggestions cannot fabricate, reuse or mark unavailable garm
     ['blazer','trousers','nonexistent'],
     ['coat','trousers','loafers'],
     ['blazer','silk','loafers'],
-    ['cashmere','cashmere','loafers','trousers'],
+    ['recorded-work','recorded-work','loafers','trousers'],
   ]) assert.throws(()=>stylist.verifyLooks(candidate(ids),state,'agent'),/unknown|unavailable|incompatible/);
   assert.throws(()=>stylist.verifyLooks(new Array(4).fill(candidate(['cashmere','trousers','loafers'])[0]),state,'agent'),/unknown|unavailable|incompatible/);
 });
@@ -102,9 +103,9 @@ test('a saved look is metadata only, independently stored and is not an automati
 
 test('provider-looking HTML, invalid display-only illustration and unknown ids never leak into accepted model', () => {
   const state=wardrobe.initialState();
-  const raw=[{id:'ok',title:'<script>alert(1)</script>',explanation:'Illustration only',
-    itemIds:['cashmere','trousers','loafers'],illustration:'/other-origin'}];
+  const raw=[{id:'ok',title:'<script>alert(1)</script>',explanation:'Recorded URL cannot be injected',
+    itemIds:['recorded-work','trousers','loafers'],heroImagePath:'https://other-origin.example/'}];
   const result=stylist.verifyLooks(raw,state,'agent');
-  assert.equal(result.looks[0].illustration,null);
+  assert.equal(result.looks[0].heroImagePath,null);
   assert.equal(result.looks[0].title,raw[0].title); // escaped by the view, never inserted as HTML
 });

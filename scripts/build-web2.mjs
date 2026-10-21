@@ -38,19 +38,8 @@ await sharp(join(root, 'docs/mockups/v2/WearAgain-03-Personalizacja-i-wyjazd.png
   .resize({ width: 360 }).webp({ quality: 88 })
   .toFile(join(dest, 'assets/demo-portrait.webp'));
 
-// Editorial style illustrations from the accepted design boards. These
-// are *not* YouCam outputs or verified combinations of multiple garments.
-const editorials = [
-  { id: 'classic', file: 'WearAgain-07-Desktop-Stylistka.png', region: { left: 690, top: 245, width: 392, height: 615 } },
-  { id: 'soft', file: 'WearAgain-01-Aplikacja.png', region: { left: 1050, top: 119, width: 392, height: 425 } },
-  { id: 'relaxed', file: 'WearAgain-13-Landing-v2.png', region: { left: 612, top: 64, width: 390, height: 528 } },
-];
-for (const entry of editorials) {
-  await sharp(join(root, 'docs/mockups/v2', entry.file))
-    .extract(entry.region).resize({ width: 640 })
-    .webp({ quality: 88 }).toFile(join(dest, 'assets', 'editorial-' + entry.id + '.webp'));
-}
-
+// Outfit previews use only the real six single-garment recordings in the
+// immutable manifest. Never create hero images by cropping design boards.
 // Future flows reuse the original immutable recording paths and manifest.
 // Individual cloth-v4 outputs must never be described as complete outfit renders.
 await mkdir(join(dest, 'demo'), { recursive: true });

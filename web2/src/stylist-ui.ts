@@ -1,5 +1,5 @@
 import {
-  demoLooks, loadSaved, persistSaved, proposeLooks, saveChosen, verifyLooks,
+  demoLooks, loadSaved, persistSaved, proposeLooks, recordedPreviewForItem, saveChosen, verifyLooks,
   type SavedLook, type StylistBrief, type StylistResult,
 } from './stylist.js';
 import type { WardrobeState, WardrobeItem } from './state.js';
@@ -39,6 +39,8 @@ function svg(which: 'arrow' | 'left' | 'calendar' | 'hanger' | 'check' | 'lock')
   return '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths[which] + '</svg>';
 }
 function picture(item: WardrobeItem): string {
+  const recording = recordedPreviewForItem(item.id);
+  if (recording) return '<img src="' + escapeHtml(recording) + '" alt="' + escapeHtml(item.name) + '" loading="lazy" />';
   return item.photo
     ? '<img src="/assets/items/' + escapeHtml(item.photo) + '.webp" alt="' + escapeHtml(item.name) + '" loading="lazy" />'
     : '<span class="stylist-empty-thumbnail">' + svg('hanger') + '</span>';
@@ -81,15 +83,21 @@ function lookPreview(wardrobe: WardrobeState, selection: StylistResult): string 
   const owned = look.itemIds
     .map(id => wardrobe.items.find(item => item.id === id))
     .filter((item): item is WardrobeItem => !!item);
-  const image = look.illustration
-    ? '<img src="/assets/editorial-' + escapeHtml(look.illustration) + '.webp" alt="' + escapeHtml(t('stylistImageNote')) + '" />'
-    : '<div class="stylist-no-render">' + svg('hanger') + '<span>' + escapeHtml(t('stylistImageNote')) + '</span></div>';
+  const image = look.heroImagePath
+    ? '<img src="' + escapeHtml(look.heroImagePath) + '" alt="' + escapeHtml(t('stylistSavedRender')) + '" />'
+    : '<div class="stylist-no-render">' + svg('hanger') + '<span>' + escapeHtml(t('stylistUnrendered')) + '</span></div>';
   return '<section class="stylist-result"><div class="stylist-preview-column">' +
     '<div class="stylist-progress"><span>' + escapeHtml(t('stylistSuggestion',{index:selected+1,count:selection.looks.length})) + '</span>' +
     '<div class="stylist-arrows"><button type="button" data-look-prev aria-label="' + escapeHtml(t('stylistPrevious')) + '">' + svg('left') + '</button>' +
     '<button type="button" data-look-next aria-label="' + escapeHtml(t('stylistNext')) + '">' + svg('arrow') + '</button></div></div>' +
-    '<div class="stylist-photo">' + image + '<span class="stylist-photo-label">' + escapeHtml(t('stylistModelLabel')) + '</span></div>' +
-    '<h2 class="stylist-caption">' + escapeHtml(look.title) + '</h2></div>' +
+    '<div class="stylist-photo">' + image +
+    (look.heroImagePath ? '<span class="stylist-photo-label">' + escapeHtml(t('stylistModelLabel')) + '</span>' +
+      '<span class="stylist-photo-origin">' + escapeHtml(t('stylistSavedRender')) + '</span>' +
+      '<span class="stylist-photo-fit">' + escapeHtml(t('styleFitDisclaimer')) + '</span>' : '') +
+    '</div>' +
+    '<h2 class="stylist-caption">' + escapeHtml(look.title) + '</h2>' +
+    (selection.verified ? '<p class="stylist-verified">' + svg('check') + ' ' + escapeHtml(t('stylistVerified')) + '</p>' : '') +
+    '</div>' +
     '<div class="stylist-details"><h2>' + escapeHtml(t('stylistAllOwned')) + '</h2>' +
     '<p class="stylist-detail-count">' + escapeHtml(t('stylistPieces',{count:owned.length})) + '</p>' +
     '<div class="stylist-garments">' + owned.map(item =>
@@ -99,7 +107,6 @@ function lookPreview(wardrobe: WardrobeState, selection: StylistResult): string 
     '<button type="button" class="button button-primary full-width" data-save-look>' + escapeHtml(t('stylistSave')) + '</button>' +
     '<button type="button" class="stylist-trip-link" disabled title="' + escapeHtml(t('stylistTripUnavailable')) + '">' + escapeHtml(t('stylistSaveTrip')) + '</button>' +
     '<button type="button" class="text-link stylist-next-link" data-look-next>' + escapeHtml(t('stylistChangeLook')) + ' ' + svg('arrow') + '</button>' +
-    '<p class="stylist-disclaimer">' + escapeHtml(t('styleFitDisclaimer')) + '</p>' +
     '<p class="stylist-disclaimer">' + escapeHtml(t('stylistImageNote')) + '</p>' +
     '<p class="stylist-disclaimer">' + escapeHtml(t('stylistDemoNote')) + '</p></div></section>';
 }

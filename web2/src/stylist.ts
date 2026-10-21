@@ -1,5 +1,6 @@
 import { availableNow, type WardrobeItem, type WardrobeState } from './state.js';
 import { t } from './i18n.js';
+import demoManifest from '../../fixtures/youcam/demo-manifest.json' with { type: 'json' };
 
 export interface StylistBrief {
   readonly occasion: string;
@@ -11,12 +12,14 @@ export interface OccasionSuggestion {
   readonly title: string;
   readonly explanation: string;
   readonly itemIds: readonly string[];
-  /** Only verified board illustrations have an image. The Worker may not invent one. */
-  readonly illustration: 'classic' | 'soft' | 'relaxed' | null;
+  /** Only a matching manifest recording can supply an individual garment preview. */
+  readonly heroImagePath: string | null;
 }
 export interface StylistResult {
   readonly source: 'demo' | 'agent';
   readonly looks: readonly OccasionSuggestion[];
+  /** Domain validation passed. This is not a proof of visual fit or weather. */
+  readonly verified: true;
 }
 /**
  * Injection point for the future bounded Worker agent endpoint.
@@ -30,21 +33,40 @@ export type WorkerAgentHook = (input: {
   readonly readyWardrobe: ReadonlyArray<Pick<WardrobeItem, 'id' | 'name' | 'category'>>;
 }) => Promise<unknown>;
 
-const demoRecipes: readonly OccasionSuggestion[] = [
+/**
+ * Demo inventory carries exact IDs for the existing recorded owned tops.
+ * Do not map the PR-A cashmere/silk/blazer to these recordings: those are
+ * different garments, and a photo would misrepresent the outfit.
+ */
+const recordedTopElements: Readonly<Record<string, string>> = {
+  'recorded-work': 'work',
+  'recorded-weekend': 'weekend',
+};
+export function recordedPreviewForItem(id: string): string | null {
+  const elementId = recordedTopElements[id];
+  if (!elementId) return null;
+  const recording = demoManifest.renders.find(entry =>
+    entry.element.kind === 'top' && entry.element.id === elementId &&
+    entry.syntheticAvatarOnly && entry.api === 'cloth-v4');
+  return recording && /^\/demo\/renders\/[a-z0-9_-]+\.(jpg|png)$/.test(recording.imagePath)
+    ? recording.imagePath : null;
+}
+
+const demoRecipes: readonly Omit<OccasionSuggestion,'heroImagePath'>[] = [
   {
     id: 'classic', title: t('stylistLookClassic'),
     explanation: t('stylistClassicReason'),
-    itemIds: ['blazer','silk','trousers','loafers'], illustration: 'classic',
+    itemIds: ['blazer','recorded-work','trousers','loafers'],
   },
   {
     id: 'soft', title: t('stylistLookSoft'),
     explanation: t('stylistSoftReason'),
-    itemIds: ['cashmere','trousers','loafers'], illustration: 'soft',
+    itemIds: ['recorded-weekend','trousers','loafers'],
   },
   {
     id: 'relaxed', title: t('stylistLookRelaxed'),
     explanation: t('stylistRelaxedReason'),
-    itemIds: ['silk','trousers','loafers'], illustration: 'relaxed',
+    itemIds: ['recorded-work','trousers','loafers'],
   },
 ];
 
@@ -79,18 +101,17 @@ export function verifyLooks(raw: unknown, wardrobe: WardrobeState, source: 'demo
     const owned = look.itemIds.map(id => wardrobe.items.find(item => item.id === id));
     if (owned.some(item => !item || !availableNow(item))) throw new Error(t('stylistInvalidProposal'));
     if (!hasCompleteOutfit(owned as WardrobeItem[])) throw new Error(t('stylistInvalidProposal'));
-    const illustration = source === 'demo' &&
-      ['classic','soft','relaxed'].includes(String(look.illustration)) &&
-      demoRecipes.some(recipe => recipe.id === look.id &&
-        JSON.stringify(recipe.itemIds) === JSON.stringify(look.itemIds))
-        ? (look.illustration as OccasionSuggestion['illustration']) : null;
+    const recordedItem = source === 'demo' ?
+      look.itemIds.find(id => typeof id === 'string' && recordedPreviewForItem(id) !== null) : null;
     suggestions.push({
       id: look.id, title: look.title, explanation: look.explanation,
-      itemIds: [...look.itemIds] as string[], illustration,
+      itemIds: [...look.itemIds] as string[],
+      // Never accept an agent-supplied URL or design-board illustration.
+      heroImagePath: recordedItem ? recordedPreviewForItem(recordedItem) : null,
     });
     seen.add(look.id);
   }
-  return { source, looks: suggestions };
+  return { source, looks: suggestions, verified: true };
 }
 export function demoLooks(wardrobe: WardrobeState): StylistResult {
   const candidates = demoRecipes.filter(recipe => recipe.itemIds.every(id =>

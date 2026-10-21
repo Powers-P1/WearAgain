@@ -21,7 +21,7 @@ test('English is default, with a catalogue and fallback for future Polish locale
   assert.equal(i18n.DEFAULT_LOCALE, 'en');
   assert.equal(i18n.t('yourWardrobe'), 'Your wardrobe');
   assert.equal(i18n.t('yourWardrobe', undefined, 'pl'), 'Your wardrobe');
-  assert.equal(i18n.t('wardrobeCount', { count: 8 }), '8 pieces you love.');
+  assert.equal(i18n.t('wardrobeCount', { count: 8 }), '10 pieces you love.');
   assert.equal(i18n.t('demoModel'), 'Demo model');
   assert.equal(i18n.t('styleFitDisclaimer'), 'Style preview, not size fit');
   assert.equal(i18n.t('checkPurchase'), 'Check purchase');
@@ -30,10 +30,12 @@ test('English is default, with a catalogue and fallback for future Polish locale
 test('PR-A sample wardrobe uses English board meanings and stable category IDs', () => {
   const example = state.initialState();
   assert.equal(example.version, 1);
-  assert.equal(example.items.length, 8);
+  assert.equal(example.items.length, 10);
   assert.equal(new Set(example.items.map(item => item.id)).size, example.items.length);
   assert.equal(example.items[0].name, 'Cashmere sweater');
   assert.equal(example.items[7].name, 'Everyday handbag');
+  assert.equal(example.items[8].name, 'Cream shirt · demo example');
+  assert.equal(example.items[8].photo, null);
   assert.equal(example.items[0].category, 'tops');
   assert.equal(state.categoryLabel('bottoms'), 'Bottoms');
   assert.notEqual(example.items[0], state.initialState().items[0]);
@@ -41,7 +43,7 @@ test('PR-A sample wardrobe uses English board meanings and stable category IDs',
 
 test('wardrobe filters and case-insensitive search depend on data, not localized labels', () => {
   const wardrobe = state.initialState();
-  assert.equal(state.itemsForView(wardrobe, 'all', '').length, 8);
+  assert.equal(state.itemsForView(wardrobe, 'all', '').length, 10);
   assert.deepEqual(state.itemsForView(wardrobe, 'bottoms', '').map(item => item.id), ['trousers']);
   assert.deepEqual(state.itemsForView(wardrobe, 'shoes', '').map(item => item.id), ['loafers']);
   assert.deepEqual(state.itemsForView(wardrobe, 'all', 'CASHMERE').map(item => item.id), ['cashmere']);
@@ -71,8 +73,8 @@ test('new own garments remain separate from image board references', () => {
     id: 'own_1', name: '  Rain coat  ', detail: 'Brown · Cotton',
     category: 'tops', availability: 'in_wash',
   });
-  assert.equal(original.items.length, 8);
-  assert.equal(changed.items.length, 9);
+  assert.equal(original.items.length, 10);
+  assert.equal(changed.items.length, 11);
   assert.equal(state.itemsForView(changed, 'all', '')[0].id, 'own_1');
   assert.equal(state.itemsForView(changed, 'all', '')[0].photo, null);
   assert.equal(changed.items.at(-1).name, 'Rain coat');

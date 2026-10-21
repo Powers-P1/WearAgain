@@ -39,9 +39,13 @@ const EXAMPLE_ROWS: readonly Example[] = [
   ['dress', 'dress', 'dressDetail', 'dresses', 'needs_ironing', 3],
   ['loafers', 'loafers', 'loafersDetail', 'shoes', 'ready', 2],
   ['bag', 'bag', 'bagDetail', 'accessories', 'needs_repair', 1],
+  // Exact tops from the approved saved YouCam manifest. Unlike the eight
+  // board-05 photographs, these have no garment-only product photo.
+  ['recorded-work', 'recordedWork', 'recordedWorkDetail', 'tops', 'ready', 0],
+  ['recorded-weekend', 'recordedWeekend', 'recordedWeekendDetail', 'tops', 'ready', -1],
 ];
 const EXAMPLES: readonly WardrobeItem[] = EXAMPLE_ROWS.map(([id, name, detail, category, availability, order]) => ({
-  id, name: t(name), detail: t(detail), category, availability, photo: id, order,
+  id, name: t(name), detail: t(detail), category, availability, photo: id.startsWith('recorded-') ? null : id, order,
 }));
 export const DEMO_STYLE = t('defaultStyle');
 /** Keep v1 storage key and migrate keys in-place so earlier test users keep their edits. */
