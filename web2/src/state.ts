@@ -101,7 +101,13 @@ export function parseStored(value: unknown): WardrobeState {
       category, availability, photo: raw.photo, order: raw.order,
     });
   }
-  return { version: 1, items, style: value.style === OLD_DEMO_STYLE ? DEMO_STYLE : value.style };
+  // Saved PR-A wardrobes have eight board-05 garments. Append missing
+  // recorded-example tops without changing any user-entered garments or
+  // availability choices. Never truncate a full 200-item wardrobe.
+  const recorded = EXAMPLES.filter(item => item.id.startsWith('recorded-') && !ids.has(item.id));
+  const migrated = items.length + recorded.length <= 200
+    ? [...items, ...recorded.map(item => ({ ...item }))] : items;
+  return { version: 1, items: migrated, style: value.style === OLD_DEMO_STYLE ? DEMO_STYLE : value.style };
 }
 export function loadState(storage?: Pick<Storage, 'getItem'>): WardrobeState {
   try {
