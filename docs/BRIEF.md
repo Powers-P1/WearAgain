@@ -47,11 +47,19 @@ ChatGPT/Codex writes code via pull requests; OK Agency side runs live YouCam cal
 - No key or personal image in the repository.
 - Public live URL and repository link ready for Devpost.
 
+## Event mode (decision by Damian 21.10)
+- Input: a free-text occasion ("dinner at the Ritz, London, 19:00"), a date; weather from the city is optional.
+- Occasion to requirements (formality level, warmth, rain, footwear, colour constraints): a small model on Cloudflare Workers AI (free tier), with a fallback table of about 12 occasion types. This is the ONLY LLM use: bounded (at most 1 call, at most 400 tokens) and always with the template fallback.
+- Deterministic styling: pick the best outfit from the shopper's wardrobe against the requirements and score it 0-100. Render on the synthetic model, or on the shopper's own photo in live mode with explicit consent, never stored by us (YouCam requires a face in the base image).
+- Gaps: if the score is below a threshold, the existing minimum-basket solver proposes the cheapest purchase from the shop catalogue with the minimality certificate, product links, and a choice of "delivery" or "pick up today at store X" taken from shop data.
+- One click = cart in one shop (no real checkout in the demo).
+- Plan: PR4b, after PR4 (front). If it works, it becomes the headline demo scenario.
+
 ## Plan
 - 22.10: repo skeleton, core types, solver (PR1).
 - 23.10: certificate and tests; YouCam client against fixtures.
 - 24.10: Worker, Durable Object ledger; integration spike with the key (100 units).
-- 25.10: front end, rating UI.
+- 25.10: front end, rating UI (PR4); Event mode as PR4b right after PR4.
 - 26.10: decision-relevant rendering and unit comparison; saved demo scenarios.
 - 27.10: physical check, polish, deployment.
 - 28.10: freeze, bug fixes.
