@@ -1,0 +1,122 @@
+WearAgain — nowe wizualizacje: sklepy i jurorzy
+ImageGen, 21.10.2026.
+Pierwotne widoki pozostają bez zmian. W tej paczce są tylko cztery nowe widoki.
+
+Retailer landing page
+
+Use case: ui-mockup.
+Create a premium high-fidelity WearAgain B2B RETAILER LANDING PAGE, one complete long desktop website screenshot on a portrait canvas approximately 1536x2304 or 1024x1536. Input image is the APPROVED CONSUMER LANDING BRAND REFERENCE. Match its ivory #F8F6F1, deep olive #30392F, exquisite modern serif type with selective italic, refined readable sans serif, crisp rectangular photography, precise whitespace, natural warm fashion editorial imagery, and intentional light/dark section rhythm. This is a NEW page for RETAILERS, not a remake of the consumer page. All text in excellent English for the hackathon audience. No generic SaaS feature cards, invented performance claims, statistics, customer logos, testimonials, award badges, real retail brand names or gradients. Images are design mockups, not measured results.
+
+HEADER: WearAgain wordmark left, small simple "For retailers". Right navigation "Experience", "The pilot", a HIGHLY VISIBLE restrained outlined olive link "Judges · Start here ↗", then compact solid olive "Explore retailer demo". Jury route must clearly stand out as a dedicated entry, without looking like an award or official endorsement.
+
+HERO, top 38%: spacious asymmetric 45/50 desktop split. Left giant beautiful serif heading exactly "Your collection.
+Her wardrobe.
+A reason to buy." Last line delicately italic. Below concise text "Show shoppers how your garments work with what they already own." Primary olive button "Explore the store experience →". Small secondary link "Discuss a one-category pilot". Right a spectacular full-length natural editorial photograph of same dark-haired 35-year-old WearAgain demo woman wearing an elegant camel coat with ivory knit, navy tailored trousers and brown loafers, against a pale architectural doorway. A small coherent product-page inset overlaps only lower edge: a camel coat product thumbnail and an olive button "See it with my wardrobe". Small photo label "Illustrative demo".
+
+SECTION TWO, next 29%: open editorial two-column layout, reversed visual emphasis. Left one realistic desktop product-page preview for a fictional unbranded fashion store: navy blazer or camel coat photo, simple product text and a restrained WearAgain module headed "Does it belong in your wardrobe?" with three SEPARATE existing garment thumbnails of ivory sweater, navy trousers, brown loafers, and olive "See it on me". It should be instantly clear the shopper's own wardrobe adds context to the merchant product. No personal shopper data visible to the store. Right big serif heading "More context.
+A clearer choice." Three short open lines separated by fine rules, not cards: "Your product, in her wardrobe."; "Her style, in her own words."; "An honest reason to buy — or pass." Small line "Visualizes style. Does not predict physical fit." Clean whitespace.
+
+SECTION THREE, next 23%: full-width deep olive band with warm ivory type. Large serif heading "Start with one category.
+Measure what matters." Beneath three elegantly spaced open columns with small numerals 01, 02, 03 and headings "Conversion", "Returns", "Margin". Concise descriptions respectively "Compare against a control group."; "Evaluate after the return window closes."; "Assess margin after returns and API costs." Clear small qualifier "Pilot evaluation plan. Results are not yet measured." No numbers pretending a pilot ran.
+At bottom of band understated ivory outlined button "See the pilot plan →".
+
+FOOTER, final 10%: warm ivory again. Left medium serif "Better decisions.
+Worth coming back for." Right small concise privacy statement "Her photos and wardrobe stay in her account. The store sees the shopping decision, not her private closet." Treat this as proposed product architecture, not certification. One fine rule then WearAgain left, "Consumer app", "For judges", "Privacy", "Contact" right. Tiny footer "Design concept · retailer pilot proposed".
+Beautiful readable desktop page, crisp visual hierarchy, differentiated retail business story with a concrete product-page mechanism and honest measurement plan.
+
+======================================================================
+
+Retail product page / WearAgain panel
+
+Use case: ui-mockup.
+Create one gorgeous high-fidelity full DESKTOP PRODUCT PAGE with an embedded WearAgain wardrobe-aware shopping experience. Landscape 1536x1024, no device frame or presentation backdrop. Reference image is WearAgain brand direction; retain ivory, deep olive, stone, exquisite serif headings and clear sans-serif UI, natural light, beautiful product photography. The merchant store is FICTIONAL and unbranded; header wordmark "DEMO ATELIER", tiny "Illustrative store". No real retail logos, no fake conversion metrics, no official endorsements. All text English, crisp, accessible, impeccably aligned.
+
+This is a realistic working-layout CONCEPT: a shopper on a retailer's coat product page has opened a WearAgain panel to see the candidate with her own wardrobe, on a demo model. The merchant product and original retail price remain visible. A subtle top utility label "Retailer experience" makes the audience clear.
+
+HEADER full width: DEMO ATELIER left; "New in", "Clothing", "Shoes", "Accessories" center; small search, account and bag outline icons right. Thin horizontal rule.
+Below small breadcrumb "Clothing / Coats / Wool-blend coat". Three desktop regions with spacious 32px gaps:
+
+LEFT, 36%: one tall pristine product photograph, an elegant camel wool overcoat fully visible isolated on a pale stone studio background, no model, lovely soft shadow and tactile fabric. Below three small alternate product thumbnail angles and plain small text "Product photos". No generated model mixed into the merchant catalog image.
+
+MIDDLE, 24%: large serif "Wool-blend coat", price exactly "€320" in clear sans serif, small text "Original retailer price". Fine rule. Label "Colour · Camel", tiny neutral swatches. Label "Select your size", simple XS, S, M, L, XL options with M as the user's chosen size, NOT AI recommendation. Small "Size guide" link. Merchant's normal solid olive button "Add to bag". Beneath two short lines "Relaxed silhouette. Soft wool blend." and "Details & care →". A separate small outlined WearAgain trigger lower down titled "Does it work with your wardrobe?" with short line "See it with pieces you already own." Button "Open WearAgain" with tiny external arrow. It is the trigger for the already-open right panel, no fake merchant integration status.
+
+RIGHT, 34%, separated with a thin warm-gray vertical rule, NOT a modal blocking the whole page: WearAgain wordmark small, close X. Large serif "With what you own." Tiny text "Sample wardrobe · demo model". One beautiful full-length editorial preview of same brown-haired 35-year-old woman wearing this camel coat with ivory fine-knit top, navy trousers and brown loafers against a warm pale naturally lit background, a coherent look. Photo has discreet "Illustrative preview" caption. Under photo row of THREE separate existing garment thumbnails: ivory knit, navy trousers, brown loafers, and small label "Already in your wardrobe".
+Below clear concise statement "Works with your navy trousers and ivory knit." Small why "A calm palette with pieces you already wear." A restrained dark olive button "Keep on my shortlist". Secondary text link "Compare with my own coat →". Tiny honest line "Style preview. Choose size with the retailer's guide."
+
+Footer very small "Design concept · sample product and wardrobe". Balance density to fit all regions without tiny type, large unframed images, focused action, preserve customer privacy, no timeline, dashboard, pricing change or real purchase claim. This should be the concrete B2B mechanism judges can understand instantly.
+
+======================================================================
+
+Dedicated jury landing page
+
+Use case: ui-mockup.
+Create an exceptionally polished dedicated WearAgain FOR JUDGES website design, one complete high-resolution long DESKTOP page screenshot on portrait canvas around 1536x2304 or 1024x1536. This is a separately designed, prominently distinguished JURY ENTRY PAGE for the YouCam API hackathon, not the consumer marketing landing page. The judge has hundreds of entries to evaluate. Make the product immediately understandable and the important evidence easy to reach. All text ENGLISH, crisp and economical. Input image is the approved WearAgain CONSUMER BRAND reference: retain warm ivory #F8F6F1, deep olive #30392F, stone, exquisite large serif plus restrained italic and clear sans serif, premium natural editorial imagery. Add purposeful document-like wayfinding, never a dense enterprise dashboard. Visually distinctive, elegant, genuinely easy to scan. No fake awards, ranking badges, fabricated real API run IDs, completed-status indicators, measured impact statistics or claims that an implementation has been verified. This is a visual design for a future review experience, with evidence destinations to be connected later.
+
+TOP: a narrow deep olive utility band, ivory text "YouCam API Hackathon" left and "eCommerce VTO" right. Below plain ivory header with WearAgain wordmark, a clearly distinguished small olive-outline label "For judges · Start here", and navigation links "Guided demo", "API integration", "Code & setup".
+
+HERO, top about 34%: clear desktop 50/45 split. Left a huge beautifully typeset serif statement exactly "Try it on.
+Know why." Make second line elegantly italic. Supporting sentence "A wardrobe-aware stylist that helps you wear what you own and buy with a reason." Beneath a very short darker line "YouCam visualizes the garment. WearAgain adds wardrobe context." Primary dark olive button "Start the guided demo →". Secondary simple play icon text link "Watch the 2-minute walkthrough". Below tiny useful note "Start with a sample wardrobe and demo model." Direct small utility links "Source code" and "Testing instructions", no invented URLs.
+Right one beautiful crisp-edged sample try-on composition: full-length elegant dark-haired 35-year-old demo woman in camel coat, ivory knit, navy trousers, brown loafers, in a pale naturally lit interior; beneath image a narrow strip of three separate tiny garment product thumbnails. Small honest image caption "Illustrative preview · demo model". No confusing collage or giant outer card.
+
+NEXT REGION, about 24%: medium serif heading "Three moments. One clear decision." Three horizontal numbered open editorial columns, no colored cards:
+"01 / Your wardrobe" with beautiful 2x2 tiny product-grid crop of cream sweater, navy blazer, beige trousers and brown loafers; line "Start with what you already own."
+"02 / A candidate" with tiny garment product photo + body preview side-by-side; line "See a new piece in your own context."
+"03 / An honest verdict" with two separate navy blazer thumbnails; clear small large serif verdict "You already have this." and line "Good advice can mean buying nothing."
+Every step has a small understated arrow. This is the first guided demo route, with NO registration or uploading required to begin.
+
+NEXT REGION, about 24%: deep olive band, ivory typography. Large serif heading "Where YouCam fits." A clean legible one-line FLOW, native-looking simple boxes or rules, with short labels:
+"Person photo + garment photo" → "YouCam Clothes VTO" → "Try-on preview".
+Under flow concise line "Planned server-side flow: upload · create task · poll · display". Below two open columns: "YouCam" / "Garment visualization"; "WearAgain" / "Wardrobe context, occasion styling, background queue, buy/pass reasoning". Small link "Inspect the integration plan →". Do not pretend this design image proves live API execution. No fabricated terminal output, secret keys or traces.
+
+FINAL REGION, about 18%: ivory again, an exceptionally legible compact evidence index titled "Review your way." Four aligned OPEN rows with thin rules:
+"Technology" — "API integration, source & setup" — arrow
+"Design" — "Guided product experience" — arrow
+"Impact" — "User stories & retailer pilot plan" — arrow
+"Idea" — "Wardrobe-aware, honest advice" — arrow
+Then a concise small scope line "Demo focus: wardrobe → try-on → verdict. Additional concepts: voice mornings, mall capture, wardrobe care." Treat additional concepts honestly, no claims all are built.
+Fine footer: WearAgain left, "Consumer app", "For retailers", "Team & credits" right. Tiny line "Submission representative: Oliwia". A small final honest caption "Jury page design concept · video, code and API evidence to be connected".
+The full page should feel crafted for respectful efficient judging: the first 10 seconds explain the idea, one dominant guided demo action, short video and code always easy to find, attractive fashion imagery and actual technical role visible. No subscription, upsell, chatbot onboarding or marketing detours.
+
+======================================================================
+
+Jury landing — final text and thumbnail correction
+
+Use case: precise-object-edit / ui-mockup text correction.
+Edit this existing WearAgain FOR JUDGES full-page design. Preserve the ENTIRE image: exact page layout, navigation, header, hero, typography sizes, ivory/olive colors, button labels, portraits, section heights, grid, footer, scope and all copy except the one correction specified.
+Make ONLY these two precision corrections:
+1. In the third column titled "03 / An honest verdict", replace the large italic sentence below the two navy blazers with exact correctly spelled text: "Keep your blazer." Render every letter accurately, no misspellings. Keep the existing typography and alignment. Keep the small line "Good advice can mean buying nothing." beneath it.
+2. In the deep olive "Where YouCam fits." flow, the final small output-image thumbnail labeled "Try-on preview" must show the same woman WEARING THE CAMEL COAT from the garment-input thumbnail. It currently looks as if the coat is missing. Correct only that tiny output-photo content so the coat is plainly visible, matching the big hero look. Preserve flow arrows, all labels and boxes.
+No other changes. Do not redesign, crop, add sections, alter copy, shift layout or change branding. Retain the small honest design-concept footer.
+
+======================================================================
+
+Guided jury demo
+
+Use case: ui-mockup.
+Create one exceptionally clear high-fidelity DESKTOP GUIDED DEMO screen for WearAgain's dedicated JUDGE EXPERIENCE. Landscape 1536x1024, full-screen web app, no physical device or presentation backdrop. Input is WearAgain fashion brand reference: ivory #F8F6F1, olive-black #30392F, stone rules, refined modern serif headings, precise readable sans-serif controls and naturally lit beautiful fashion photos. All text ENGLISH. This is a visual CONCEPT for a reviewer-friendly demo, not evidence of an already-built system. Never invent actual API run IDs, logs, successful network requests, measured timings or verified implementation badges. Use "Illustrative saved preview" for the image shown; live evidence fields are explicitly awaiting a run.
+
+HEADER: WearAgain left, a small restrained outlined "For judges" label. Right utility links "2-minute video", "Source code", "Testing instructions". Thin rule. 
+Below header a slim guide stepper spanning main width, exactly:
+"1  Sample wardrobe" → "2  Try-on" active olive underline → "3  Honest verdict".
+Small secondary top line right "No account needed for the sample tour".
+A narrow LEFT SIDE rail about 185px has simple links "Overview", "Guided demo" active, "YouCam integration", "Code & setup", and low emphasis "Back to site →". No giant menu.
+
+MAIN title "See it in her wardrobe." elegant serif, with one concise subtitle "A new piece, styled with what she already owns."
+Below three functional open columns:
+
+LEFT INPUTS COLUMN about 270px: small label "THE CANDIDATE". Beautiful square product photograph of a single camel wool coat on stone. Short name "Camel wool coat". Fine divider. Small label "FROM HER WARDROBE". Below a neat row or small column of three individual small product photos: ivory fine-knit sweater, navy trousers, brown loafers. Each has short labels "Ivory knit", "Navy trousers", "Loafers". Small bottom text "Sample wardrobe selected". No dropzones or forced upload. Garments must be separate product photographs.
+
+CENTER PREVIEW COLUMN about 420px: small top line "Illustrative saved preview". Large superb full-length natural editorial image of the same brown-haired 35-year-old WearAgain model wearing the candidate camel coat over the chosen ivory knit and navy trousers with brown loafers. Warm pale natural interior, accurate tangible clothing, clear full body, model face consistent. Small label at image bottom "Demo model". Under photo a small outline button "Generate with YouCam". Important: this is a PROPOSED live-generation action; do not show a fake completed result or live success badge beside it.
+
+RIGHT CONTEXT AND EVIDENCE COLUMN about 340px:
+Medium serif heading "The picture is the start." Under it clean two open explanatory sections:
+"YouCam" / "Creates the garment try-on image."
+"WearAgain" / "Adds wardrobe context, personal style and a reasoned buy-or-pass decision."
+Thin rule then heading "Live API evidence". Small quiet line "Available after a live run". Three concise unfilled readable rows with dash placeholders, no fabricated values:
+"Input references   —"
+"Task status   —"
+"Generated output   —"
+A simple link "View the planned API flow →". No secret keys or request IDs invented.
+At lower right one dominant full-width dark olive button "Next: the honest verdict →". Small line below "You can inspect code at any point."
+
+Footer small and unobtrusive "Guided demo design concept · saved example shown · backend and evidence to connect". A progress label "Step 2 of 3". Design must be extremely easy to follow and demonstrate real product thinking beyond one API call, keeping the demonstration and live-generation path distinct and clearly labeled. Maintain luxurious photography and airy editorial coherence rather than technical console clutter.

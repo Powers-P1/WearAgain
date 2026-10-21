@@ -1,0 +1,68 @@
+WearAgain — brief nowych widoków dla Fable / ChatGPT
+Stan koncepcji: 21.10.2026. Termin wewnętrzny wskazany przez Damiana: 31.10.2026.
+Zakres pracy tutaj: wizualizacje ImageGen i układ informacji. Implementacja po stronie Fable / ChatGPT.
+Istniejących widoków konsumenckich, szafy i aplikacji mobilnej nie przeprojektowywać.
+
+NOWE WIDOKI
+
+1. /retail — landing dla sklepów
+Plik: WearAgain-14-Retail-Landing.png
+Przekaz: Your collection. Her wardrobe. A reason to buy.
+Główna akcja prowadzi do demonstracyjnej karty produktu. Druga do planu pilota.
+Mechanizm: produkt sklepu + rzeczy klientki + jej styl + podgląd i uczciwa decyzja.
+Pilot jednej kategorii; konwersja względem grupy kontrolnej, zwroty po zakończeniu okresu zwrotów, marża po zwrotach i kosztach API.
+Na planszy jest plan pomiaru, nie dowód poprawy wyników. Nie zamieniać go na deklaracje wzrostów bez danych.
+Sklep demonstracyjny jest fikcyjny; dane produktu i cena są przykładowe.
+
+2. /retail/demo — karta produktu z panelem WearAgain
+Plik: WearAgain-15-Retail-Produkt.png
+Oryginalny produkt, cena i wybór rozmiaru pozostają po stronie sklepu. Panel pokazuje nową rzecz z garderobą klientki.
+Przycisk „See it with my wardrobe” otwiera panel.
+Demo startuje na gotowych rzeczach i modelce; własne konto i zdjęcie nie są potrzebne do pierwszego obejrzenia.
+Własne elementy są pokazane oddzielnie obok podglądu. Ocena dotyczy stylu, nie rozmiaru.
+Prywatne zdjęcia i cała zawartość szafy nie powinny być udostępniane sprzedawcy. Konkretny zakres danych i zgody wymaga implementacji.
+
+3. /judges — osobna strona jurora, po angielsku
+Plik: WearAgain-16-Judges-Landing.png
+Przekaz: Try it on. Know why.
+Najkrótsza ścieżka: Start the guided demo. Obok film 2 minuty; łatwo dostępny kod i instrukcja testowania.
+Wyjaśnienie w jednym zdaniu: YouCam odpowiada za wizualizację ubrania; WearAgain dodaje kontekst posiadanej garderoby i uzasadnienie decyzji.
+Trzy sceny: gotowa szafa → kandydat na sobie → uczciwy werdykt, w tym „zostań przy swojej marynarce”.
+Sekcja Where YouCam fits pokazuje rolę API oraz oddziela ją od dopasowywania szafy i rozumowania stylistki.
+Indeks Review your way prowadzi do technologii, produktu, wpływu i pomysłu.
+Oliwia jest wskazana jako reprezentantka zgłoszenia; nie przypisujemy jej niepotwierdzonych ról ani tytułów.
+
+4. /judges/demo — krótka ścieżka prowadzona
+Plik: WearAgain-17-Judges-Demo.png
+Trzy kroki, widoczny postęp, gotowe dane, możliwość przejścia do filmu, kodu i instrukcji w każdej chwili.
+Zapisany podgląd oraz świeże generowanie muszą mieć czytelnie różne oznaczenia.
+Obecne wizualizacje powstały w ImageGen, nie w YouCam; nie używać ich jako dowodu wykonania YouCam API.
+Po podłączeniu backendu część techniczna powinna pokazać rzeczywiste wejście, stan zadania i wynik, bez ujawniania klucza.
+Domyślny krótki pokaz może korzystać z rzeczywistych wcześniej wygenerowanych wyników YouCam, jednoznacznie opisanych jako zapisane. Świeże generowanie jest osobną akcją.
+
+NAWIGACJA NA ISTNIEJĄCEJ STRONIE — BEZ NOWEGO GENEROWANIA
+Dodać wyróżnione „Judges · Start here ↗” w nagłówku, widoczne w pierwszym ekranie. Prowadzi do /judges.
+Na mobile umieścić je jako widoczną akcję nagłówka albo pierwszą wyróżnioną pozycję menu, nie wyłącznie w stopce.
+„For retailers” prowadzi do /retail. Zachować obecny kierunek wizualny.
+Widok jurora i materiały konkursowe po angielsku; dla obecnej polskiej aplikacji przygotować angielską wersję do oceny.
+
+STATUS I MATERIAŁY DO PODPIĘCIA
+Wizualizacje określają układ. Nie stanowią potwierdzenia działającego kodu, integracji, filmu ani wyników pilota.
+Film, repozytorium, instrukcja testowania i rzeczywiste wyniki API mają zostać podłączone przed zgłoszeniem. Po weryfikacji usunąć z gotowej strony noty „design concept”.
+Na filmie pokazać działający prototyp i rolę YouCam, korzystając z własnych lub dozwolonych zasobów.
+
+REGULAMIN — SPRAWDZONE FAKTY
+Oficjalne źródło:
+https://youcam-api-skin-ai-ecommerce.devpost.com/rules
+Deadline: 2.11.2026, 11:45 Eastern Time = 17:45 Europe/Warsaw. Plan wewnętrzny: 31.10.
+Wymagane: działający prototyp z YouCam, dostęp do kodu i testów, film 1–3 minuty, materiały po angielsku lub z tłumaczeniem.
+Women in Tech: zespół z co najmniej jedną osobą identyfikującą się jako kobieta, deklaracja przy zgłoszeniu oraz opt-in do nagrody. Rola Oliwii w zespole musi być rzeczywista.
+Oficjalne kryteria mają równą wagę: wdrożenie technologiczne, projekt doświadczenia, potencjalny wpływ i jakość pomysłu.
+Projekt musi pozostać dostępny do testów do końca oceniania 20.11.2026, 11:45 Eastern Time.
+
+PLAN INTEGRACJI API — DO IMPLEMENTACJI I TESTÓW
+Dokumentacja producenta:
+https://docs.perfectcorp.com/reference/ai_clothes/section/overview/integration-guide
+Oficjalny przepływ Clothes VTO obejmuje przygotowanie zdjęć osoby i ubrania, utworzenie zadania i odpytywanie o wynik. Dokumentacja opisuje /s2s/v2.0/task/cloth-v4.
+Przed implementacją ponownie zweryfikować specyfikację, ograniczenia wejść i parametry właściwe dla wybranego typu ubrania. Klucz wyłącznie po stronie serwera.
+
