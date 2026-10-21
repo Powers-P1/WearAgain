@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+.env
+.env.*
+*.key
+secrets/
+fixtures/raw/
+*.log
