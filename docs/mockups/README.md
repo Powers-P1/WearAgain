@@ -39,6 +39,7 @@ Implementation notes (PR4, front):
 - Implement as the site index (`/`); the app lives behind the CTA "Try the demo" (the mockup says "Explore the prototype"; use "Try the demo").
 - Two entry points in the header: "For shoppers" (wardrobe, separate try-on previews, justified purchase) and "For retailers" (catalogue recommendations, pilot offer).
 - Copy in English. The guided tour starts from the landing and from a jury section.
+- Demo: web/PWA. Product: native iOS/Android apps in the stores.
 - Order: hero, problem, 3 steps, certificate example, zero purchases, trust strip, AI Stylist (planned), retailers (pilot concept), jury invitation + FAQ, close, footer.
 
 Content fixes needed before implementing:
