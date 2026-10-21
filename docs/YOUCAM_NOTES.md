@@ -27,3 +27,14 @@ Status labels: CONFIRMED = read from Perfect Corp public pages by the OK Agency 
 - CONFIRMED (docs): V2 cloth task path /s2s/v2.0/task/cloth, templates /s2s/v2.0/task/template/cloth; separate "AI Cloth V3" exists; parameters garment_category (auto) and change_shoes. Source: https://yce.perfectcorp.com/document/index.html
 - CONFIRMED (docs): uploaded files stored 24 hours, results 24 hours after completion. This supersedes the REPORTED "30 days". The path "cloth-v4" was NOT found in the read portion: treat as UNKNOWN.
 - UNKNOWN: units per image, response schema, image constraints, charge for failed cloth task (Skin Analysis docs say no charge), latency, output-usage terms.
+
+## Live probe 2026-10-21 (real API key, 4 units spent, own CC0 inputs)
+- CONFIRMED: V2 auth is `Authorization: Bearer <API key>`; no separate auth call or id_token needed. Balance: GET /s2s/v1.0/client/credit (free).
+- CONFIRMED: feature-cost lists AI Clothes V2, V3 and V4, each 2 units per result_image. The path /s2s/v2.0/task/cloth-v4 (and its status GET) works, so the earlier "cloth-v4" note is now CONFIRMED. The earlier "2 units" is CONFIRMED.
+- CONFIRMED flow: POST /s2s/v2.0/file/cloth -> PUT to pre-signed URL -> POST /s2s/v2.0/task/cloth (or cloth-v4) with src_file_id, ref_file_id, garment_category -> poll GET /s2s/v2.0/task/<cloth|cloth-v4>/<task_id> until task_status is success or error -> download data.results.url. Shapes: fixtures/youcam/cloth_tryon_task.synthetic.json.
+- CONFIRMED latency (one run each): V2 about 8 s, V4 about 11 s from task creation to success (polled every 2.7 s); uploads about 1 s each.
+- CONFIRMED: result image has the same size as the person image; jacket product photo on a hanger worked as ref with garment_category upper_body.
+- CONFIRMED: missing parameters or bad ids return HTTP 400 (error_code InvalidParameters), 0 units. An accepted task with an undecodable image ends as task_status error (error_decode_image), 0 units charged.
+- CONFIRMED (docs): person image must show a visible face, upper body, facing forward, one person, 512x384 min, 4096 max side, <10 MB, jpg/png. So a face-free mannequin is not a valid input. Product ref: single front-facing garment.
+- CONFIRMED (docs): uploads kept 24 h, results 24 h after completion, download link may expire after about 2 h. Rate limit 250 requests / 300 s and 5 QPS per IP and per key (429).
+- UNKNOWN: terms on use of generated outputs (docs point to Perfect Corp Terms of Service, not read here), DPA and processing region, behaviour of a failed task when polling times out (docs: units still consumed if not polled), concurrency limits, layering a second garment on a prior result.

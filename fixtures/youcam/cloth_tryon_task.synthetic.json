@@ -1,0 +1,12 @@
+{
+  "metadata": {"synthetic": true, "no_raw_api_data": true, "shape_source": "observed 2026-10-21"},
+  "file_api_request": {"POST": "/s2s/v2.0/file/cloth", "body": {"files": [{"content_type": "image/jpg", "file_name": "<name>.jpg", "file_size": 0}]}},
+  "file_api_response": {"status": 200, "data": {"files": [{"content_type": "image/jpg", "file_name": "<name>.jpg", "file_id": "<opaque_file_id>", "requests": [{"method": "PUT", "url": "<presigned_upload_url>", "headers": {"Content-Length": "<n>", "Content-Type": "image/jpg"}}]}]}},
+  "create_task_request": {"POST": "/s2s/v2.0/task/cloth", "body": {"src_file_id": "<opaque_file_id>", "ref_file_id": "<opaque_file_id>", "garment_category": "upper_body"}},
+  "create_task_response": {"status": 200, "data": {"task_id": "<opaque_task_id>"}},
+  "poll_running": {"status": 200, "data": {"task_status": "running", "error": null, "results": null}},
+  "poll_success": {"status": 200, "data": {"task_status": "success", "error": null, "results": {"url": "<presigned_result_url_short_lived>"}}},
+  "poll_error": {"status": 200, "data": {"task_status": "error", "error": "error_decode_image", "error_message": "error_decode_image", "results": null}},
+  "validation_error_400": {"status": 400, "error": "<message>", "error_code": "InvalidParameters"},
+  "units": {"cost_per_result_image": 2, "charged_on_error": 0}
+}
