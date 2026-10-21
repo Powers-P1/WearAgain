@@ -26,7 +26,8 @@ function garmentTile(kind: 'top' | 'outerwear', id: string, name: string): strin
       esc(t('purchaseSavedAlt',{item:name})) + '" />' :
       '<div class="purchase-image-empty">' + esc(t('purchaseImageMissing')) + '</div>') +
     (saved ? '<span class="purchase-model-label">' + esc(t('demoModel')) + '</span>' +
-      '<span class="purchase-recorded-label">' + esc(t('purchaseSavedSingle')) + '</span>' : '') +
+      '<span class="purchase-recorded-label">' + esc(t('purchaseSavedSingle')) + '</span>' +
+      '<span class="purchase-fit-overlay">' + esc(t('styleFitDisclaimer')) + '</span>' : '') +
     '</div><figcaption><strong>' + esc(name) + '</strong>' +
     '<span>' + esc(kind === 'top' ? t('purchaseOwnedExample') : t('purchaseShopExample')) + '</span></figcaption></figure>';
 }

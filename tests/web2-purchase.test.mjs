@@ -41,6 +41,7 @@ test('core solver returns the tested minimum-basket result with a complete certi
   assert.equal(session.ratingsOrigin,'example');
   assert.equal(session.scenario.tops[0].label,'Cream shirt');
   assert.equal(session.scenario.outerwear[2].label,'Nova jacket');
+  assert.deepEqual(session.scenario.requirements.map(req=>req.label), ['For work','For weekends','For evenings']);
   const answer = purchase.computeDecision(session);
   assert.equal(answer.status,'solved');
   assert.deepEqual(answer.basket.candidateIds,['all-round']);

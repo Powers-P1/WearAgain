@@ -28,9 +28,10 @@
 .purchase-preview-tile { min-width: 0; margin: 0; }
 .purchase-image-wrap { position: relative; display: grid; place-items: center; aspect-ratio: .68; background: var(--stone); overflow: hidden; }
 .purchase-image-wrap img { width: 100%; height: 100%; object-fit: contain; }
-.purchase-model-label, .purchase-recorded-label { position: absolute; background: rgba(248,246,241,.94); color: var(--olive); padding: 3px 5px; font-size: 9px; line-height: 1.2; max-width: calc(100% - 12px); }
+.purchase-model-label, .purchase-recorded-label, .purchase-fit-overlay { position: absolute; background: rgba(248,246,241,.94); color: var(--olive); padding: 3px 5px; font-size: 9px; line-height: 1.2; max-width: calc(100% - 12px); }
 .purchase-model-label { top: 6px; left: 6px; }
-.purchase-recorded-label { bottom: 6px; left: 6px; }
+.purchase-recorded-label { top: 6px; right: 6px; font-size: 8px; max-width: 55%; }
+.purchase-fit-overlay { bottom: 6px; left: 6px; }
 .purchase-image-empty { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.45; padding: 18px; }
 .purchase-preview-tile figcaption { padding: 10px 2px 0; display: flex; flex-direction: column; gap: 4px; }
 .purchase-preview-tile figcaption strong { font-size: 12px; font-weight: 600; }

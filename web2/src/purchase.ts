@@ -38,6 +38,13 @@ const labels: Record<string, TranslationKey> = {
 export function itemLabel(id: string, fallback: string): string {
   return labels[id] ? t(labels[id]) : fallback;
 }
+function needLabel(id: string, fallback: string): string {
+  const needs: Record<string, TranslationKey> = {
+    work: 'purchaseNeedWork', weekend: 'purchaseNeedWeekend',
+    evening: 'purchaseNeedEvening', rain: 'purchaseRain',
+  };
+  return needs[id] ? t(needs[id]) : fallback;
+}
 export function recordingFor(kind: 'top' | 'outerwear', id: string): { readonly id: string; readonly imagePath: string; readonly recordedAt: string } | null {
   const record = manifest.renders.find(value => value.element.kind === kind && value.element.id === id);
   if (!record || record.syntheticAvatarOnly !== true || record.api !== 'cloth-v4'
@@ -52,7 +59,7 @@ export function scenarioForDemo(demo: PurchaseDemo): Scenario {
     ...input,
     tops: input.tops.map(item => ({ ...item, label: itemLabel(item.id, item.label) })),
     outerwear: input.outerwear.map(item => ({ ...item, label: itemLabel(item.id, item.label) })),
-    requirements: input.requirements.map(item => ({ ...item, label: itemLabel(item.id, item.label) })),
+    requirements: input.requirements.map(item => ({ ...item, label: needLabel(item.id, item.label) })),
   });
 }
 export function initialPurchase(demo: PurchaseDemo = 'minimum'): PurchaseSession {
