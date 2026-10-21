@@ -22,3 +22,8 @@ Status labels: CONFIRMED = read from Perfect Corp public pages by the OK Agency 
 - Whether publishing raw API output or fixtures is allowed by the terms.
 - DPA, processing region, backup deletion.
 - Handling of personal garment photos without a face.
+
+## Docs check 2026-10-21 (no live probe yet; API key not available)
+- CONFIRMED (docs): V2 cloth task path /s2s/v2.0/task/cloth, templates /s2s/v2.0/task/template/cloth; separate "AI Cloth V3" exists; parameters garment_category (auto) and change_shoes. Source: https://yce.perfectcorp.com/document/index.html
+- CONFIRMED (docs): uploaded files stored 24 hours, results 24 hours after completion. This supersedes the REPORTED "30 days". The path "cloth-v4" was NOT found in the read portion: treat as UNKNOWN.
+- UNKNOWN: units per image, response schema, image constraints, charge for failed cloth task (Skin Analysis docs say no charge), latency, output-usage terms.
