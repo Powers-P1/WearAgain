@@ -4,6 +4,7 @@ import {
   type Availability, type Category, type WardrobeItem, type WardrobeState,
 } from './state.js';
 import { DEFAULT_LOCALE, t, type TranslationKey } from './i18n.js';
+import { purchasePage, handlePurchaseClick } from './purchase-ui.js';
 import { handleStylistClick, savedPage, stylistPage, submitStylist } from './stylist-ui.js';
 import './style.css';
 
@@ -211,6 +212,7 @@ function render(): void {
     : navIds.includes(current.screen as NavId) ? current.screen as NavId : 'wardrobe';
   const page = current.screen === 'wardrobe' ? wardrobe()
     : current.screen === 'stylist' ? stylistPage(data)
+    : current.screen === 'check' ? purchasePage()
     : current.screen === 'saved' ? savedPage(storage)
     : current.screen === 'profile' ? profile()
     : current.screen === 'item' ? itemDetail(current.itemId)
@@ -225,9 +227,10 @@ function render(): void {
 root.addEventListener('click', event => {
   const target = event.target;
   if (!(target instanceof Element)) return;
-  const control = target.closest<HTMLElement>('[data-nav], [data-cat], [data-item], [data-status], [data-expand], [data-stylist-reset], [data-occasion], [data-look-next], [data-look-prev], [data-save-look]');
+  const control = target.closest<HTMLElement>('[data-nav], [data-cat], [data-item], [data-status], [data-expand], [data-stylist-reset], [data-occasion], [data-look-next], [data-look-prev], [data-save-look], [data-purchase-demo], [data-purchase-candidate], [data-purchase-top], [data-purchase-rating], [data-purchase-clear], [data-purchase-replay], [data-purchase-choice]');
   if (!control) return;
   if (handleStylistClick(control, { wardrobe: data, storage, rerender: render, notice: value => { message = value; } })) return;
+  if (handlePurchaseClick(control, { rerender: render, notice: value => { message = value; } })) return;
   if (control.hasAttribute('data-expand')) { revealMore = true; render(); return; }
   if (control.dataset.nav) { navigate(control.dataset.nav); return; }
   if (control.dataset.cat && (control.dataset.cat === 'all' || CATEGORIES.includes(control.dataset.cat as Category))) {

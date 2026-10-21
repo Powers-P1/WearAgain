@@ -131,3 +131,16 @@ test('persisted image names may only point to approved local board assets', () =
   const bad = { ...valid, items: [{ ...valid.items[0], photo: 'https://attacker.example/image.png' }] };
   assert.deepEqual(state.parseStored(bad), valid);
 });
+
+test('existing PR-A wardrobe state gains matching recorded example tops on upgrade', () => {
+  const current=state.initialState();
+  const legacy={...current,style:'Personal style',items:current.items
+    .filter(item=>!item.id.startsWith('recorded-'))
+    .map(item=>item.id==='blazer'?{...item,availability:'needs_ironing'}:item)};
+  const migrated=state.parseStored(legacy);
+  assert.equal(migrated.items.length,10);
+  assert.equal(migrated.items.filter(item=>item.id.startsWith('recorded-')).length,2);
+  assert.equal(migrated.items.find(item=>item.id==='blazer').availability,'needs_ironing');
+  assert.equal(migrated.style,'Personal style');
+  assert.deepEqual(state.parseStored(migrated),migrated);
+});
