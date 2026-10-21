@@ -1,0 +1,220 @@
+WearAgain — prompty wizualizacji v2
+21.10.2026. Wygenerowano wbudowanym narzędziem ImageGen.
+Każda plansza korzysta z pierwszej planszy mobile lub zaakceptowanej szafy desktopowej jako referencji estetycznej.
+
+Desktop — szafa
+
+Use case: ui-mockup.
+Asset type: full-screen high-fidelity desktop web APPLICATION UI, WearAgain / wardrobe. Create ONE complete wide desktop app screenshot, landscape 1536x1024, no device frame, no marketing copy, no presentation board. Input image is the established MOBILE APP VISUAL SYSTEM reference; translate its aesthetics into a purposeful desktop layout. Exact brand warmth, fine modern editorial serif headings, highly readable refined sans serif controls, olive-black #30392F action buttons, warm ivory #F8F6F1, stone #EEEAE3, subtle fine rules, natural product photographs. Much more elegant than a generic admin dashboard. Broad generous spacing with efficient desktop use, impeccable grid and typography. All text Polish, carefully typeset. No gradients, no fake metrics or charts, no giant round cards. Each actual garment is photographed SEPARATELY, never merged as layered garment collage.
+
+Persistent narrow LEFT SIDEBAR, about 208px of canvas, pale warm stone. Top refined serif WearAgain wordmark. Below essential vertical navigation with simple thin icons: "Szafa" selected on a restrained olive tinted rectangular background, "Stylistka", "Sprawdź zakup". Fine divider, secondary navigation "Zapisane zestawy", "Zakupy w galerii". Bottom small circular portrait of elegant brown-haired woman and name "Anna", small "Mój styl" link. No crowded extra sidebar sections or upsell block.
+
+MAIN CONTENT, ample 48px desktop gutters:
+At top left large serif heading "Twoja szafa" and short gray caption "28 rzeczy, które lubisz." Aligned top right a restrained outlined "Ułóż stylizację" and dark olive "+ Dodaj rzecz". Next horizontal row a quiet outlined wide search input with magnifier and placeholder "Znajdź w szafie"; to right subtle sort "Ostatnio dodane" with small down chevron.
+Below horizontal text category tabs: "Wszystko" active dark olive underline, "Góry", "Doły", "Sukienki", "Buty", "Dodatki". Fine divider.
+Beautiful open FOUR-COLUMN by TWO-ROW photo gallery fills main space. Each image square-ish and softly lit against warm-neutral background with no separate box borders and no heavy drop shadows. Under each image one short clear name in sans serif and tiny muted material or color:
+Row 1: ivory cashmere sweater / "Kaszmirowy sweter" / "Kremowy · Kaszmir"; navy tailored blazer / "Granatowa marynarka" / "Granat · Wełna"; ivory silk blouse / "Jedwabna bluzka" / "Śmietankowy · Jedwab"; camel tailored overcoat / "Camelowy płaszcz" / "Camel · Wełna".
+Row 2: beige wide-leg trousers / "Spodnie z wełny" / "Beż · Wełna"; minimalist black midi dress / "Czarna sukienka" / "Czerń · Wiskoza"; brown leather loafers / "Skórzane loafersy" / "Brąz · Skóra"; tasteful brown structured leather handbag / "Codzienna torebka" / "Brąz · Skóra".
+Images have editorial realism, tactile fabric and exquisite lighting. Each product nicely centered and entirely visible, not absurdly oversized. Subtle tiny bookmark only on hover-like one item, otherwise clean.
+Near bottom unobtrusive line "Twoje rzeczy. Więcej możliwości." and a quiet text link "Poznaj swój styl →".
+The result must unmistakably be the functional WearAgain DESKTOP APP wardrobe, not its marketing landing page and not mobile screens pasted onto a canvas.
+
+======================================================================
+
+Desktop — centrum garderoby
+
+Use case: ui-mockup. Asset type: WearAgain desktop APPLICATION / wardrobe control center.
+Create ONE exquisite full-screen desktop application screenshot, landscape 1536x1024, no device frame. Input image is the wardrobe INVENTORY screen the user has just approved. Preserve its exact brand and visual system: same left sidebar, wordmark, warm ivory and stone backgrounds, near-black olive accents, serif headings, legible sans serif UI, product photo art direction, spacing and generous open layout. This new screen is the OVERVIEW of the wardrobe, a sophisticated personal wardrobe dashboard, practical and image-led rather than an analytics dashboard. Polish text with perfect legibility. No marketing landing page, no graph filler, no fake wardrobe health score, no neon, no gradients, no nesting of cards. The dashboard answers: what do I wear, what do I neglect, what needs repair, what do I have too much of, what is a real gap. Personal recommendations based on the user's OWN logged wears and reported condition, never automated disposal.
+
+LEFT SIDEBAR must closely match reference, same approximate 208px width:
+WearAgain wordmark top; "Szafa" active, "Stylistka", "Sprawdź zakup". Fine divider. "Zapisane zestawy", "Zakupy w galerii". At bottom same Anna portrait and "Mój styl →".
+
+MAIN HEADER: large elegant serif "Twoja garderoba" with small subtitle "Dobry plan zaczyna się od tego, co już masz." Top right solid olive button "+ Dodaj rzecz". Beneath a slim text tab bar "Przegląd" active with underline and "Wszystkie rzeczy" inactive. Quiet small contextual "Październik" on right.
+Below calm summary strip with three small open columns separated by fine vertical rules, NOT giant bright KPI cards: "28" / "rzeczy w szafie"; "16" / "noszonych w tym miesiącu"; "5" / "czeka na Twoją decyzję". Small line "Na podstawie zapisanych stylizacji."
+
+Main region splits approximately 65% left and 30% right with a generous gap.
+LEFT: editorial serif heading "Warto się nimi zająć". Three clean horizontal image-led rows, with thin dividers; square product photo about 100px to left, useful short text middle and action at right.
+1. Beige cashmere cardigan thumbnail. Title "Ulubiony kardigan". Small warm brown label "Do naprawy". One line "Rozpruty szew · oznaczone przez Ciebie". Restrained outlined action "Zaplanuj naprawę".
+2. Elegant black midi dress thumbnail. Title "Czarna sukienka". Small gray label "Dawno nienoszona". One line "Brak zapisanej stylizacji od 6 miesięcy". Simple action "Przejrzyj".
+3. Two separately photographed identical navy blazers in ONE compact side-by-side thumbnail. Title "Dwie bardzo podobne marynarki". One line "Sprawdź, czy obie nadal są Ci potrzebne." Simple action "Porównaj".
+Beneath these rows an open lower band heading "Czego naprawdę brakuje?" One concise recommendation "Buty na deszcz, w Twoim stylu." Supporting "Masz zestawy na chłód, ale brakuje w nich butów na mokre dni." Small understated link "Sprawdź tę lukę →". No pressure to buy; this is a thoughtful recommendation.
+
+RIGHT: one BEAUTIFUL full-length editorial photograph, 310x390-ish, same sophisticated brown-haired woman about 35 in navy blazer, ivory silk blouse, beige tailored wide-leg trousers, brown loafers, natural light in pale classic apartment. Caption under photo large serif "Na dziś, z Twojej szafy." Small line "Cały zestaw już masz." Dark olive full-width button "Zobacz stylizację". Below tiny secondary link "Zapisz, co dziś nosisz →".
+Very bottom unobtrusive line "Ty decydujesz, co zostaje." The design must feel like a luxurious personal fashion tool with useful real decisions, not an enterprise SaaS dashboard. Preserve reference photography and spacious design quality exactly.
+
+======================================================================
+
+Desktop — stylistka
+
+Use case: ui-mockup.
+Create a full-screen WearAgain DESKTOP APPLICATION screenshot, landscape 1536x1024. This is the STYLIST workspace, not a marketing site. The input image is the just-approved desktop wardrobe app; preserve the exact same sidebar, wordmark, palette, icon line treatment, photography quality, typography and desktop spacing. Warm ivory #F8F6F1, dark olive #30392F buttons, stone outlines, exquisite serif headings and calm readable sans serif controls. Polish copy, real desktop productivity with fashion-house elegance. No device frame, no generic dashboard charts, no giant wrapper cards, no gradients.
+
+LEFT SIDEBAR exactly matches reference: WearAgain top, "Szafa", "Stylistka" active olive tint, "Sprawdź zakup", thin rule, "Zapisane zestawy", "Zakupy w galerii". Anna portrait and "Mój styl →" bottom.
+
+MAIN HEADER: elegant serif "Twoja stylistka" and short gray line "Na tę okazję. W Twoim stylu." Top-right low-emphasis text link "Zapisane zestawy →". Fine rule below.
+
+Main layout is three aligned functional columns using open space, about 340px form, 420px large model preview, 270px outfit detail; intentional breathing room between columns. It shows a completed first suggestion and editable brief at the same time.
+
+LEFT FORM: medium serif heading "Na jaką okazję?" and line "Opowiedz mi po swojemu." Beautiful cream bordered textarea with exact content "Piątkowa kolacja w Ritzu. Elegancko, ale bez przesady." Below simple calendar row "Piątek, 23 października" with tiny calendar icon. Another row heading "Twój styl" with quiet "Zmień" link and text "Klasyka · beż i granat · bez wzorów". Fine divider, short line "Zacznę od Twojej szafy." Outline button "Zmień propozycje". At bottom of form two quiet suggested occasion text links "Weekend w Londynie →" and "Dzień w pracy →". Keep this restrained, no chat bubbles.
+
+CENTER: at top slim strip "Propozycja 1 z 3" with discreet left/right arrow buttons aligned right. Below one large full-length editorial photograph of the same brown-haired 35-year-old woman from reference standing in pale sunlit classical apartment. She wears navy blazer, ivory silk blouse, beige high-waisted wide-leg trousers and brown loafers. Natural skin, tactile quality fabrics, feet visible. Small unobtrusive photo label "Modelka demo". Below photo short elegant serif caption "Klasyka, która jest Tobą." No artificial glowing effects.
+
+RIGHT OUTFIT DETAIL: medium serif "Cały zestaw już masz." Short text "Cztery rzeczy z Twojej szafy." Then four clean compact rows with individual SEPARATE small square garment photo and name: navy blazer "Granatowa marynarka"; silk blouse "Jedwabna bluzka"; beige trousers "Spodnie z wełny"; brown loafers "Skórzane loafersy". Thin separators between rows, no boxed cards. Under rows one short explanation "Granat dodaje elegancji. Jasna baza zachowuje lekkość." Main solid olive full-width button "Zapisz stylizację". Secondary link below "Zapisz w planie wyjazdu". Tiny honest note near bottom "Podgląd stylu, nie rozmiaru."
+
+The UI should look precise, useful and coherent with reference, with a strong photograph as focal point, an instantly understood brief and one clear final saving action. No marketing hero slogan.
+
+======================================================================
+
+Desktop — sprawdzanie zakupu
+
+Use case: ui-mockup.
+Create ONE polished full-screen WearAgain DESKTOP APPLICATION screenshot, landscape 1536x1024. Input is the approved wardrobe desktop UI. Preserve its identical wordmark, left sidebar, ivory #F8F6F1 and pale stone, dark olive #30392F accents, fine line icons, legible sans serif labels, refined large serif headings, airy open layout and superb garment photography. This screen is the desktop BUYING DECISION WORKSPACE. It combines items captured on the phone with one clear honest wardrobe-aware verdict. No device frame, no landing page, no analytics widgets, no gradients, no nested card boxes. All text Polish, crisp and beautifully typeset.
+
+LEFT SIDEBAR identical reference: WearAgain wordmark; "Szafa", "Stylistka", "Sprawdź zakup" ACTIVE; thin divider; "Zapisane zestawy", "Zakupy w galerii"; Anna portrait and "Mój styl →" bottom.
+
+MAIN HEADER "Sprawdź, zanim kupisz." large serif; short supporting line "Nowa rzecz powinna wnosić coś nowego." Top right outlined "Dodaj zdjęcie" and olive "Wklej link". Fine horizontal rule.
+Below main three-column workspace with generous alignment.
+
+LEFT COLUMN about 260px: small heading "Twoje znaleziska" and quiet caption "Z telefonu · Dzisiaj". Three clean garment list rows, each square item photo, name and store context. Row 1 selected with very light olive tint and thin left olive rule: navy blazer / "Granatowa marynarka" / "Mango · Piętro 1". Row 2 camel coat / "Camelowy płaszcz" / "Massimo Dutti · Parter". Row 3 black dress / "Czarna sukienka" / "COS · Piętro 1". Small outlined camera-plus link below "Dodaj kolejną rzecz". No fabricated price or checkout.
+
+CENTER COLUMN about 400px: small title "Z Twoją garderobą" with understated 1 / 3 and left/right arrows. Large full-length photoreal editorial image of same naturally beautiful dark-haired woman about 35 in pale sunlit apartment, navy tailored blazer, ivory blouse, beige trousers, brown loafers. It is the candidate navy blazer styled with her existing trousers/blouse/shoes. Small discreet image caption "Modelka demo". Under picture a two-option control "✓ Noszę" selected soft olive and "× Nie noszę" outlined, comfortable clicks. Quiet note "Podgląd stylu, nie rozmiaru."
+
+RIGHT COLUMN about 330px: large lovely serif heading "Pasuje.
+Ale już to masz." Short direct verdict "Twój granatowy robi to samo." Below TWO separate blazer product images SIDE BY SIDE, never overlapped, labels "Ze sklepu" and "Z Twojej szafy". Thin horizontal rule. Small heading "Dlaczego?" then two short useful sentences "Na te same okazje wybierasz swoją marynarkę. Ta nie tworzy żadnego nowego zestawu." Comfortable white space. Primary solid dark olive button "Zostaję przy swoim". Secondary understated link "Zapisz mimo to". Below tiny supportive line "Dobra szafa nie musi być większa."
+Keep garment imagery luxurious, decisions clear, and visual hierarchy calm. This must be a true usable desktop counterpart of the established mobile app, retaining honesty and user autonomy.
+
+======================================================================
+
+Mobile — poranek głosowy
+
+Use case: ui-mockup. Asset type: WearAgain MOBILE APP / rushed weekday morning voice stylist.
+Generate one stunning high-fidelity presentation with exactly THREE large flat mobile app screens side by side, high-resolution landscape 1536x1024 or larger. Input is the established WearAgain mobile visual system: match warm ivory, pale stone canvas, dark olive buttons, refined editorial serif headings, clean sans serif UI, thin restrained phone outlines, generous spacing and elegant natural photo art direction. Tiny external title WearAgain top-left and "PORANEK · 01" top-right. External captions below screens "01 / Mówisz, czego potrzebujesz", "02 / Szykujesz się. Stylistka pracuje.", "03 / Trzy zestawy na już". All copy in natural Polish. This is a CORE USER STORY: a woman wakes late, says "Do biura, na szybko, bez prasowania", washes her hair while outfits generate asynchronously, gets THREE outfits made from owned garments already marked ready-to-wear, then chooses one. No shopping suggestions, no missing-item upsells, no setup interruption, no smart-home hardware needed.
+
+SCREEN 1 / VOICE BRIEF: 7:42 status, WearAgain wordmark and small Anna avatar. Large elegant serif "Spóźniona?
+Ubierzmy Cię." Small warm line "Powiedz, czego dziś potrzebujesz." Middle a spacious refined cream transcript area, with small microphone outline and tiny "Słucham Cię". Beautiful legible transcript as actual content "Do biura. Na szybko, bez prasowania. Tylko z tego, co mam." Below three understated text criteria separated by middots "Do pracy · Bez prasowania · Moja szafa". Lower a very simple understated olive voice waveform, then one comfortable round dark olive mic control and caption "Mów naturalnie". Tiny text link "Wolę napisać". Bottom consistent four-item nav "Szafa", "Stylistka" active, "Sprawdź", "Profil". No extra wizard steps.
+
+SCREEN 2 / ASYNC: 7:43, same header and nav. Large serif "Ty szykuj się.
+Ja dobiorę zestaw." Small line "Przygotowuję 3 propozycje do biura." Middle beautifully simple visual of three small separate garment photo tiles: cream fine-knit top, navy jersey dress, beige trousers, all with restrained small warm-olive loading lines BELOW them rather than overlays. Beneath neat open check rows "Z Twojej szafy", "Bez prasowania", "Tylko gotowe do założenia". Small gray note "Pomijam rzeczy w praniu i do naprawy." Lower a tasteful bordered single row with bell outline "Dam znać, gdy będą gotowe". Large clear line "Możesz zamknąć aplikację." Secondary outline button "Wróć do swoich zajęć". No fabricated seconds-to-completion or fake percentages. No need to keep screen open, this is background work.
+
+SCREEN 3 / THREE READY LOOKS: 7:47 status. Top WearAgain, a tiny quiet bell. Serif heading "Trzy zestawy.
+Możesz wychodzić." Small line "Do biura · bez prasowania". Exactly THREE beautifully aligned open horizontal outfit-selection rows, separated by thin stone lines, each with a 105px-wide full-length EDITORIAL photograph of the SAME reference brown-haired woman about 35 on a pale natural-light backdrop, short title and ready-state text to right, and small circular radio selector. All outfits are distinct and readily visible, never clothes collaged on the body:
+row 1 photo: cream fine-knit top, navy tailored trousers, brown loafers; title "Spokojna klasyka"; small "Gotowe do założenia"; SELECTED radio.
+row 2 photo: simple navy jersey midi dress, neat brown ankle boots; title "Jedna rzecz mniej"; small "Gotowe do założenia".
+row 3 photo: navy fine-knit sweater, beige tailored trousers, brown loafers; title "Miękko i elegancko"; small "Gotowe do założenia".
+Main full-width dark olive button below "Zakładam ten zestaw". Tiny line "Zapiszę go jako dzisiejszy." Very small honest photo line "Podgląd na modelce demo. Styl, nie rozmiar." Bottom nav Stylistka active.
+Maintain extremely legible large type, realistic phone proportions, calm actionable luxury and no feature clutter.
+
+======================================================================
+
+Mobile — zdjęcia w galerii
+
+Use case: ui-mockup. Asset type: WearAgain native mobile app / FAST SHOPPING capture.
+Create a coordinated high-fidelity design board of exactly THREE large flat mobile UI screens, side by side, landscape 1536x1024 or higher. Input is the existing WearAgain MOBILE visual system reference. Preserve thin rounded phone outlines, identical WearAgain wordmark, warm ivory, olive-black buttons, quiet editorial serif headings, readable sans serif labels, generous negative space and fine icons. Tiny presentation title WearAgain top-left and "ZAKUPY W GALERII · 01" top-right. External captions "01 / Zdjęcie i idziesz dalej", "02 / Podgląd bez przebierania", "03 / Kolejne zdjęcia, bez czekania". Polish text. This is a native app for a busy mall visit: take garment photographs, see an optional personal visualization as soon as ready, or keep photographing and view generated results later at coffee. App must preserve store context without repeated form entry. Do not promise literal instant generation. Style previews never guarantee physical fit. Demo photographs use the same female model, clearly labeled.
+
+SCREEN 1 / CAMERA IN STORE:
+Status 14:20. Simple header back arrow and "Zakupy w galerii", no generic dashboard. A slim selector "Teraz w: Mango · Piętro 1" with small "Zmień" link, remembered for subsequent captures.
+Large functional CAMERA viewfinder, about 62% of screen: a photographically realistic elegant camel wool coat hanging on a rail inside a softly lit fashion shop, calm blurred background, coat fully visible. Fine simple corner framing guides only. On top of viewfinder small unobtrusive instruction "Cała rzecz w kadrze". No crowded exposure controls. Under viewfinder a tiny thumbnail of previous garment at left, LARGE white/olive circular shutter center, flash icon at right. One line beneath "Zrób zdjęcie. Resztę zrobi stylistka." Bottom a small queue tray with THREE tiny captured garment thumbnails, concise "3 rzeczy · podglądy w tle" and a right arrow. Shopping camera is full task mode, without bottom nav stealing viewfinder space.
+
+SCREEN 2 / READY PREVIEW FROM ONE CAPTURE:
+Status 14:23. Back arrow and "Camelowy płaszcz". Thin store line "Mango · Piętro 1".
+Large full-length natural editorial photo, about 52% height: same dark-brown-haired 35-year-old woman from reference wearing the captured camel overcoat over ivory knit and navy trousers, with brown loafers, in neutral pale studio interior. This clearly shows the candidate garment ON the body, with separate existing garments coordinated. Small subtle photo label "Podgląd na modelce demo".
+Below a short elegant serif verdict "Warto wrócić i przymierzyć." One specific smaller sentence "Pasuje do 3 gór z Twojej szafy." Two comfortable controls: dark olive "Dodaj do powrotu" with bookmark, and low-emphasis "Pomiń". Then a wide secondary outline camera action "Fotografuj dalej". Tiny line "Podgląd stylu, nie rozmiaru." No buy pressure and no claim that try-on is unnecessary. Bottom nav "Szafa", "Stylistka", "Sprawdź" active, "Profil".
+
+SCREEN 3 / CONTINUOUS CAPTURE:
+Status 14:26. Same minimal camera header, active store selector now "Teraz w: COS · Piętro 1" with "Zmień".
+Large beautiful camera viewfinder shows a refined simple black dress hanging on rail in a pale modern clothes shop. On top small quiet non-blocking acknowledgment "Zdjęcie zapisane ✓". Viewfinder remains fully usable; previous generation never blocks the camera.
+Below simple large shutter control exactly as first screen, previous photo thumbnail and flash.
+Bottom a clean expanded queue strip: heading "Twoje dzisiejsze znaleziska"; three tiny separate garment thumbnails of coat, blazer, black dress; status exactly "6 zapisanych · 2 podglądy gotowe". Secondary quiet text "Pozostałe przygotowuję w tle." Clear small text action "Przejrzę przy kawie →". No fake percentages or wait countdown. One tiny network-resilience line "Zdjęcia zostają zapisane, gdy znika internet." Use no modal waiting overlay or extra confirmation after each photo.
+Aim for beautiful production app storytelling, realistic clear camera UI, no clutter and maximum speed in a crowded shop.
+
+======================================================================
+
+Mobile — kawa i powrót
+
+Use case: ui-mockup. Asset type: WearAgain native mobile / coffee review and return shortlist.
+Generate one high-fidelity mobile design presentation, exactly THREE large flat phone screens side by side, landscape 1536x1024 or greater. Input reference is the established WearAgain mobile system. Match its ivory, stone, dark olive, serif headings, clean sans-serif UI, same simple bottom nav, thin device outlines, luxurious natural photography and generous spacing. Tiny background header WearAgain and "ZAKUPY W GALERII · 02". External bottom captions "04 / Kawa, a podglądy robią się w tle", "05 / Oglądasz rzeczy na sobie", "06 / Wracasz tylko po wybrane". Polish throughout, crisp and readable.
+This directly continues photographing six things in mall shops. All garment photos/store locations are sample data for a DEMO. Some previews are ready while others still process. The user can review ready ones independently and shortlist things worth revisiting. No automatic shopping order, no claim of real fit or real store availability, no mandatory waiting screen, no fake mall navigation map.
+
+SCREEN 1 / QUEUE WHILE AT COFFEE:
+14:42 status, WearAgain wordmark and small bell. Large serif headline "Ty pijesz kawę.
+Podglądy robią się w tle." Small line "Dzisiejsze zakupy · 6 rzeczy". Quiet status row "4 podglądy gotowe · 2 jeszcze w tle". Thin tabs "Wszystkie 6" selected and "Gotowe 4". Main area three clear open rows with high-quality individual garment product thumbnails and actual context:
+camel overcoat / "Camelowy płaszcz" / "Mango · Piętro 1" / restrained olive check "Gotowe";
+navy tailored blazer / "Granatowa marynarka" / "Mango · Piętro 1" / olive check "Gotowe";
+ivory blouse / "Jedwabna bluzka" / "Massimo Dutti · Parter" / small neutral spinner "Przygotowuję".
+Rows separated with fine rules. Lower text "Nie musisz czekać na pozostałe." Primary dark olive button "Przejrzyj gotowe podglądy". Quiet secondary link "Dodaj kolejne zdjęcia →". Bottom nav Sprawdź active.
+
+SCREEN 2 / REVIEW ON YOUR BODY:
+14:44 status. Back arrow, "Podgląd 1 z 4", bookmark outline. Small line "Mango · Piętro 1".
+Large beautiful full-length editorial photo occupying about 55%: the same reference woman about 35 with dark brown hair wearing the photographed camel coat, ivory sweater, navy trousers, brown loafers, against simple pale naturally lit interior. Small discreet photo caption "Podgląd na modelce demo". Below short serif "Ten warto przymierzyć." One informative small sentence "Pasuje do 3 gór z Twojej szafy."
+Below two large easily tapped side-by-side actions: outlined "Pomijam" with X and dark olive "Wracam po to" with bookmark. Tiny secondary line "Możesz zmienić decyzję." A subtle next item arrow "Następna rzecz →". Honest tiny line "Oceniasz styl. Rozmiar sprawdzisz w sklepie." Bottom nav Sprawdź active. Do not add a generic shopping cart.
+
+SCREEN 3 / RETURN SHORTLIST:
+14:49 status. Back arrow, WearAgain. Large serif heading "Wracasz tylko
+po te rzeczy." Small line "2 rzeczy · 2 sklepy". Thin text tabs "Do sprawdzenia 2" active and "Odrzucone 4".
+Store group one open heading "Mango" and small right "Piętro 1". Below gorgeous square camel coat thumbnail, name "Camelowy płaszcz", small "Do przymierzenia", plus a light empty completion checkbox. Small text action "Pokaż zdjęcie →".
+Store group two heading "Massimo Dutti" and small right "Parter". Below navy pleated midi skirt photo, name "Granatowa spódnica", small "Do przymierzenia", empty checkbox. Small text action "Pokaż zdjęcie →".
+Fine dividers, no giant boxed cards. Lower calm small explanatory line "Odznacz rzecz po przymierzeniu." Full-width dark olive button "Pokaż pierwszą rzecz". Secondary link "Wróć do aparatu". Bottom nav Sprawdź active.
+The result should clearly express a thoughtful novel shopping user story and practical return list, with no hurry pressure and no visual clutter.
+
+======================================================================
+
+Mobile — przegląd garderoby
+
+Use case: ui-mockup. Asset type: WearAgain mobile wardrobe control and garment lifecycle.
+Create one beautifully polished high-fidelity presentation with exactly THREE large flat mobile app screens side by side, landscape 1536x1024 or higher, thin elegant rounded device outlines, pale warm stone presentation canvas. Input is the WearAgain MOBILE reference, preserve wordmark, warm ivory, olive-black buttons, typography, spacing, simple bottom navigation and editorial product photography exactly. Board header tiny WearAgain left and "PRZEGLĄD GARDEROBY" right. External screen captions "01 / Co wymaga uwagi", "02 / Ty decydujesz, co dalej", "03 / Nadmiar i prawdziwe braki". All UI Polish, highly readable.
+Purpose: the native mobile app offers the same wardrobe control as desktop. It can help review neglected items, repair, donate, sell, and assess duplicates or gaps. Decisions are by the user. Wear counts are based on logged outfits; lack of logging is not proof of non-use. Condition is set by the user, not inferred from photos. No arbitrary automated disposal, health-score gimmick, graph clutter, shopping pressure or deep nested cards.
+
+SCREEN 1 / REVIEW:
+9:41 status, WearAgain and Anna avatar. Large serif heading "Twoja szafa,
+pod dobrą opieką." Below slim text tabs "Rzeczy" and "Przegląd" selected olive underline.
+Small quiet overview line "5 rzeczy czeka na decyzję". Main three spacious open rows, with square high-quality product photo left and concise text right, chevron:
+cream fine-knit cardigan / "Do naprawy" small warm brown text / "Ulubiony kardigan" / "Rozpruty szew · Twój wpis";
+black midi dress / "Dawno bez zapisu" muted text / "Czarna sukienka" / "Ostatnia stylizacja: 6 miesięcy temu";
+two navy blazers photographed separately side by side / "Podobne rzeczy" / "Dwie granatowe marynarki" / "Sprawdź, czy potrzebujesz obu".
+Below a fine rule, serif section title "Czego brakuje, a czego dość?" with simple arrow link "Zobacz podpowiedzi →". Bottom small quiet line "Ty decydujesz, co zostaje." Standard bottom nav "Szafa" active, "Stylistka", "Sprawdź", "Profil".
+
+SCREEN 2 / ITEM DECISION:
+9:41 status, back arrow and small bookmark. Large serif heading "Czarna sukienka". Gorgeous wide product photograph of a simple black midi dress isolated on warm stone, about 28% of screen. Under it small data line "3 zapisane założenia · ostatnie 6 miesięcy temu".
+Clear simple row "Stan" and dropdown "Gotowa do założenia" with chevron, showing this is user-maintained. Fine rule.
+Small serif section title "Co dalej?" Four comfortable quiet options in 2x2 layout, like radio decisions, NOT four competing solid CTAs: "Zostaje" selected pale olive; "Do naprawy"; "Oddam"; "Sprzedam". Small text link "Pokaż zestawy z tą rzeczą →" helps give it another chance.
+Main full-width dark olive bottom button "Zapisz decyzję". Bottom nav Szafa active. This screen must show real user autonomy and useful item status that enables ready-to-wear morning outfits.
+
+SCREEN 3 / EXCESS AND GAPS:
+9:41, WearAgain and small profile. Large serif "Szafa
+w równowadze." Subtitle "Podpowiedzi z zapisanych stylizacji."
+First open section heading "Tych masz sporo". Row of THREE separate elegant ivory shirt product photos, no overlap. Under them concise text "3 jasne koszule. Najczęściej wybierasz jedną." Smaller evidence qualifier "W Twoich zapisanych zestawach." Quiet link "Porównaj koszule →".
+Fine horizontal divider.
+Second open section heading "Tu może być luka". Small product photo of dark brown rain-ready ankle boots alongside text "Buty na mokre dni" and "Twoje jesienne zestawy nie mają takiej pary." Below very clear small line "Sprawdź najpierw, czy nie masz ich poza aplikacją." Primary dark olive button "Sprawdzę swoją szafę". No buy button. Bottom nav Szafa active.
+Keep all three screens emotionally warm, fashion-led and extraordinarily easy to act on.
+
+======================================================================
+
+Landing page v2
+
+Use case: ui-mockup. Asset type: redesigned WearAgain desktop MARKETING LANDING PAGE, version 2.
+Create one exceptionally sophisticated complete long DESKTOP website design screenshot, portrait canvas around 1536x2304 or 1024x1536. Full-width desktop layout inside the image, no presentation board, no physical computer or browser chrome. The input image is the approved MOBILE APP BRAND reference, NOT a layout to copy. Keep its refined WearAgain serif wordmark, warm ivory #F8F6F1, black olive #30392F, natural fabric palette, exquisite serif headings and refined legible sans serif. The previous landing page felt too generic and visually flat. This NEW design must have real editorial art direction, more intentional asymmetry, a stronger hierarchy, varied section rhythm, premium original fashion photography, precise whitespace, and compelling product storytelling. It must look like a distinguished fashion house launching a genuinely useful personal wardrobe app. NOT generic SaaS, not a webshop catalog, not a standard 3-feature card template. No cream-to-photo fading masks, no gradients, no copied identical apartment shot everywhere, no fake statistics, testimonials, fake app store badges, fake partners, hero eyebrow labels or pricing. All text Polish, beautifully composed and readable.
+
+Create FOUR distinct elegant page regions with connective typography and alignment:
+
+1 / HEADER AND HERO, about top 39%.
+Header on plain ivory: WearAgain left; quiet right navigation "Jak to działa", "Dla sklepów", "Zaloguj się"; small dark olive primary "Wypróbuj demo".
+Below asymmetrical but clear editorial hero: left 44% text, right 51% photo with a crisp rectangular boundary and a generous gutter, NOT a soft blended background. Huge beautifully typeset serif heading, exactly "Ta sama szafa.
+Więcej Ciebie." with second line exquisite italic. Two compact sans-serif supporting lines "Stylistka, która zna to, co masz.
+Na poranek w biegu, wyjazd i lepsze zakupy." Primary solid olive button "Zajrzyj do demo →". Tiny understated note below "W demo poznasz aplikację z gotową modelką."
+Right a spectacular genuine full-body editorial fashion photograph of a naturally beautiful dark-haired woman about 35, same general brand model as reference, wearing cream fine-knit top, navy tailored trousers, elegant brown loafers, carrying a camel coat over one forearm and a small structured brown bag. She stands in a minimalist warm stone architectural doorway, morning natural light, restrained confident pose, tactile fabric detail, luxurious without ostentation. Clean cinematic composition, no busy luxury palace setting.
+A SINGLE restrained slim phone mockup overlaps only the LOWER LEFT EDGE of this right photograph, not the hero text; it clearly shows a WearAgain native app outfit result screen with main photo of the same woman and title "Na dziś, z Twojej szafy", olive button "Zakładam ten zestaw". Phone is a subtle product cue, not a collage.
+
+2 / MORNING STORY, about next 24%.
+Ivory background continues, fine top rule. Wide split with reversed emphasis: LEFT a beautiful open triptych of THREE small full-length fashion photos of the same woman, separate rectangular frames, cream/navy capsule wardrobe combinations with brown shoes. Slightly staggered image heights as an intentional editorial rhythm; no overlapping garments. RIGHT a large serif heading "Poranek w biegu.
+Zestaw już gotowy." Beneath a clean outlined quote field with tiny microphone icon and actual natural-language quote "Do biura, na szybko, bez prasowania." Small useful copy "Ty szykujesz się do wyjścia. Stylistka przygotowuje trzy zestawy z Twoich rzeczy." Plain text link "Poznaj swoją stylistkę →". Keep enough air, no card grid.
+
+3 / SHOPPING STORY, about next 24%.
+A full-width DEEP OLIVE #30392F band provides strong intentional visual rhythm, with warm ivory serif and sans-serif text and generous padding. LEFT about 48% an exquisite large serif headline "Zrób zdjęcia.
+Idź na kawę." Supporting text "Fotografuj to, co wpada Ci w oko. Przy kawie obejrzysz rzeczy na sobie i wybierzesz, po co warto wrócić." Underlined ivory text link "Zobacz zakupy po swojemu →". Tiny clear honesty note "Podgląd stylu, nie dopasowania rozmiaru."
+RIGHT about 42% a photoreal editorial image: a woman's hand holding a phone above a pale stone café table, neat cappuccino with crema beside it, daylight, warm restrained mall-café background softly out of focus. Phone screen visibly shows WearAgain "Wracasz tylko po te rzeczy" with two clean product thumbnails, camel coat and navy skirt, store groups and olive action button. Realistic hands, subtle tasteful manicure, no branded coffee cup. The phone content is a visual product signal and should remain logically designed.
+
+4 / WARDROBE CARE, PRIVACY AND FOOTER, about final 13%.
+Back to warm ivory, a calm concise horizontal final section with left serif headline "Twoja szafa.
+Na dłużej." Right short copy "Co nosić, co naprawić, co oddać. Ty decydujesz." and simple link "Zobacz przegląd garderoby →".
+Below one slim quiet privacy line with lock icon "Twoje zdjęcie widzisz tylko Ty. Usuniesz je jednym dotknięciem." Fine rule, then restrained footer: WearAgain wordmark left, "Dla sklepów: poznaj pilota →" middle, "Prywatność" and "Kontakt" right.
+Typography and rhythm are the star. Make the whole page cohesive, aspirational and recognizably fashion-led while its three real stories remain instantly clear. Every section complete, no clipping, excellent image-to-text proportions and no invented extra sections.

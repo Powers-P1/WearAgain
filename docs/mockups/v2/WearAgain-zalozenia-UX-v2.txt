@@ -1,0 +1,18 @@
+WearAgain — decyzje projektowe v2, 21.10.2026
+
+Status: koncepcje wizualne ImageGen, do dalszego projektowania i implementacji.
+
+1. Aplikacja mobilna jest podstawowym narzędziem. Desktop rozszerza ją o wygodny przegląd i planowanie całej garderoby.
+2. Szafa ma widok rzeczy i przegląd: zapisane użycie, rzeczy do naprawy, dawno bez zapisanej stylizacji, podobne rzeczy, nadmiar i potencjalne braki. Brak zapisu nie oznacza pewności, że rzecz nie była noszona.
+3. Stan rzeczy i jej dostępność wymagają danych od użytkowniczki. Decyzje „zostaje / naprawa / oddam / sprzedam” należą do niej. Lista dostępności do wdrożenia powinna rozróżniać gotowe, w praniu, do prasowania i do naprawy.
+4. Poranek: polecenie głosowe „Do biura, na szybko, bez prasowania, z tego, co mam”; trzy propozycje powstają w tle; aplikacja powiadamia o gotowości; wybór „Zakładam ten zestaw” zapisuje dzisiejszy zestaw. Do porannego scenariusza trafiają rzeczy oznaczone jako dostępne i gotowe, z uwzględnieniem pielęgnacji.
+5. Galeria: fotografia rzeczy jest zapisywana od razu, z kontekstem sklepu; kolejne zdjęcie nie czeka na generowanie poprzedniego podglądu. Zmianę sklepu podaje się raz, bez formularza dla każdej rzeczy.
+6. Przy kawie: gotowe podglądy można przeglądać niezależnie od pozostałych. Decyzje „pomijam / wracam po to” tworzą listę powrotów z nazwą sklepu, piętrem i zdjęciem rzeczy. Dane sklepów na planszach są przykładowe, nie potwierdzają dostępności produktów ani lokalizacji sklepów.
+7. Sesja zakupowa jest oddzielona od posiadanej szafy. Obejrzenie lub zapisanie kandydata nie oznacza zakupu ani dodania go do posiadanych rzeczy.
+8. Podgląd na sobie pomaga ocenić styl, nie rozmiar ani rzeczywiste dopasowanie. Demo używa gotowej modelki; własne zdjęcie jest prywatną opcją produkcyjną.
+9. Stan rzeczy i rozpoznane braki nie powinny opierać się na założeniu, że szafa w aplikacji jest kompletna. Najpierw sprawdzenie własnych rzeczy; potem ewentualny zakup.
+10. Smart home — kierunek do osobnej walidacji, nie gotowa integracja: ekran przy szafie z zestawem dnia i opcjonalne tagi NFC wywołujące zapis „dziś noszę”. Oficjalna dokumentacja Home Assistant potwierdza wyzwalanie automatyzacji skanem tagu:
+https://www.home-assistant.io/triggers/tag/
+https://companion.home-assistant.io/docs/integrations/universal-links/
+Wymagałoby to osobnego połączenia WearAgain z systemem domowym. Podstawowe scenariusze działają w samej aplikacji.
+
