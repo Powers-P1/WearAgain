@@ -17,10 +17,10 @@ Set these variables on the Worker (or edit the committed non-secret defaults bef
 
 | Variable | Committed default | Meaning |
 | --- | --- | --- |
-| `LIVE_ENABLED` | `false` | Explicit opt-in to the live HTTP routes. |
-| `LIVE_TOTAL_UNITS` | `0` | Total lifetime allocation to this ledger, covering spent + all held units. |
-| `LIVE_DAILY_UNITS` | `0` | UTC daily spend + every unresolved hold, including older days. |
-| `LIVE_SESSION_DAILY_UNITS` | `0` | The same rule per anonymous session token. |
+| `LIVE_ENABLED` | `true` | Explicit opt-in to the live HTTP routes. |
+| `LIVE_TOTAL_UNITS` | `440` | Total lifetime allocation to this ledger, covering spent + all held units. |
+| `LIVE_DAILY_UNITS` | `240` | UTC daily spend + every unresolved hold, including older days. |
+| `LIVE_SESSION_DAILY_UNITS` | `40` | The same rule per anonymous session token. |
 | `ALLOWED_ORIGINS` | `https://wearagain.pages.dev` | Comma-separated exact frontend origins. Add a localhost origin only for local development. |
 | `DEMO_ASSET_ORIGIN` | `https://wearagain.pages.dev` | Origin serving approved `/demo/renders/` static files. |
 | `YOUCAM_ASSET_HOSTS` | unset | Optional exact comma-separated upload/result hostnames; default is `yce-us.s3-accelerate.amazonaws.com`, as in the provider guide. Verify any additions against a trusted probe. |

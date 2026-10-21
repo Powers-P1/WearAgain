@@ -5,11 +5,11 @@ compatibility_date = "2026-10-21"
 [vars]
 VERSION = "0.3.0-youcam-ledger"
 ALLOWED_ORIGINS = "https://wearagain.pages.dev"
-# Enable only after allocating an explicit remaining provider budget.
-LIVE_ENABLED = "false"
-LIVE_TOTAL_UNITS = "0"
-LIVE_DAILY_UNITS = "0"
-LIVE_SESSION_DAILY_UNITS = "0"
+# Team allocation decided 21 Oct 2026: 440 units total (220 renders), 240 per UTC day, 40 per session; the rest of the provider balance stays in reserve.
+LIVE_ENABLED = "true"
+LIVE_TOTAL_UNITS = "440"
+LIVE_DAILY_UNITS = "240"
+LIVE_SESSION_DAILY_UNITS = "40"
 DEMO_ASSET_ORIGIN = "https://wearagain.pages.dev"
 
 [[durable_objects.bindings]]
