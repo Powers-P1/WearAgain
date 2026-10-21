@@ -1,0 +1,16 @@
+{
+  "id": "/app",
+  "name": "WearAgain - Wardrobe demo",
+  "short_name": "WearAgain",
+  "description": "Explore a smaller, explainable basket using the wardrobe you already own. Web demo; native apps are planned.",
+  "lang": "en",
+  "start_url": "/app?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fbf9f5",
+  "theme_color": "#304d33",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

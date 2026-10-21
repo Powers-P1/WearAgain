@@ -15,8 +15,12 @@ concurrency:
 
 jobs:
   core:
-    name: Typecheck and core tests
-    runs-on: ubuntu-latest
+    name: Types, tests and Pages build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     timeout-minutes: 10
     steps:
       - name: Check out source

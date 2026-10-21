@@ -1,6 +1,6 @@
 # Render API (PR3)
 
-This is the server boundary for PR4. PR3 implements the client, Worker and ledger; the Pages product UI remains PR4. Tests exercise the full protocol with synthetic fixture responses and deny external network access. They are not a live provider measurement.
+This is the server boundary used by the PR4 frontend. PR3 implements the client, Worker and ledger; [FRONTEND.md](FRONTEND.md) documents the Pages UI and recording handoff. Tests exercise the full protocol with synthetic fixture responses and deny external network access. They are not a live provider measurement.
 
 ## Public routes
 
@@ -8,7 +8,7 @@ This is the server boundary for PR4. PR3 implements the client, Worker and ledge
 | --- | --- |
 | `GET /health` | Version and whether live mode has an explicit configuration. No secrets. |
 | `GET /do-check` | SQLite Durable Object health, no reservation or provider call. |
-| `GET /api/avatars` | Approved synthetic adult avatar IDs, immutable base revisions and image URLs. Selection remains PR4. |
+| `GET /api/avatars` | Approved synthetic adult avatar IDs, immutable base revisions and image URLs. The PR4 selector uses the same committed catalogue. |
 | `GET /api/demo/renders` | Recorded-demo manifest, `unitsCharged: 0`, and explicit availability. |
 | `GET /api/demo/renders/{id}/image` | Redirect to the matching approved static recording; no YouCam call. |
 | `POST /api/session` | Anonymous live session token and expiry; body empty or `{}`. Requires enabled live mode and positive configured budgets. |

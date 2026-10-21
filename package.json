@@ -9,13 +9,17 @@
     "node": ">=24 <25"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.web.json",
     "build": "tsc",
     "test": "npm run build && node --test tests/*.test.mjs",
-    "check": "npm run typecheck && npm test"
+    "check": "npm run typecheck && npm test && npm run build:web",
+    "build:web": "node scripts/build-web.mjs",
+    "dev:web": "node scripts/serve-web.mjs"
   },
   "devDependencies": {
     "typescript": "5.9.3",
-    "wrangler": "^4.151.3"
+    "wrangler": "^4.151.3",
+    "esbuild": "0.28.2",
+    "sharp": "0.35.5"
   }
 }
