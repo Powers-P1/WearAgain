@@ -4,13 +4,15 @@ Try-on runs on a synthetic base model, never on a user photo. Index: `fixtures/b
 
 ## Library (in scope for the hackathon)
 
-Two neutral adults plus one fallback, all synthetic. Adults (18+) only; children are intentionally excluded. A grid of sex x size (S-3XL) x height x build is planned in `avatars.json`, not yet generated.
+Ten synthetic adults plus one fallback: two neutral (M/L) and a pilot series of eight size-L silhouettes (4 builds - slim, average, muscular, belly - x 2 sexes, `woman_L_*_01` / `man_L_*_01`). Adults (18+) only; children are intentionally excluded. The wider grid of sex x size (S-3XL) x height x build is planned in `avatars.json`, not yet generated.
+
+**Measurements are nominal.** The L series assumes about 45 years, 175 cm and size L; these are prompt assumptions (`assumptions` field), not measurements, and the height/weight bands are team-chosen selection bands. Belly differences are deliberately subtle. Never present an avatar as a size chart.
 
 ## Deterministic nearest-avatar selection
 
 Input: sex, height, weight, age (declared, never inferred), optional girths.
 
-1. Filter by sex and `ageBand: adult`. Skip entries with `role: fallback` unless nothing else remains.
+1. Filter by sex and `ageBand: adult`. Selection order: sex, then build, then nearest height/weight bands. Skip entries with `role: fallback` unless nothing else remains.
 2. For each remaining avatar, normalise every provided measure against its band: `d = max(0, |x - mid| - halfWidth) / halfWidth`, where `mid` and `halfWidth` come from the band.
 3. Distance = sqrt of the weighted sum of squares (height 2, weight 2, girths 1 each). A requested build adds a penalty of 1 on mismatch.
 4. Pick the lowest distance; break ties by `id`, so the same input always gives the same avatar.
