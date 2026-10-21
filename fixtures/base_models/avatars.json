@@ -1,14 +1,20 @@
 {
   "version": 1,
-  "note": "Heights and weights are nominal bands chosen by the team for selection; the images are synthetic and were not measured.",
-  "schema": "id, file, sex, heightBandCm [min,max], weightBandKg [min,max], build (neutral|slim|muscular|belly), ageBand (adult only), notes, role (optional: primary|fallback)",
+  "note": "Heights and weights are nominal bands chosen by the team for selection; the images are synthetic and were not measured. The L series assumes about 45 years and 175 cm: prompt assumptions, not measurements.",
+  "schema": "id, file, sex, size (optional), heightBandCm [min,max], weightBandKg [min,max], build (neutral|slim|average|muscular|belly), ageBand (adult only), nominalAgeYears/nominalHeightCm/assumptions (optional), notes, role (optional: primary|fallback)",
   "avatars": [
     {
       "id": "woman_neutral_01",
       "file": "woman_neutral_01.png",
       "sex": "female",
-      "heightBandCm": [160, 172],
-      "weightBandKg": [54, 68],
+      "heightBandCm": [
+        160,
+        172
+      ],
+      "weightBandKg": [
+        54,
+        68
+      ],
       "build": "neutral",
       "ageBand": "adult",
       "role": "primary",
@@ -18,19 +24,199 @@
       "id": "man_neutral_01",
       "file": "man_neutral_01.png",
       "sex": "male",
-      "heightBandCm": [174, 186],
-      "weightBandKg": [68, 84],
+      "heightBandCm": [
+        174,
+        186
+      ],
+      "weightBandKg": [
+        68,
+        84
+      ],
       "build": "neutral",
       "ageBand": "adult",
       "role": "primary",
       "notes": "Front view, hands at sides, white tee, dark jeans, grey background. Size roughly M-L."
     },
     {
+      "id": "woman_L_slim_01",
+      "file": "woman_L_slim_01.png",
+      "sex": "female",
+      "size": "L",
+      "build": "slim",
+      "ageBand": "adult",
+      "nominalAgeYears": 45,
+      "nominalHeightCm": 175,
+      "assumptions": "prompt assumptions, not measured",
+      "heightBandCm": [
+        168,
+        182
+      ],
+      "weightBandKg": [
+        60,
+        74
+      ],
+      "role": "primary",
+      "notes": "Front view, hands at sides, white tee, dark jeans, light grey background, 1024x1536. Slimmer build; T-shirt fits closely. Same fictional face across the four builds of one sex. Nominal size L (label, not a size chart)."
+    },
+    {
+      "id": "woman_L_average_01",
+      "file": "woman_L_average_01.png",
+      "sex": "female",
+      "size": "L",
+      "build": "average",
+      "ageBand": "adult",
+      "nominalAgeYears": 45,
+      "nominalHeightCm": 175,
+      "assumptions": "prompt assumptions, not measured",
+      "heightBandCm": [
+        168,
+        182
+      ],
+      "weightBandKg": [
+        70,
+        86
+      ],
+      "role": "primary",
+      "notes": "Front view, hands at sides, white tee, dark jeans, light grey background, 1024x1536. Average build; the baseline of the series. Same fictional face across the four builds of one sex. Nominal size L (label, not a size chart)."
+    },
+    {
+      "id": "woman_L_muscular_01",
+      "file": "woman_L_muscular_01.png",
+      "sex": "female",
+      "size": "L",
+      "build": "muscular",
+      "ageBand": "adult",
+      "nominalAgeYears": 45,
+      "nominalHeightCm": 175,
+      "assumptions": "prompt assumptions, not measured",
+      "heightBandCm": [
+        168,
+        182
+      ],
+      "weightBandKg": [
+        76,
+        92
+      ],
+      "role": "primary",
+      "notes": "Front view, hands at sides, white tee, dark jeans, light grey background, 1024x1536. Muscular upper body, broad shoulders and arms. Same fictional face across the four builds of one sex. Nominal size L (label, not a size chart)."
+    },
+    {
+      "id": "woman_L_belly_01",
+      "file": "woman_L_belly_01.png",
+      "sex": "female",
+      "size": "L",
+      "build": "belly",
+      "ageBand": "adult",
+      "nominalAgeYears": 45,
+      "nominalHeightCm": 175,
+      "assumptions": "prompt assumptions, not measured",
+      "heightBandCm": [
+        168,
+        182
+      ],
+      "weightBandKg": [
+        78,
+        94
+      ],
+      "role": "primary",
+      "notes": "Front view, hands at sides, white tee, dark jeans, light grey background, 1024x1536. Slight belly; the difference is deliberately restrained. Same fictional face across the four builds of one sex. Nominal size L (label, not a size chart)."
+    },
+    {
+      "id": "man_L_slim_01",
+      "file": "man_L_slim_01.png",
+      "sex": "male",
+      "size": "L",
+      "build": "slim",
+      "ageBand": "adult",
+      "nominalAgeYears": 45,
+      "nominalHeightCm": 175,
+      "assumptions": "prompt assumptions, not measured",
+      "heightBandCm": [
+        170,
+        184
+      ],
+      "weightBandKg": [
+        68,
+        82
+      ],
+      "role": "primary",
+      "notes": "Front view, hands at sides, white tee, dark jeans, light grey background, 1024x1536. Slimmer build; T-shirt fits closely. Same fictional face across the four builds of one sex. Nominal size L (label, not a size chart)."
+    },
+    {
+      "id": "man_L_average_01",
+      "file": "man_L_average_01.png",
+      "sex": "male",
+      "size": "L",
+      "build": "average",
+      "ageBand": "adult",
+      "nominalAgeYears": 45,
+      "nominalHeightCm": 175,
+      "assumptions": "prompt assumptions, not measured",
+      "heightBandCm": [
+        170,
+        184
+      ],
+      "weightBandKg": [
+        78,
+        92
+      ],
+      "role": "primary",
+      "notes": "Front view, hands at sides, white tee, dark jeans, light grey background, 1024x1536. Average build; the baseline of the series. Same fictional face across the four builds of one sex. Nominal size L (label, not a size chart)."
+    },
+    {
+      "id": "man_L_muscular_01",
+      "file": "man_L_muscular_01.png",
+      "sex": "male",
+      "size": "L",
+      "build": "muscular",
+      "ageBand": "adult",
+      "nominalAgeYears": 45,
+      "nominalHeightCm": 175,
+      "assumptions": "prompt assumptions, not measured",
+      "heightBandCm": [
+        170,
+        184
+      ],
+      "weightBandKg": [
+        86,
+        102
+      ],
+      "role": "primary",
+      "notes": "Front view, hands at sides, white tee, dark jeans, light grey background, 1024x1536. Muscular upper body, broad shoulders and arms. Same fictional face across the four builds of one sex. Nominal size L (label, not a size chart)."
+    },
+    {
+      "id": "man_L_belly_01",
+      "file": "man_L_belly_01.png",
+      "sex": "male",
+      "size": "L",
+      "build": "belly",
+      "ageBand": "adult",
+      "nominalAgeYears": 45,
+      "nominalHeightCm": 175,
+      "assumptions": "prompt assumptions, not measured",
+      "heightBandCm": [
+        170,
+        184
+      ],
+      "weightBandKg": [
+        88,
+        104
+      ],
+      "role": "primary",
+      "notes": "Front view, hands at sides, white tee, dark jeans, light grey background, 1024x1536. Slight belly; the difference is deliberately restrained. Same fictional face across the four builds of one sex. Nominal size L (label, not a size chart)."
+    },
+    {
       "id": "synthetic_model_01_upper",
       "file": "synthetic_model_01_upper.jpg",
       "sex": "female",
-      "heightBandCm": [158, 170],
-      "weightBandKg": [50, 64],
+      "heightBandCm": [
+        158,
+        170
+      ],
+      "weightBandKg": [
+        50,
+        64
+      ],
       "build": "slim",
       "ageBand": "adult",
       "role": "fallback",
@@ -38,12 +224,31 @@
     }
   ],
   "gridPlan": {
-    "status": "planned, not generated",
+    "status": "partially generated: M/L neutral plus L series (4 builds x 2 sexes); the rest planned",
     "axes": {
-      "sex": ["female", "male"],
-      "size": ["S", "M", "L", "XL", "XXL", "3XL"],
-      "heightClass": ["short", "medium", "tall"],
-      "build": ["neutral", "slim", "muscular", "belly"]
+      "sex": [
+        "female",
+        "male"
+      ],
+      "size": [
+        "S",
+        "M",
+        "L",
+        "XL",
+        "XXL",
+        "3XL"
+      ],
+      "heightClass": [
+        "short",
+        "medium",
+        "tall"
+      ],
+      "build": [
+        "neutral",
+        "slim",
+        "muscular",
+        "belly"
+      ]
     },
     "scope": "Adults (18+) only. Children and teenagers are intentionally excluded for the hackathon.",
     "rules": [
