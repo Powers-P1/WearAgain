@@ -1,6 +1,6 @@
 import { morningLooks, localISODate, storeDaily, wearToday, type DailyState } from './daily.js';
 import { proposeLooks, recordedPreviewForItem, type OccasionSuggestion } from './stylist.js';
-import type { WardrobeItem, WardrobeState } from './state.js';
+import type { WardrobeState } from './state.js';
 import { t } from './i18n.js';
 import './daily.css';
 

@@ -113,6 +113,7 @@ export const en = {
   mallLinkOnly: 'Link only · no model preview',
   mallReviewNow: 'Review captured items',
   mallPhotoDeleteFailed: 'Could not delete the stored photo. Remove it in your browser’s site data.',
+  mallRemovePhoto: 'Delete this device-only candidate photo',
   mallShopUnknown: 'Shop not entered',
   mallFloorUnknown: 'Floor not entered',
   mallLinkWithoutImage: 'No image: link saved',

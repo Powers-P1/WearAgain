@@ -28,7 +28,7 @@ const validId=(x:unknown):x is string=>typeof x==='string'&&/^[a-zA-Z0-9_-]{1,64
 function validDate(x:unknown):x is string {return typeof x==='string' && /^\d{4}-\d{2}-\d{2}$/.test(x) && !Number.isNaN(Date.parse(x));}
 export function sampleShopping(): ShoppingSession {
   const scenario=scenarioForDemo('minimum');
-  const items:ShopItem[]=scenario.outerwear.filter(item=>item.kind==='candidate').map(item=>{
+  const items:ShopItem[]=scenario.outerwear.filter(item=>item.kind==='candidate').map<ShopItem>(item=>{
     const recorded=recordingFor('outerwear',item.id);
     return {
       id:'demo_'+item.id.replaceAll('-','_'),title:item.label,source:'recorded',status:'saved_preview',
