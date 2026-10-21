@@ -39,7 +39,8 @@ export class YouCamClient {
     const hosts = options.allowedAssetHosts ?? YOUCAM_DEFAULT_ASSET_HOSTS;
     if (hosts.length === 0 || hosts.some(host => !/^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/i.test(host) || /(?:^|\.)(?:localhost|local|internal)$/i.test(host))) throw new YouCamError("input", "downloadResult");
     this.#apiKey = options.apiKey;
-    this.#fetch = options.fetchImpl ?? fetch;
+    // Workers throws "Illegal invocation" if global fetch is called with this = client.
+    this.#fetch = options.fetchImpl ?? ((input, init) => fetch(input, init));
     this.#beforeRequest = options.beforeRequest ?? (async () => {});
     this.#timeoutMs = timeout;
     this.#assetHosts = new Set(hosts.map(host => host.toLowerCase()));
