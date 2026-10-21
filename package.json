@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "A deterministic minimum-basket decision tool for the clothes you already own.",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "type": "module",
   "engines": {
     "node": ">=24 <25"

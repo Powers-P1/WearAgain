@@ -64,5 +64,5 @@ The Pages demo and live mode are labelled distinctly. Demo replays permitted sav
 
 ## License
 
-[MIT](LICENSE).
+Proprietary. All rights reserved; see [LICENSE](LICENSE). Hackathon judges with read access may evaluate the work; earlier MIT-licensed versions (before 21 October 2026) keep that licence for those versions only.
 
