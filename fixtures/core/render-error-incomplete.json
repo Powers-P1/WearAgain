@@ -1,0 +1,49 @@
+{
+  "provenance": "synthetic_hand_authored_no_api_output",
+  "description": "An error preserves its reason and is unresolved evidence; it must never be silently converted into would_not_wear.",
+  "scenario": {
+    "schemaVersion": 1,
+    "currency": "PLN",
+    "tops": [
+      {
+        "id": "shirt",
+        "label": "Synthetic shirt"
+      }
+    ],
+    "outerwear": [
+      {
+        "id": "coat",
+        "label": "Synthetic coat",
+        "kind": "candidate",
+        "priceMinor": 5000
+      }
+    ],
+    "outfits": [
+      {
+        "id": "shirt-coat",
+        "topId": "shirt",
+        "outerwearId": "coat"
+      }
+    ],
+    "requirements": [
+      {
+        "id": "work",
+        "label": "Synthetic work",
+        "minCount": 1,
+        "outfitIds": [
+          "shirt-coat"
+        ]
+      }
+    ],
+    "ratings": [
+      {
+        "outfitId": "shirt-coat",
+        "status": "render_error",
+        "reason": "Synthetic fixture: garment details changed."
+      }
+    ]
+  },
+  "expected": {
+    "status": "incomplete"
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "provenance": "synthetic_hand_authored_no_api_output",
+  "description": "Two distinct work outfits are required, and the accepted hoodie/a pair also satisfies rain; shared use across needs is allowed.",
+  "scenario": {
+    "schemaVersion": 1,
+    "currency": "PLN",
+    "tops": [
+      {
+        "id": "shirt",
+        "label": "Synthetic shirt"
+      },
+      {
+        "id": "hoodie",
+        "label": "Synthetic hoodie"
+      }
+    ],
+    "outerwear": [
+      {
+        "id": "old",
+        "label": "Synthetic old",
+        "kind": "owned"
+      },
+      {
+        "id": "a",
+        "label": "Synthetic a",
+        "kind": "candidate",
+        "priceMinor": 3000
+      },
+      {
+        "id": "b",
+        "label": "Synthetic b",
+        "kind": "candidate",
+        "priceMinor": 4000
+      }
+    ],
+    "outfits": [
+      {
+        "id": "shirt-old",
+        "topId": "shirt",
+        "outerwearId": "old"
+      },
+      {
+        "id": "hoodie-a",
+        "topId": "hoodie",
+        "outerwearId": "a"
+      },
+      {
+        "id": "shirt-b",
+        "topId": "shirt",
+        "outerwearId": "b"
+      }
+    ],
+    "requirements": [
+      {
+        "id": "work",
+        "label": "Synthetic work",
+        "minCount": 2,
+        "outfitIds": [
+          "shirt-old",
+          "hoodie-a",
+          "shirt-b"
+        ]
+      },
+      {
+        "id": "rain",
+        "label": "Synthetic rain",
+        "minCount": 1,
+        "outfitIds": [
+          "hoodie-a"
+        ]
+      }
+    ],
+    "ratings": [
+      {
+        "outfitId": "shirt-old",
+        "status": "would_wear"
+      },
+      {
+        "outfitId": "hoodie-a",
+        "status": "would_wear"
+      },
+      {
+        "outfitId": "shirt-b",
+        "status": "would_wear"
+      }
+    ]
+  },
+  "expected": {
+    "status": "solved",
+    "candidateIds": [
+      "a"
+    ],
+    "costMinor": 3000,
+    "priceOptimality": "proven",
+    "selectionStability": "stable",
+    "cheaperBasketCount": 1
+  }
+}

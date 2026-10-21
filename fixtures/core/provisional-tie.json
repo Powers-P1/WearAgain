@@ -1,0 +1,71 @@
+{
+  "provenance": "synthetic_hand_authored_no_api_output",
+  "description": "No cheaper basket can work, but an unresolved same-price candidate can change deterministic tie selection.",
+  "scenario": {
+    "schemaVersion": 1,
+    "currency": "PLN",
+    "tops": [
+      {
+        "id": "shirt",
+        "label": "Synthetic shirt"
+      }
+    ],
+    "outerwear": [
+      {
+        "id": "z",
+        "label": "Synthetic z",
+        "kind": "candidate",
+        "priceMinor": 5000
+      },
+      {
+        "id": "a",
+        "label": "Synthetic a",
+        "kind": "candidate",
+        "priceMinor": 5000
+      }
+    ],
+    "outfits": [
+      {
+        "id": "shirt-z",
+        "topId": "shirt",
+        "outerwearId": "z"
+      },
+      {
+        "id": "shirt-a",
+        "topId": "shirt",
+        "outerwearId": "a"
+      }
+    ],
+    "requirements": [
+      {
+        "id": "work",
+        "label": "Synthetic work",
+        "minCount": 1,
+        "outfitIds": [
+          "shirt-z",
+          "shirt-a"
+        ]
+      }
+    ],
+    "ratings": [
+      {
+        "outfitId": "shirt-z",
+        "status": "would_wear"
+      },
+      {
+        "outfitId": "shirt-a",
+        "status": "unrated"
+      }
+    ]
+  },
+  "expected": {
+    "status": "solved",
+    "candidateIds": [
+      "z"
+    ],
+    "costMinor": 5000,
+    "priceOptimality": "proven",
+    "selectionStability": "provisional",
+    "cheaperBasketCount": 1
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "wearagain",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A deterministic minimum-basket decision tool for the clothes you already own.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "check": "npm run typecheck && npm test"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

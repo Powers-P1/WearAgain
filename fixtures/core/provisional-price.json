@@ -1,0 +1,67 @@
+{
+  "provenance": "synthetic_hand_authored_no_api_output",
+  "description": "An unrendered cheaper candidate is not a rejection; the current feasible basket cannot claim unconditional minimality.",
+  "scenario": {
+    "schemaVersion": 1,
+    "currency": "PLN",
+    "tops": [
+      {
+        "id": "shirt",
+        "label": "Synthetic shirt"
+      }
+    ],
+    "outerwear": [
+      {
+        "id": "cheap",
+        "label": "Synthetic cheap",
+        "kind": "candidate",
+        "priceMinor": 4000
+      },
+      {
+        "id": "known",
+        "label": "Synthetic known",
+        "kind": "candidate",
+        "priceMinor": 9000
+      }
+    ],
+    "outfits": [
+      {
+        "id": "shirt-cheap",
+        "topId": "shirt",
+        "outerwearId": "cheap"
+      },
+      {
+        "id": "shirt-known",
+        "topId": "shirt",
+        "outerwearId": "known"
+      }
+    ],
+    "requirements": [
+      {
+        "id": "work",
+        "label": "Synthetic work",
+        "minCount": 1,
+        "outfitIds": [
+          "shirt-cheap",
+          "shirt-known"
+        ]
+      }
+    ],
+    "ratings": [
+      {
+        "outfitId": "shirt-known",
+        "status": "would_wear"
+      }
+    ]
+  },
+  "expected": {
+    "status": "solved",
+    "candidateIds": [
+      "known"
+    ],
+    "costMinor": 9000,
+    "priceOptimality": "provisional",
+    "selectionStability": "provisional",
+    "cheaperBasketCount": 2
+  }
+}
