@@ -8,3 +8,5 @@ dist/
 secrets/
 fixtures/raw/
 *.log
+.wrangler/
+.dev.vars

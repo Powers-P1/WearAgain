@@ -1,0 +1,14 @@
+name = "wearagain-api"
+main = "src/index.js"
+compatibility_date = "2026-10-21"
+
+[vars]
+VERSION = "0.1.0-skeleton"
+
+[[durable_objects.bindings]]
+name = "UNIT_LEDGER"
+class_name = "UnitLedger"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["UnitLedger"]
