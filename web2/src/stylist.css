@@ -1,0 +1,111 @@
+/* PR-B - the same warm editorial system as PR-A, without a UI kit. */
+.stylist-view { max-width: 1330px; }
+.stylist-intro { display: flex; justify-content: space-between; gap: 24px; align-items: start; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+.stylist-intro p { margin-top: 7px; color: var(--muted); }
+.stylist-saved-link { margin-top: 10px; white-space: nowrap; }
+.stylist-layout { display: grid; grid-template-columns: minmax(270px, 330px) minmax(0, 1fr); gap: 34px; margin-top: 29px; }
+.stylist-form { display: flex; flex-direction: column; align-items: stretch; min-width: 0; }
+.stylist-form h2 { font-size: 32px; }
+.stylist-form-note { color: var(--muted); margin: 5px 0 21px; font-size: 13px; }
+.stylist-form textarea {
+  background: var(--paper); border: 1px solid var(--line); width: 100%; min-height: 159px;
+  resize: vertical; padding: 17px; font-size: 14px; line-height: 1.6; outline: 0;
+}
+.stylist-form textarea:focus { border-color: var(--olive); }
+.occasion-suggestions { display: flex; gap: 16px; margin: 15px 0 22px; flex-wrap: wrap; }
+.occasion-suggestions button { display: flex; gap: 5px; align-items: center; border: 0; background: transparent; padding: 2px 0; font-size: 12px; color: var(--muted); }
+.occasion-suggestions .icon { width: 13px; height: 13px; }
+.stylist-date { display: flex; align-items: center; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 17px 0; gap: 12px; }
+.stylist-date .icon { width: 19px; height: 19px; }
+.stylist-date input { font-size: 13px; width: 100%; border: 0; background: transparent; color: var(--olive); color-scheme: light; }
+.stylist-style-row { display: flex; justify-content: space-between; gap: 15px; align-items: start; padding: 24px 0; border-bottom: 1px solid var(--line); }
+.stylist-style-row strong { font-weight: 600; font-size: 13px; }
+.stylist-style-row p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-top: 6px; max-height: 65px; overflow: hidden; }
+.stylist-style-row button { background: transparent; border: 0; padding: 2px 0; text-decoration: underline; text-underline-offset: 2px; font-size: 12px; }
+.stylist-owned { display: flex; align-items: center; gap: 9px; color: #5b7158; padding: 23px 0; font-size: 13px; }
+.stylist-owned .icon { width: 17px; height: 17px; }
+.stylist-form > .button { min-height: 46px; }
+.stylist-footnote { color: var(--muted); font-size: 11px; margin-top: 18px; }
+.stylist-result { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(220px, .85fr); gap: 28px; min-width: 0; }
+.stylist-preview-column, .stylist-details { min-width: 0; }
+.stylist-progress { min-height: 28px; display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 12px; margin-bottom: 13px; }
+.stylist-arrows { display: flex; align-items: center; gap: 9px; }
+.stylist-arrows button { width: 30px; height: 30px; display: grid; place-items: center; background: transparent; border: 1px solid var(--line); }
+.stylist-arrows button:hover { background: var(--olive-soft); }
+.stylist-arrows .icon { width: 16px; height: 16px; }
+.stylist-photo { position: relative; overflow: hidden; background: var(--stone); aspect-ratio: .78; max-height: 560px; }
+.stylist-photo > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.stylist-photo-label { position: absolute; bottom: 7px; left: 8px; font-size: 10px; background: rgba(248,246,241,.91); padding: 4px 7px; }
+.stylist-no-render { display: flex; flex-direction: column; height: 100%; justify-content: center; align-items: center; gap: 12px; color: var(--muted); text-align: center; padding: 35px; }
+.stylist-no-render .icon { width: 42px; height: 42px; }
+.stylist-caption { margin-top: 10px; font-size: 31px; }
+.stylist-details { padding-top: 35px; }
+.stylist-details h2 { font-size: 31px; line-height: 1.11; }
+.stylist-detail-count { margin-top: 9px; font-size: 13px; color: var(--muted); }
+.stylist-garments { margin: 21px 0 20px; }
+.stylist-garment { display: flex; align-items: center; min-height: 68px; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.stylist-garment:first-child { border-top: 1px solid var(--line); }
+.stylist-item-photo { flex: 0 0 60px; height: 60px; background: var(--stone); overflow: hidden; }
+.stylist-item-photo img { width: 100%; height: 100%; object-fit: cover; }
+.stylist-empty-thumbnail { display: grid; place-items: center; width: 100%; height: 100%; color: var(--muted); }
+.stylist-reason { font-size: 13px; line-height: 1.6; margin: 20px 0; }
+.stylist-details .button { min-height: 47px; }
+.stylist-trip-link { display: block; border: 0; background: transparent; margin: 11px auto 0; padding: 3px 0; color: var(--muted); font-size: 12px; text-decoration: underline; text-underline-offset: 2px; cursor: not-allowed; }
+.stylist-next-link { display: flex; justify-content: center; margin: 10px auto 0; font-weight: 400; }
+.stylist-disclaimer { color: var(--muted); font-size: 11px; line-height: 1.5; margin-top: 9px; }
+.stylist-mobile-back { display: none; }
+.saved-view { max-width: 760px; }
+.saved-look-list { margin: 24px 0; }
+.saved-look-item { border-top: 1px solid var(--line); padding: 20px 0; }
+.saved-look-item h2 { font-size: 28px; }
+.saved-look-item p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.saved-view > .button { margin-top: 15px; }
+
+@media (max-width: 1170px) and (min-width: 801px) {
+  .stylist-layout { grid-template-columns: minmax(230px, .78fr) minmax(0, 1.7fr); gap: 23px; }
+  .stylist-result { grid-template-columns: minmax(0,1fr) minmax(190px,.9fr); gap: 18px; }
+  .stylist-details h2, .stylist-caption { font-size: 26px; }
+  .stylist-item-photo { flex-basis: 50px; height: 50px; }
+}
+@media (max-width: 800px) {
+  .stylist-view { max-width: 590px; }
+  .stylist-intro { border: 0; padding: 7px 0 16px; }
+  .stylist-intro h1 { display: none; }
+  .stylist-intro p { display: none; }
+  .stylist-saved-link { margin-left: auto; font-size: 12px; margin-top: 0; }
+  .stylist-layout { display: flex; flex-direction: column; margin-top: 6px; gap: 0; }
+  .stylist-form h2 { font-size: 43px; line-height: 1.05; }
+  .stylist-form-note { font-size: 14px; margin-bottom: 22px; }
+  .stylist-form textarea { min-height: 175px; font-size: 14px; }
+  .occasion-suggestions { margin: 14px 0 26px; }
+  .occasion-suggestions button { border: 1px solid var(--line); border-radius: 21px; padding: 9px 14px; font-size: 12px; }
+  .occasion-suggestions .icon { display: none; }
+  .stylist-date { padding: 17px 0; }
+  .stylist-style-row { padding: 20px 0; }
+  .stylist-owned { padding: 22px 0; }
+  .stylist-footnote { text-align: center; }
+  .stylist-view.show-brief .stylist-result { display: none; }
+  .stylist-view.show-result .stylist-form { display: none; }
+  .stylist-mobile-back { background: transparent; border: 0; align-items: center; padding: 6px 0; gap: 5px; font-size: 12px; }
+  .stylist-view.show-result .stylist-mobile-back { display: flex; }
+  .stylist-mobile-back .icon { width: 15px; height: 15px; }
+  .stylist-result { display: flex; flex-direction: column; gap: 0; }
+  .stylist-progress { margin-top: 11px; }
+  .stylist-photo { aspect-ratio: .84; max-height: 49vh; }
+  .stylist-caption { font-size: 32px; margin-top: 10px; }
+  .stylist-details { padding: 15px 0 0; }
+  .stylist-details h2 { font-size: 26px; }
+  .stylist-detail-count { margin-top: 3px; }
+  .stylist-garments { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 7px; margin: 13px 0; }
+  .stylist-garment { display: flex; flex-direction: column; border: 0!important; padding: 0; gap: 5px; align-items: start; min-height: 0; font-size: 10px; }
+  .stylist-item-photo { flex: 0 0 auto; width: 100%; height: auto; aspect-ratio: 1; }
+  .stylist-garment > span:last-child { line-height: 1.2; }
+  .stylist-reason { margin: 12px 0 15px; font-size: 12px; }
+  .stylist-trip-link { display: none; }
+  .stylist-disclaimer { margin-top: 7px; }
+  .saved-view h1 { margin-top: 18px; }
+}
+@media (max-width: 390px) {
+  .stylist-form h2 { font-size: 40px; }
+  .stylist-garments { gap: 5px; }
+}
