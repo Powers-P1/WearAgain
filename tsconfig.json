@@ -3,7 +3,7 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
     "rootDir": "src",
     "outDir": "dist",
     "declaration": true,
@@ -18,5 +18,5 @@
     "verbatimModuleSyntax": true,
     "skipLibCheck": false
   },
-  "include": ["src/core/**/*.ts"]
+  "include": ["src/core/**/*.ts", "src/youcam/**/*.ts"]
 }

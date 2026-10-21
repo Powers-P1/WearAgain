@@ -6,21 +6,21 @@ Built for the YouCam API Skin AI & eCommerce VTO Hackathon. The planned AI Styli
 
 ## Current scope
 
-PR1 provides the exhaustive minimum-basket solver and certificate. PR2 adds per-element image state, revision-bound pair ratings, conservative selection of the next useful pair, requirement provenance, explicit wardrobe scoring/UNKNOWN, and pure typed tool contracts. Tests and CI require no key or provider calls.
+PR1 provides the exhaustive minimum-basket solver and certificate. PR2 adds per-element image state, revision-bound pair ratings, conservative selection of the next useful pair, requirement provenance, explicit wardrobe scoring/UNKNOWN, and pure typed tool contracts. PR3 adds the YouCam client, Worker routes and a SQLite Durable Object ledger with reservations, idempotency, daily limits and background reconciliation. Tests and CI require no key or provider calls.
 
-The deployed `worker/` and `web/` are skeletons; `UnitLedger` is a placeholder, not an implemented budget guard. PR3 supplies provider integration and atomic accounting, PR4 the product UI, PR4b the AI Stylist, and PR5 the release handoff. See [docs/DEPLOY.md](docs/DEPLOY.md).
+`web/` remains a placeholder. PR4 supplies the product UI, guided tour and avatar selection; PR4b the AI Stylist; PR5 the release handoff. The Worker code now implements the integration, but this PR does not deploy it. Live mode defaults to disabled with zero allocated units. The prerecorded demo loader reports missing recordings explicitly because no saved try-on results have been supplied yet. See [docs/API.md](docs/API.md) and [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Run locally
 
 Use Node.js 24 and npm. TypeScript is pinned in the lockfile.
 
 ```sh
-npm ci
+npm ci --ignore-scripts
 npm run check
 npm run build
 ```
 
-`check` runs strict type checking, builds the core, and runs the Node.js test suite. Build output is written to `dist/core/` and is not committed. Tests include synthetic fixtures and an independent brute-force oracle for the solver and certificate.
+`check` runs strict type checking, builds the core/client, and runs Node tests plus a real local `workerd`/SQLite emulator. Build output is written to `dist/` and is not committed. Tests include synthetic fixtures, an independent brute-force solver oracle, provider protocol replay, concurrent accounting and persistence across emulator restart. The emulator needs a loopback port; all external network requests are denied in its tests.
 
 ## Core contract
 
@@ -49,16 +49,18 @@ The live path must use `projectPairRatings` before solving (the tool adapter doe
 | [src/core](src/core/) | Pure domain, parser, solver, and certificate implementation. |
 | [fixtures/core](fixtures/core/) | Synthetic wardrobe and requirement scenarios; prices are test data. |
 | [tests](tests/) | Regression checks and an independent exhaustive oracle. |
-| [src/youcam](src/youcam/) | Reserved for the later provider adapter. |
+| [src/youcam](src/youcam/) | Typed one-shot YouCam client, strict response/image validation and bounded transport. |
+| [worker/src](worker/src/) | HTTP/session boundary, SQLite ledger, rate gate and reconciliation alarms. |
+| [docs/API.md](docs/API.md) | Frontend integration contract, accounting semantics and recorded-demo handoff. |
 | [docs/PRD.md](docs/PRD.md) | Domain/tool contracts, acceptance criteria, PR1-PR5 including PR4b, and pending decisions. |
 | [docs/BRIEF.md](docs/BRIEF.md) | Original approved product brief. |
 | [docs/YOUCAM_NOTES.md](docs/YOUCAM_NOTES.md) | Provider evidence and unresolved integration questions. |
 
 ## Integration and publication boundaries
 
-The OK Agency team owns live YouCam probes, secrets, deployment, review, and merging. Its probe reports 2 units per successful image, no charge for the observed terminal errors, and 24-hour provider retention; see [docs/YOUCAM_NOTES.md](docs/YOUCAM_NOTES.md). PR2 accepts a configured unit cost and makes no provider calls. Output-publication permissions and uncertain/timeout charging still need resolution. Public fixtures use synthetic data; raw recordings, keys and photos of real people do not belong in the repository. See [fixtures/README.md](fixtures/README.md).
+The OK Agency team owns live YouCam probes, secrets, deployment, review, and merging. Its probe reports 2 units per successful image, no charge for the observed parameter/decode errors, and 24-hour provider retention; see [docs/YOUCAM_NOTES.md](docs/YOUCAM_NOTES.md). PR3 reserves 2 units before any YouCam call, commits once on confirmed success, and releases only against the narrow confirmed-free evidence allowlist. Timeouts and unknown error charges remain pending, including across day changes. Output-publication permissions still need resolution. Public protocol fixtures use synthetic data; raw responses, keys and photos of real people do not belong in the repository. See [fixtures/README.md](fixtures/README.md).
 
-The future Pages demo and live mode must be labelled distinctly. Demo replays permitted images and saved agent transcripts with no calls. Live rendering requires a reservation; a plan is not a reservation. Personal model photos are a later explicit-consent path, never stored by this application; this does not imply zero provider retention. Physical-check outcomes, live latency and spending/return reductions are not measured by the core tests.
+The future Pages demo and live mode must be labelled distinctly. Demo replays permitted saved images with no provider calls; saved agent transcripts belong to PR4b. Live rendering requires a reservation; a plan is not a reservation. PR3 allows only approved synthetic adult base images and ephemeral garment uploads. Personal model photos are a later explicit-consent path, never stored by this application; this does not imply zero provider retention. Physical-check outcomes, live latency and spending/return reductions are not measured by offline tests.
 
 ## License
 
