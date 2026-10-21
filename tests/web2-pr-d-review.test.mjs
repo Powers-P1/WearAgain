@@ -59,7 +59,8 @@ test('review #16: mobile camera has a real focusable tile before name, finds and
   assert.ok(camera.indexOf('mall-capture-label')<camera.indexOf('mall-capture-title'));
   assert.ok(camera.indexOf('mall-capture-title')<camera.indexOf('mall-queue-panel'));
   assert.ok(camera.indexOf('mall-queue-panel')<camera.indexOf('mall-link-panel'));
-  const tile=camera.slice(camera.indexOf("'<label class=\"mall-capture-label\""),camera.indexOf("'</label>'"));
+  const tileStart=camera.indexOf("'<label class=\"mall-capture-label\"");
+  const tile=camera.slice(tileStart,camera.indexOf("'</label>'",tileStart));
   assert.match(tile,/mall-camera/);
   assert.match(tile,/type="file"/);
   assert.match(css,/\.mall-capture-label:focus-within\s*\{[^}]*outline:\s*3px/);
