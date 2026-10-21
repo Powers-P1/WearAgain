@@ -79,7 +79,7 @@ Do not reconcile an unknown reservation by age or by assuming every HTTP error w
 
 ## Recorded demo assets
 
-The demo loader is implemented, but `fixtures/youcam/demo-manifest.json` currently has no entries because no generated try-on outputs were supplied. Follow [API.md](API.md#recorded-demo-handoff) and [FRONTEND.md](FRONTEND.md#recording-handoff) to add approved synthetic-avatar recordings under `web/demo/renders/`; the build copies only manifest-listed outputs to `web/dist/demo/renders/`. Base avatars and flat-colour test PNGs are not generated outfit previews. The current app exposes an explicitly labelled synthetic solver walkthrough and unavailable-preview states. Recorded-image mode becomes available when matching recordings exist. Demo requires no secret and makes no provider requests.
+The demo loader is implemented and `fixtures/youcam/demo-manifest.json` lists six saved YouCam outputs for the demo scenario (see its `note` for their garment references). Follow [API.md](API.md#recorded-demo-handoff) and [FRONTEND.md](FRONTEND.md#recording-handoff) to add approved synthetic-avatar recordings under `web/demo/renders/`; the build copies only manifest-listed outputs to `web/dist/demo/renders/`. Base avatars and flat-colour test PNGs are not generated outfit previews. The app opens in the explicitly labelled synthetic solver walkthrough; **Use recorded previews** switches to the saved images for the selected model. Demo requires no secret and makes no provider requests.
 
 ## Post-deploy checks owned by the team
 

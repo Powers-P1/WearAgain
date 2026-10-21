@@ -67,7 +67,7 @@ The database stores only opaque session/render/task IDs, hashes, statuses, unit 
 
 ## Recorded demo handoff
 
-`fixtures/youcam/demo-manifest.json` is intentionally empty: main supplied approved base inputs but no saved YouCam try-on results. The endpoint currently returns `available: false`, `reason: "recordings_not_supplied"`; it never labels a base avatar or test PNG as a generated outfit.
+`fixtures/youcam/demo-manifest.json` holds six saved YouCam cloth-v4 results (one per demo element: tops `work`, `weekend`, `evening`; outerwear `cheap-a`, `cheap-b`, `all-round`), all on `woman_neutral_01`, images under `web/demo/renders/`. The endpoint returns `available: true` with these entries; with an empty manifest it returns `available: false`, `reason: "recordings_not_supplied"`. It never labels a base avatar or test PNG as a generated outfit. The garment references behind the six results are disclosed in the manifest `note`.
 
 After recording approved synthetic-avatar results, the team can add entries with this exact shape and copy the image to `web/demo/renders/` for Pages:
 

@@ -63,7 +63,7 @@ function preview(vm: ViewModel, kind: 'top' | 'outerwear', id: string, label: st
   const render = vm.renders.find(item => key(item.element.kind, item.element.id) === itemKey);
   const url = vm.urls.get(itemKey);
   if (url && render?.status === 'ready') return `<figure class="wa-pair-image"><img src="${h(url)}" alt="${h(label)}, separate preview on a synthetic model"><figcaption>${h(label)}</figcaption></figure>`;
-  return `<div class="wa-preview-missing ${render?.status === 'error' ? 'is-error' : ''}">${icon(render?.status === 'pending' ? 'clock' : 'image')}<strong>${h(label)}</strong><small>${render?.status === 'pending' ? 'Render pending' : render?.status === 'error' ? 'Preview unavailable' : vm.mode === 'demo' ? 'Recording not supplied' : 'Ready to render'}</small></div>`;
+  return `<div class="wa-preview-missing ${render?.status === 'error' ? 'is-error' : ''}">${icon(render?.status === 'pending' ? 'clock' : 'image')}<strong>${h(label)}</strong><small>${render?.status === 'pending' ? 'Render pending' : render?.status === 'error' ? 'Preview unavailable' : vm.mode === 'demo' ? (vm.simulated && vm.hasRecordings ? 'Saved preview: use recorded previews' : 'Recording not supplied') : 'Ready to render'}</small></div>`;
 }
 
 function unitPanel(vm: ViewModel): string {

@@ -299,7 +299,7 @@ test('session signatures, origin binding, expiry and absence of public settlemen
 });
 
 test('live defaults require explicit budgets while demo honestly reports missing recordings', async t => {
-  const h = harness(t, { env: { LIVE_ENABLED: 'false' } });
+  const h = harness(t, { env: { LIVE_ENABLED: 'false' }, demoManifest: { schemaVersion: 1, renders: [] } });
   assert.equal((await h.request('/api/session', { method: 'POST' })).status, 503);
   const demo = await (await h.request('/api/demo/renders')).json();
   assert.deepEqual(demo, { mode: 'demo', unitsCharged: 0, available: false, reason: 'recordings_not_supplied', renders: [] });

@@ -39,3 +39,7 @@ explicitly requested and verified by the team's live probe in `docs/YOUCAM_NOTES
 Do not replace these fixtures with personal photographs, credentials or live signed
 URLs. Demo output assets must be separately recorded and labelled by their actual
 origin.
+
+## Saved demo recordings
+
+`demo-manifest.json` lists six saved cloth-v4 results (2026-10-21, 12 units) for the demo scenario on `woman_neutral_01`; images live in `web/demo/renders/`. They are real provider outputs on a synthetic avatar, with garment references re-cropped from the team's mockup artwork (see the manifest `note`). Raw API responses and signed URLs are not stored.

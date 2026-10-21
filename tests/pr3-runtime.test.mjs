@@ -130,8 +130,10 @@ test('production Worker bundles and serves demo, signed sessions and SQLite with
   const demo = await (await call('/api/demo/renders')).json();
   assert.equal(demo.mode, 'demo');
   assert.equal(demo.unitsCharged, 0);
-  assert.equal(demo.available, false);
-  assert.equal(demo.reason, 'recordings_not_supplied');
+  assert.equal(demo.available, true);
+  assert.equal(demo.reason, null);
+  assert.equal(demo.renders.length, 6);
+  assert.ok(demo.renders.every(item => item.avatarId === 'woman_neutral_01' && item.api === 'cloth-v4' && item.assetId === `demo:${item.id}`));
   assert.equal((await (await call('/api/avatars')).json()).avatars.length, 11);
   assert.equal((await call('/api/ledger')).status, 401);
 
