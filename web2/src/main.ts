@@ -276,7 +276,7 @@ function render(): void {
 root.addEventListener('click', event => {
   const target = event.target;
   if (!(target instanceof Element)) return;
-  const control = target.closest<HTMLElement>('[data-nav], [data-cat], [data-item], [data-status], [data-expand], [data-stylist-reset], [data-occasion], [data-look-next], [data-look-prev], [data-save-look], [data-purchase-demo], [data-purchase-candidate], [data-purchase-top], [data-purchase-rating], [data-purchase-clear], [data-purchase-replay], [data-purchase-choice], [data-purchase-next], [data-purchase-prev], [data-mall-view], [data-mall-filter], [data-mall-step], [data-mall-decision], [data-mall-undo], [data-mall-remove], [data-morning-select], [data-morning-wear], [data-morning-reset], [data-overview-review], [data-overview-decision], [data-overview-save]');
+  const control = target.closest<HTMLElement>('[data-nav], [data-cat], [data-item], [data-status], [data-expand], [data-stylist-reset], [data-occasion], [data-look-next], [data-look-prev], [data-save-look], [data-purchase-demo], [data-purchase-candidate], [data-purchase-top], [data-purchase-rating], [data-purchase-clear], [data-purchase-replay], [data-purchase-choice], [data-purchase-next], [data-purchase-prev], [data-mall-view], [data-mall-filter], [data-mall-step], [data-mall-decision], [data-mall-undo], [data-mall-remove], [data-morning-select], [data-morning-wear], [data-morning-reset], [data-morning-voice], [data-overview-review], [data-overview-decision], [data-overview-save]');
   if (!control) return;
   if (handleStylistClick(control, { wardrobe: data, storage, rerender: render, notice: value => { message = value; } })) return;
   if (handlePurchaseClick(control, { rerender: render, notice: value => { message = value; } })) return;

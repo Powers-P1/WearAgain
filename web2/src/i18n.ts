@@ -20,6 +20,12 @@ export const en = {
   morningBriefLabel: 'Your morning request',
   morningChips: 'For work · No ironing · My wardrobe',
   morningPrepare: 'Find ready outfits',
+  morningStartListening: 'Dictate a request',
+  morningStopListening: 'Stop listening',
+  morningVoiceDisclosure: 'Optional browser dictation may use your browser’s online speech service. Typing and the saved-look demo work fully offline.',
+  morningVoiceUnavailable: 'Voice dictation is not supported in this browser. Type your request instead.',
+  morningVoiceFailed: 'Browser voice dictation could not start or complete. You can type your request.',
+
   morningOfflineNote: 'Offline demo: suggestions use verified wardrobe recipes, not a live AI interpretation. Voice dictation needs separate browser support.',
   morningPreparing: 'Finding what is ready.',
   morningPreparingHint: 'Checking your wardrobe and excluding items that need care.',

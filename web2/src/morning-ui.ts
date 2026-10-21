@@ -11,6 +11,21 @@ let spoken=t('morningRequestExample');
 let selected:string|null=null;
 let currentLooks:readonly OccasionSuggestion[]=[];
 let outstanding=0;
+interface DictationEvent { readonly results: ArrayLike<ArrayLike<{ readonly transcript:string }>>; }
+interface DictationRecognizer {
+  lang:string; interimResults:boolean;
+  onresult:((event:DictationEvent)=>void)|null;
+  onerror:((event:unknown)=>void)|null;
+  onend:(()=>void)|null;
+  start:()=>void; stop:()=>void;
+}
+type DictationCtor=new()=>DictationRecognizer;
+let recognizer:DictationRecognizer|null=null;
+let listening=false;
+function voiceConstructor():DictationCtor|null {
+  const withSpeech=window as Window & {SpeechRecognition?:DictationCtor;webkitSpeechRecognition?:DictationCtor};
+  return withSpeech.SpeechRecognition??withSpeech.webkitSpeechRecognition??null;
+}
 const esc=(v:unknown)=>String(v??'').replace(/[&<>"']/g,k=>
   ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[k]??k));
 const svg=(name:'mic'|'check'|'arrow')=>{
@@ -49,6 +64,9 @@ export function morningPage(wardrobe:WardrobeState,daily:DailyState):string{
       '<form id="morning-form" class="morning-form"><label for="morning-request">'+svg('mic')+' '+esc(t('morningBriefLabel'))+'</label>'+
       '<textarea id="morning-request" name="request" rows="5" maxlength="500" required>'+esc(spoken)+'</textarea>'+
       '<p class="morning-chips">'+esc(t('morningChips'))+'</p>'+
+      '<button type="button" class="morning-dictate" data-morning-voice aria-pressed="'+listening+'">'+svg('mic')+
+      ' '+esc(t(listening?'morningStopListening':'morningStartListening'))+'</button>'+
+      '<p class="morning-help">'+esc(t('morningVoiceDisclosure'))+'</p>'+
       '<button type="submit" class="button button-primary full-width">'+esc(t('morningPrepare'))+' '+svg('arrow')+'</button>'+
       '<p class="morning-help">'+esc(t('morningOfflineNote'))+'</p></form>':
     stage==='preparing'?
@@ -81,6 +99,30 @@ export function morningPage(wardrobe:WardrobeState,daily:DailyState):string{
     '</section>';
 }
 export function handleMorningClick(button:HTMLElement,actions:Actions):boolean{
+  if(button.hasAttribute('data-morning-voice')){
+    if(listening&&recognizer){
+      recognizer.stop();listening=false;actions.rerender();return true;
+    }
+    const Ctor=voiceConstructor();
+    if(!Ctor){actions.notice(t('morningVoiceUnavailable'));actions.rerender();return true;}
+    try{
+      const speech=new Ctor(); recognizer=speech;
+      speech.lang='en-US';speech.interimResults=false;
+      speech.onresult=event=>{
+        if(stage!=='brief')return;
+        const text=event.results[0]?.[0]?.transcript?.trim();
+        if(text){
+          spoken=text;
+          const input=document.getElementById('morning-request');
+          if(input instanceof HTMLTextAreaElement)input.value=text;
+        }
+      };
+      speech.onerror=()=>{listening=false;actions.notice(t('morningVoiceFailed'));actions.rerender();};
+      speech.onend=()=>{listening=false;actions.rerender();};
+      speech.start();listening=true;actions.rerender();
+    }catch{listening=false;actions.notice(t('morningVoiceFailed'));actions.rerender();}
+    return true;
+  }
   if(button.dataset.morningSelect){
     const allowed=prepared(actions.wardrobe).find(row=>row.id===button.dataset.morningSelect);
     if(allowed)selected=allowed.id;
@@ -103,6 +145,7 @@ export function submitMorning(form:HTMLFormElement,actions:Actions):boolean{
   const data=new FormData(form);
   const request=String(data.get('request')??'').trim();
   if(request.length<3||request.length>500){actions.notice(t('morningInvalidRequest'));actions.rerender();return true;}
+  if(recognizer&&listening){recognizer.stop();listening=false;}
   spoken=request;stage='preparing';actions.rerender();
   const token=++outstanding;
   // Offline example: resolved locally; NEVER assert that the browser continues

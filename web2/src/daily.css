@@ -12,6 +12,10 @@
 .morning-form textarea { background:var(--paper); width:100%; border:1px solid var(--line); min-height:160px; padding:19px; font-family:var(--serif); font-size:clamp(24px,3vw,31px); line-height:1.2; resize:vertical; }
 .morning-chips { color:var(--warm); font-size:12px; margin:13px 0 27px; }
 .morning-form .button { min-height:53px; }
+.morning-dictate {display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--paper);font-size:12px;padding:9px 13px;margin-bottom:5px;min-height:43px;}
+.morning-dictate .icon {width:18px;height:18px;}
+.morning-dictate[aria-pressed=true] {background:var(--olive-soft);border-color:var(--olive);}
+
 .morning-help { font-size:11px; line-height:1.5; color:var(--muted); margin-top:12px; }
 .morning-wait { padding:25px 0; }
 .morning-wait h1 { max-width:700px; }
