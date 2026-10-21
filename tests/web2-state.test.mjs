@@ -21,7 +21,7 @@ test('English is default, with a catalogue and fallback for future Polish locale
   assert.equal(i18n.DEFAULT_LOCALE, 'en');
   assert.equal(i18n.t('yourWardrobe'), 'Your wardrobe');
   assert.equal(i18n.t('yourWardrobe', undefined, 'pl'), 'Your wardrobe');
-  assert.equal(i18n.t('wardrobeCount', { count: 8 }), '10 pieces you love.');
+  assert.equal(i18n.t('wardrobeCount', { count: 8 }), '8 pieces you love.');
   assert.equal(i18n.t('demoModel'), 'Demo model');
   assert.equal(i18n.t('styleFitDisclaimer'), 'Style preview, not size fit');
   assert.equal(i18n.t('checkPurchase'), 'Check purchase');
