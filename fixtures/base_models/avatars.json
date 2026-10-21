@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "note": "Heights and weights are nominal bands chosen by the team for selection; the images are synthetic and were not measured.",
+  "schema": "id, file, sex, heightBandCm [min,max], weightBandKg [min,max], build (neutral|slim|muscular|belly), ageBand (adult only), notes, role (optional: primary|fallback)",
+  "avatars": [
+    {
+      "id": "woman_neutral_01",
+      "file": "woman_neutral_01.png",
+      "sex": "female",
+      "heightBandCm": [160, 172],
+      "weightBandKg": [54, 68],
+      "build": "neutral",
+      "ageBand": "adult",
+      "role": "primary",
+      "notes": "Front view, hands at sides, white tee, dark jeans, grey background. Size roughly S-M."
+    },
+    {
+      "id": "man_neutral_01",
+      "file": "man_neutral_01.png",
+      "sex": "male",
+      "heightBandCm": [174, 186],
+      "weightBandKg": [68, 84],
+      "build": "neutral",
+      "ageBand": "adult",
+      "role": "primary",
+      "notes": "Front view, hands at sides, white tee, dark jeans, grey background. Size roughly M-L."
+    },
+    {
+      "id": "synthetic_model_01_upper",
+      "file": "synthetic_model_01_upper.jpg",
+      "sex": "female",
+      "heightBandCm": [158, 170],
+      "weightBandKg": [50, 64],
+      "build": "slim",
+      "ageBand": "adult",
+      "role": "fallback",
+      "notes": "Earlier CC0 Sukeban crop. Fallback only: bamboo sword on the shoulder and a large wig."
+    }
+  ],
+  "gridPlan": {
+    "status": "planned, not generated",
+    "axes": {
+      "sex": ["female", "male"],
+      "size": ["S", "M", "L", "XL", "XXL", "3XL"],
+      "heightClass": ["short", "medium", "tall"],
+      "build": ["neutral", "slim", "muscular", "belly"]
+    },
+    "scope": "Adults (18+) only. Children and teenagers are intentionally excluded for the hackathon.",
+    "rules": [
+      "Every cell is a distinct synthetic person with a fictional face; no real people, no reference photos.",
+      "Same pose, framing, clothing and background across the grid so try-on results are comparable.",
+      "Generate only the cells users actually land in most often first (M/L, medium height, neutral), then widen.",
+      "Not every axis combination is needed: 2 x 6 x 3 x 4 = 144 cells is the ceiling; a first useful library is roughly 12-20 images."
+    ]
+  }
+}
