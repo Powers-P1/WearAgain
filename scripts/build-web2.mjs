@@ -38,6 +38,8 @@ await sharp(join(root, 'docs/mockups/v2/WearAgain-03-Personalizacja-i-wyjazd.png
   .resize({ width: 360 }).webp({ quality: 88 })
   .toFile(join(dest, 'assets/demo-portrait.webp'));
 
+// Outfit previews use only the real six single-garment recordings in the
+// immutable manifest. Never create hero images by cropping design boards.
 // Future flows reuse the original immutable recording paths and manifest.
 // Individual cloth-v4 outputs must never be described as complete outfit renders.
 await mkdir(join(dest, 'demo'), { recursive: true });

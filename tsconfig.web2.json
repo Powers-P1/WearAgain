@@ -5,7 +5,9 @@
     "moduleResolution": "Bundler",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "rootDir": ".",
-    "noEmit": true
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["web2/src/**/*.ts"]
 }

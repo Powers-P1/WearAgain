@@ -4,6 +4,7 @@ import {
   type Availability, type Category, type WardrobeItem, type WardrobeState,
 } from './state.js';
 import { DEFAULT_LOCALE, t, type TranslationKey } from './i18n.js';
+import { handleStylistClick, savedPage, stylistPage, submitStylist } from './stylist-ui.js';
 import './style.css';
 
 const root = document.querySelector<HTMLElement>('#app');
@@ -209,6 +210,8 @@ function render(): void {
   const active: NavId = current.screen === 'item' || current.screen === 'add' ? 'wardrobe'
     : navIds.includes(current.screen as NavId) ? current.screen as NavId : 'wardrobe';
   const page = current.screen === 'wardrobe' ? wardrobe()
+    : current.screen === 'stylist' ? stylistPage(data)
+    : current.screen === 'saved' ? savedPage(storage)
     : current.screen === 'profile' ? profile()
     : current.screen === 'item' ? itemDetail(current.itemId)
     : current.screen === 'add' ? addScreen() : placeholder(current.screen);
@@ -222,8 +225,9 @@ function render(): void {
 root.addEventListener('click', event => {
   const target = event.target;
   if (!(target instanceof Element)) return;
-  const control = target.closest<HTMLElement>('[data-nav], [data-cat], [data-item], [data-status], [data-expand]');
+  const control = target.closest<HTMLElement>('[data-nav], [data-cat], [data-item], [data-status], [data-expand], [data-stylist-reset], [data-occasion], [data-look-next], [data-look-prev], [data-save-look]');
   if (!control) return;
+  if (handleStylistClick(control, { wardrobe: data, storage, rerender: render, notice: value => { message = value; } })) return;
   if (control.hasAttribute('data-expand')) { revealMore = true; render(); return; }
   if (control.dataset.nav) { navigate(control.dataset.nav); return; }
   if (control.dataset.cat && (control.dataset.cat === 'all' || CATEGORIES.includes(control.dataset.cat as Category))) {
@@ -246,7 +250,9 @@ root.addEventListener('submit', event => {
   const form = event.target;
   if (!(form instanceof HTMLFormElement)) return;
   event.preventDefault();
-  if (form.id === 'style-form') {
+  if (form.id === 'stylist-form') {
+    submitStylist(form,{ wardrobe:data, storage, rerender:render, notice:value => { message = value; } });
+  } else if (form.id === 'style-form') {
     persist(setStyle(data, (form.elements.namedItem('style') as HTMLTextAreaElement).value));
     message ||= t('styleSaved'); render();
   } else if (form.id === 'add-form') {
