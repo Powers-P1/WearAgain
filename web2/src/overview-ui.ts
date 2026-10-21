@@ -65,7 +65,8 @@ export function overviewPage(wardrobe:WardrobeState,daily:DailyState,decisions:D
     '<p>'+esc(t('overviewOverlapOnly'))+'</p>'+
     '<p>'+metrics.categoryOverlap.map(key=>esc(categoryLabel(key as WardrobeItem['category']))).join(' · ')+'</p></section>':'')+
     '</div><aside class="overview-today"><div class="overview-today-photo">'+
-    (imagePath?'<img src="'+esc(imagePath)+'" alt="'+esc(t('morningSinglePreview'))+'" loading="lazy"/>':
+    (imagePath?'<img src="'+esc(imagePath)+'" alt="'+esc(t('morningSinglePreview'))+'" loading="lazy"/>'+
+      '<span class="overview-photo-badge">'+esc(t('morningOneGarmentBadge'))+'</span>':
       '<div class="overview-no-photo">'+esc(t('stylistUnrendered'))+'</div>')+
     '</div><h2>'+esc(t('overviewFromYourWardrobe'))+'</h2>'+
     '<p>'+esc(suggested?suggested.itemIds.map(id=>wardrobe.items.find(x=>x.id===id)?.name??id).join(' · '):t('morningNoneReady'))+'</p>'+

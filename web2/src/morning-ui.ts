@@ -1,4 +1,4 @@
-import { morningLooks, localISODate, storeDaily, wearToday, type DailyState } from './daily.js';
+import { morningLooks, morningHeadingKey, localISODate, storeDaily, wearToday, type DailyState } from './daily.js';
 import { proposeLooks, recordedPreviewForItem, type OccasionSuggestion } from './stylist.js';
 import type { WardrobeState } from './state.js';
 import { t } from './i18n.js';
@@ -40,6 +40,12 @@ function photoFor(look:OccasionSuggestion,wardrobe:WardrobeState):string{
   return garment?.photo?'<img src="/assets/items/'+esc(garment.photo)+'.webp" loading="lazy" alt="'+esc(garment.name)+'"/>':
     '<span class="morning-no-preview">'+esc(t('stylistUnrendered'))+'</span>';
 }
+/** Keep the typed brief before rerenders caused by voice controls or async events. */
+export function handleMorningInput(target:HTMLTextAreaElement):boolean {
+  if(target.id!=='morning-request')return false;
+  spoken=target.value;
+  return true;
+}
 function lookNames(look:OccasionSuggestion,wardrobe:WardrobeState):string{
   return look.itemIds.map(id=>wardrobe.items.find(item=>item.id===id)?.name??id).join(' · ');
 }
@@ -78,19 +84,19 @@ export function morningPage(wardrobe:WardrobeState,daily:DailyState):string{
       '<div class="morning-checks"><p>'+svg('check')+' '+esc(t('morningOwnedOnly'))+'</p>'+
       '<p>'+svg('check')+' '+esc(t('morningNoIron'))+'</p><p>'+svg('check')+' '+esc(t('morningReadyOnly'))+'</p></div>'+
       '<p class="morning-help">'+esc(t('morningNoBackground'))+'</p></div>':
-      '<div class="morning-ready"><div class="morning-intro"><h1 id="morning-title">'+esc(t('morningReadyHeadline',{count:looks.length}))+'</h1>'+
+      '<div class="morning-ready"><div class="morning-intro"><h1 id="morning-title">'+esc(t(morningHeadingKey(looks.length),{count:looks.length}))+'</h1>'+
       '<p>'+esc(t('morningReadySubtitle'))+'</p></div>'+
       (looks.length?'<div class="morning-looks" role="radiogroup" aria-label="'+esc(t('morningChoose'))+'">'+
         looks.map(look=>'<button type="button" role="radio" aria-checked="'+(look.id===selected)+
           '" class="morning-look '+(look.id===selected?'selected':'')+'" data-morning-select="'+esc(look.id)+'">'+
-          '<span class="morning-look-photo">'+photoFor(look,wardrobe)+'</span>'+
+          '<span class="morning-look-photo">'+photoFor(look,wardrobe)+(look.heroImagePath?'<span class="morning-photo-badge">'+esc(t('morningOneGarmentBadge'))+'</span>':'')+'</span>'+
           '<span class="morning-look-desc"><strong>'+esc(look.title)+'</strong>'+
           '<small>'+esc(t('morningReadyBadge'))+'</small>'+
           '<span>'+esc(lookNames(look,wardrobe))+'</span></span>'+
           '<span class="morning-radio" aria-hidden="true"></span></button>').join('')+'</div>'+
         '<button type="button" class="button button-primary full-width morning-wear-button" data-morning-wear>'+
         esc(t('morningWearThis'))+'</button>'+
-        '<p class="morning-help">'+esc(t('morningSavedAsToday'))+'</p>':
+        '<p class="morning-help">'+esc(t('morningTapToSave'))+'</p>':
         '<p class="morning-no-result">'+esc(t('morningNoneReady'))+'</p>')+
       (logged?'<p class="morning-logged" role="status">'+svg('check')+' '+esc(t('morningTodayRecorded',{name:logged.lookTitle}))+'</p>':'')+
       '<button type="button" class="text-link morning-restart" data-morning-reset>'+

@@ -34,3 +34,11 @@
 ## Follow-on PR-E - **not started before PR-D merges**
 
 Boards **13-17**: consumer landing; `/retail`, `/retail/demo`, `/judges`, `/judges/demo`; visibly highlighted **Judges - Start here** header action; PWA install shell; prepare but **do not trigger production switch** `web/` to `web2/`; create real responsive screenshots for review. Hackathon video/code/test links only after assets are available. This is a *separate* PR following review and merge.
+
+## PR #16 review fixes (six mandatory findings)
+- Board 10 on mobile is camera-first: a compact `Now at: ... Change` row, visible camera tile before the fold, optional item name below capture, today's candidate thumbnails next and the link form last.
+- Shared render() restores focus to the same control if present, or to an explicitly focusable page heading when the focused control disappears, route changes or a submit swaps stages. Captured photos restore focus to the camera for immediate next capture.
+- Morning typed brief is mirrored on input; gallery shop/floor, photo name and link fields maintain unsaved drafts across rerenders and view switches. Saving a link intentionally clears just the successfully submitted link fields.
+- Pre-save help uses future tense; zero/one/many ready looks have separate grammar; morning and overview single-garment images use DOM overlays `Demo model · one garment`.
+- File input is nested inside its visible capture label, with an explicit `:focus-within` 3px focus ring.
+- Own-photo/candidate delete has a minimum 44 × 44 px target and requires native confirmation before metadata and IndexedDB deletion. No background jobs, Worker changes, secrets or deploy switches.

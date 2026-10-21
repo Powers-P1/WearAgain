@@ -24,6 +24,26 @@ export interface ShoppingSession {
   readonly items: readonly ShopItem[];
 }
 export const SHOP_KEY='wearagain:web2:shopping:v1';
+/** Unsaved form values are ephemeral UI state, independent of persisted candidates. */
+export interface CaptureDraft {
+  readonly shop: string;
+  readonly floor: string;
+  readonly itemName: string;
+  readonly linkName: string;
+  readonly linkUrl: string;
+}
+export function initialCaptureDraft(session: ShoppingSession): CaptureDraft {
+  return {shop:session.shop,floor:session.floor,itemName:'',linkName:'',linkUrl:''};
+}
+const captureFields: Readonly<Record<string,keyof CaptureDraft>> = {
+  'mall-shop-name':'shop','mall-floor':'floor','mall-capture-title':'itemName',
+  'mall-link-name':'linkName','mall-link-address':'linkUrl',
+};
+export function updateCaptureDraft(state: CaptureDraft, id: string, value: string): CaptureDraft {
+  const field=captureFields[id];
+  return field ? {...state,[field]:value} : state;
+}
+
 const validId=(x:unknown):x is string=>typeof x==='string'&&/^[a-zA-Z0-9_-]{1,64}$/.test(x);
 function validDate(x:unknown):x is string {return typeof x==='string' && /^\d{4}-\d{2}-\d{2}$/.test(x) && !Number.isNaN(Date.parse(x));}
 export function sampleShopping(): ShoppingSession {

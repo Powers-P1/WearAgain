@@ -7,9 +7,9 @@ import { DEFAULT_LOCALE, t, type TranslationKey } from './i18n.js';
 import { purchasePage, handlePurchaseClick } from './purchase-ui.js';
 import { recordedPreviewForItem } from './stylist.js';
 import { loadDaily, loadDecisions, type DailyState, type DecisionsState } from './daily.js';
-import { morningPage, handleMorningClick, submitMorning } from './morning-ui.js';
+import { morningPage, handleMorningInput, handleMorningClick, submitMorning } from './morning-ui.js';
 import { overviewPage, reviewItemPage, handleOverviewClick } from './overview-ui.js';
-import { galleryPage, handleGalleryClick, handleGallerySubmit, handleGalleryFile } from './gallery-ui.js';
+import { galleryPage, handleGalleryInput, handleGalleryClick, handleGallerySubmit, handleGalleryFile } from './gallery-ui.js';
 import { handleStylistClick, savedPage, stylistPage, submitStylist } from './stylist-ui.js';
 import './style.css';
 
@@ -219,7 +219,11 @@ function placeholder(screen: Screen): string {
     '</button></section>';
 }
 let previousRoute='';
-/** Preserve focus and expanded certificate through same-screen state rerenders. */
+let hasRendered=false;
+let requestedFocus='';
+function focusAfterRender(selector:string):void { requestedFocus=selector; }
+/** Preserve focus and expanded certificate, then restore a deterministic
+ * heading when a previous control no longer exists or the route changes. */
 function render(): void {
   const routeKey=window.location.hash;
   const same=previousRoute===routeKey;
@@ -236,6 +240,8 @@ function render(): void {
     if(attribute)selector=focusScope+'['+attribute.name+
       (attribute.value?'="'+attribute.value+'"':'')+']';
   }
+  const targetSelector=requestedFocus||(same?selector:'');
+  requestedFocus='';
   const whyOpen=same&&!!root!.querySelector('.purchase-certificate[open]');
   const current = route();
   const active: NavId = current.screen === 'item' || current.screen === 'add' ? 'wardrobe'
@@ -263,7 +269,16 @@ function render(): void {
     const details=root!.querySelector<HTMLDetailsElement>('.purchase-certificate');
     if(details)details.open=true;
   }
-  if(selector)root!.querySelector<HTMLElement>(selector)?.focus({preventScroll:true});
+  const focusTarget=(targetSelector?root!.querySelector<HTMLElement>(targetSelector):null)
+    ??root!.querySelector<HTMLElement>('main .page h1')
+    ??root!.querySelector<HTMLElement>('main h1')
+    ??root!.querySelector<HTMLElement>('main');
+  if(focusTarget && (hasRendered||routeKey!=='')){
+    if(!focusTarget.matches('button,input,textarea,select,a[href],[tabindex]'))
+      focusTarget.setAttribute('tabindex','-1');
+    focusTarget.focus({preventScroll:true});
+  }
+  hasRendered=true;
   previousRoute=routeKey;
   document.title=current.screen==='wardrobe'?t('wardrobePageTitle'):
     current.screen==='profile'?t('profilePageTitle'):
@@ -280,7 +295,7 @@ root.addEventListener('click', event => {
   if (!control) return;
   if (handleStylistClick(control, { wardrobe: data, storage, rerender: render, notice: value => { message = value; } })) return;
   if (handlePurchaseClick(control, { rerender: render, notice: value => { message = value; } })) return;
-  if (handleGalleryClick(control, {storage,rerender:render,notice:value=>{message=value;}})) return;
+  if (handleGalleryClick(control, {storage,rerender:render,notice:value=>{message=value;},focus:focusAfterRender})) return;
   if (handleMorningClick(control, {wardrobe:data,daily,storage,updateDaily:next=>{daily=next;},rerender:render,notice:value=>{message=value;}})) return;
   if (handleOverviewClick(control, {wardrobe:data,decisions,storage,
       updateDecisions:next=>{decisions=next;},updateWardrobe:next=>{persist(next);},
@@ -298,6 +313,8 @@ root.addEventListener('click', event => {
 });
 root.addEventListener('input', event => {
   const target = event.target;
+  if(target instanceof HTMLTextAreaElement && handleMorningInput(target))return;
+  if(target instanceof HTMLInputElement && handleGalleryInput(target))return;
   if (!(target instanceof HTMLInputElement) || target.id !== 'wardrobe-search') return;
   search = target.value;
   const grid = root.querySelector('#wardrobe-grid');
@@ -305,7 +322,7 @@ root.addEventListener('input', event => {
 });
 root.addEventListener('change', event => {
   const target=event.target;
-  if(target instanceof HTMLInputElement && handleGalleryFile(target,{storage,rerender:render,notice:value=>{message=value;}}))return;
+  if(target instanceof HTMLInputElement && handleGalleryFile(target,{storage,rerender:render,notice:value=>{message=value;},focus:focusAfterRender}))return;
 });
 root.addEventListener('submit', event => {
   const form = event.target;
@@ -315,7 +332,7 @@ root.addEventListener('submit', event => {
     submitStylist(form,{ wardrobe:data, storage, rerender:render, notice:value => { message = value; } });
   } else if (submitMorning(form,{wardrobe:data,daily,storage,updateDaily:next=>{daily=next;},rerender:render,notice:value=>{message=value;}})) {
     // Morning session handled locally.
-  } else if (handleGallerySubmit(form,{storage,rerender:render,notice:value=>{message=value;}})) {
+  } else if (handleGallerySubmit(form,{storage,rerender:render,notice:value=>{message=value;},focus:focusAfterRender})) {
     // Mall metadata and link capture handled locally.
   } else if (form.id === 'style-form') {
     persist(setStyle(data, (form.elements.namedItem('style') as HTMLTextAreaElement).value));

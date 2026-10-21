@@ -135,6 +135,9 @@ export function overviewFor(wardrobe: WardrobeState, daily: DailyState, decision
     unknownGaps:true,
   };
 }
+export function morningHeadingKey(count:number): 'morningReadyNone' | 'morningReadyOne' | 'morningReadyMany' {
+  return count===0?'morningReadyNone':count===1?'morningReadyOne':'morningReadyMany';
+}
 export function morningLooks(wardrobe: WardrobeState): readonly OccasionSuggestion[] {
   // Share PR-B's manifest-verified demo recipes. Ineligible garment conditions
   // exclude whole looks; never pad to three with invented combinations.

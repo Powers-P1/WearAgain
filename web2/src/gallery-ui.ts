@@ -1,6 +1,7 @@
 import {
   addShopItem, decideShop, groupedReturns, loadShopping, removeShopItem, saveShopping,
-  setShop, shoppingCounts, type ShopItem, type ShoppingSession,
+  setShop, shoppingCounts, initialCaptureDraft, updateCaptureDraft,
+  type CaptureDraft, type ShopItem, type ShoppingSession,
 } from './shopping.js';
 import { deletePhoto, readPhoto, storePhoto, supportedPhoto, MAX_PHOTO_BYTES } from './photo-store.js';
 import { localISODate } from './daily.js';
@@ -8,7 +9,7 @@ import { t } from './i18n.js';
 import './gallery.css';
 
 type StorageLike=Pick<Storage,'getItem'|'setItem'>|undefined;
-type Actions={readonly storage:StorageLike;readonly rerender:()=>void;readonly notice:(s:string)=>void};
+type Actions={readonly storage:StorageLike;readonly rerender:()=>void;readonly notice:(s:string)=>void;readonly focus?:(selector:string)=>void};
 type View='capture'|'coffee'|'returns';
 let session:ShoppingSession|null=null;
 let current:View='capture';
@@ -18,6 +19,8 @@ const urls=new Map<string,string>();
 const requested=new Set<string>();
 const saving=new Set<string>();
 let refresh:(()=>void)|null=null;
+let draft:CaptureDraft|null=null;
+let editingContext=false;
 const esc=(value:unknown)=>String(value??'').replace(/[&<>"']/g,c=>
   ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]??c));
 const model=()=>session!;
@@ -35,6 +38,7 @@ function hydrated(item:ShopItem):void {
 }
 function initialise(store:StorageLike,rerender?:()=>void):void {
   if(!session)session=loadShopping(store);
+  if(!draft)draft=initialCaptureDraft(session);
   if(rerender)refresh=rerender;
   for(const item of session.items)hydrated(item);
 }
@@ -55,40 +59,60 @@ function tabbar():string{
 }
 function camera():string{
   const counts=shoppingCounts(model());
+  const values=draft??initialCaptureDraft(model());
+  const context=(values.shop||t('mallShopUnknown'))+' · '+(values.floor||t('mallFloorUnknown'));
   return '<div class="mall-capture-layout"><section class="mall-capture-panel">'+
-    '<h2>'+esc(t('mallPhotoHeadline'))+'</h2><p class="mall-lead">'+esc(t('mallCaptureIntro'))+'</p>'+
-    '<form id="mall-shop-form" class="mall-context-form"><div>'+
-    '<label for="mall-shop-name">'+esc(t('mallShopName'))+'</label>'+
-    '<input id="mall-shop-name" name="shop" maxlength="100" placeholder="'+esc(t('mallShopExample'))+'" value="'+esc(model().shop)+'" /></div>'+
-    '<div><label for="mall-floor">'+esc(t('mallFloorName'))+'</label>'+
-    '<input id="mall-floor" name="floor" maxlength="32" placeholder="'+esc(t('mallFloorExample'))+'" value="'+esc(model().floor)+'" /></div>'+
-    '<button type="submit" class="button button-outline">'+esc(t('mallUpdateContext'))+'</button></form>'+
-    '<p class="mall-small">'+esc(t('mallContextNotVerified'))+'</p>'+
-    '<label for="mall-capture-title" class="mall-field-label">'+esc(t('mallItemName'))+'</label>'+
-    '<input id="mall-capture-title" class="mall-text-input" maxlength="100" placeholder="'+esc(t('mallNewItemExample'))+'" />'+
+    '<h2>'+esc(t('mallPhotoHeadline'))+'</h2>'+
+    '<p class="mall-lead mall-camera-lead">'+esc(t('mallCameraFirstLead'))+'</p>'+
+    '<div class="mall-context-summary"><span>'+esc(t('mallNowAt'))+' <strong>'+esc(context)+'</strong></span>'+
+    '<button type="button" data-mall-context-toggle aria-expanded="'+editingContext+'">'+
+      esc(t(editingContext?'mallCloseContext':'mallChangeContext'))+'</button></div>'+
+    (editingContext?'<form id="mall-shop-form" class="mall-context-form">'+
+      '<div><label for="mall-shop-name">'+esc(t('mallShopName'))+'</label>'+
+      '<input id="mall-shop-name" name="shop" maxlength="100" placeholder="'+esc(t('mallShopExample'))+'" value="'+esc(values.shop)+'" /></div>'+
+      '<div><label for="mall-floor">'+esc(t('mallFloorName'))+'</label>'+
+      '<input id="mall-floor" name="floor" maxlength="32" placeholder="'+esc(t('mallFloorExample'))+'" value="'+esc(values.floor)+'" /></div>'+
+      '<button type="submit" data-mall-context-save class="button button-outline">'+esc(t('mallUpdateContext'))+'</button></form>'+
+      '<p class="mall-small">'+esc(t('mallContextNotVerified'))+'</p>':'')+
     '<label class="mall-capture-label" for="mall-camera">'+
-    '<span class="mall-camera-symbol" aria-hidden="true">＋</span><strong>'+esc(t('mallTakePhoto'))+'</strong>'+
-    '<small>'+esc(t('mallTakePhotoHint'))+'</small></label>'+
-    '<input id="mall-camera" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" />'+
+      '<span class="mall-camera-symbol" aria-hidden="true">＋</span>'+
+      '<strong>'+esc(t('mallTakePhoto'))+'</strong>'+
+      '<small>'+esc(t('mallTakePhotoHint'))+'</small>'+
+      '<input id="mall-camera" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" />'+
+    '</label>'+
+    '<label for="mall-capture-title" class="mall-field-label">'+esc(t('mallOptionalItemName'))+'</label>'+
+    '<input id="mall-capture-title" class="mall-text-input" maxlength="100" placeholder="'+esc(t('mallNewItemExample'))+'" value="'+esc(values.itemName)+'" />'+
     '<p class="mall-small">'+esc(t('mallPhotoOnly'))+'</p>'+
     (saving.size?'<p class="mall-pending" role="status">'+esc(t('mallSaving',{count:saving.size}))+'</p>':'')+
-    '<form id="mall-link-form" class="mall-link-form"><h3>'+esc(t('mallPasteLink'))+'</h3>'+
-    '<label for="mall-link-name">'+esc(t('mallItemName'))+'</label>'+
-    '<input id="mall-link-name" name="name" maxlength="100" required placeholder="'+esc(t('mallNewItemExample'))+'" />'+
-    '<label for="mall-link-address">'+esc(t('mallLinkLabel'))+'</label>'+
-    '<input id="mall-link-address" name="url" type="url" required placeholder="https://..." />'+
-    '<button type="submit" class="button button-outline">'+esc(t('mallSaveLink'))+'</button>'+
-    '<p class="mall-small">'+esc(t('mallLinkNoFetch'))+'</p></form></section>'+
+    '</section>'+
     '<section class="mall-queue-panel"><div class="mall-queue-head"><h2>'+esc(t('mallToday'))+'</h2>'+
-    '<span>'+esc(t('mallItemCount',{count:counts.all}))+'</span></div>'+
+      '<span>'+esc(t('mallItemCount',{count:counts.all}))+'</span></div>'+
     '<p class="mall-queue-stats">'+esc(t('mallReadyCount',{ready:counts.ready,total:counts.all}))+'</p>'+
     '<div class="mall-queue-items">'+model().items.map(item=>'<article class="mall-queue-item">'+image(item,'mall-thumb')+
-    '<div><strong>'+esc(item.title)+'</strong><p>'+esc(location(item))+'</p>'+
-    '<small>'+esc(t(item.status==='saved_preview'?'mallSavedPreview':item.status==='photo_only'?'mallOwnPhoto':'mallLinkOnly'))+'</small></div>'+
-    (item.source!=='recorded'?'<button type="button" class="mall-remove" data-mall-remove="'+esc(item.id)+'" aria-label="'+esc(t('mallRemovePhoto'))+'">×</button>':'')+
-    '</article>').join('')+'</div>'+
-    '<button class="button button-primary full-width" type="button" data-mall-view="coffee">'+esc(t('mallReviewNow'))+'</button></section></div>';
+      '<div><strong>'+esc(item.title)+'</strong><p>'+esc(location(item))+'</p>'+
+      '<small>'+esc(t(item.status==='saved_preview'?'mallSavedPreview':item.status==='photo_only'?'mallOwnPhoto':'mallLinkOnly'))+'</small></div>'+
+      (item.source!=='recorded'?'<button type="button" class="mall-remove" data-mall-remove="'+esc(item.id)+
+        '" aria-label="'+esc(t('mallRemovePhoto'))+'">×</button>':'')+
+      '</article>').join('')+'</div>'+
+    '<button class="button button-primary full-width" type="button" data-mall-view="coffee">'+esc(t('mallReviewNow'))+'</button></section>'+
+    '<section class="mall-link-panel"><form id="mall-link-form" class="mall-link-form">'+
+      '<h3>'+esc(t('mallPasteLink'))+'</h3>'+
+      '<label for="mall-link-name">'+esc(t('mallItemName'))+'</label>'+
+      '<input id="mall-link-name" name="name" maxlength="100" required placeholder="'+esc(t('mallNewItemExample'))+'" value="'+esc(values.linkName)+'" />'+
+      '<label for="mall-link-address">'+esc(t('mallLinkLabel'))+'</label>'+
+      '<input id="mall-link-address" name="url" type="url" required placeholder="https://..." value="'+esc(values.linkUrl)+'" />'+
+      '<button type="submit" data-mall-link-save class="button button-outline">'+esc(t('mallSaveLink'))+'</button>'+
+      '<p class="mall-small">'+esc(t('mallLinkNoFetch'))+'</p></form></section></div>';
 }
+/** Snapshot unsent edits immediately, so any legitimate rerender is lossless. */
+export function handleGalleryInput(input:HTMLInputElement):boolean {
+  const old=draft??initialCaptureDraft(model());
+  const updated=updateCaptureDraft(old,input.id,input.value);
+  if(updated===old)return false;
+  draft=updated;
+  return true;
+}
+
 function readyList():readonly ShopItem[]{
   return model().items.filter(item=>!showReady||item.status==='saved_preview');
 }
@@ -142,6 +166,7 @@ export function handleGalleryClick(control:HTMLElement,actions:Actions):boolean{
   initialise(actions.storage,actions.rerender);
   const d=control.dataset;
   if(d.mallView&&['capture','coffee','returns'].includes(d.mallView))current=d.mallView as View;
+  else if(control.hasAttribute('data-mall-context-toggle'))editingContext=!editingContext;
   else if(d.mallFilter){showReady=d.mallFilter==='ready';selectedId=null;}
   else if(d.mallStep){
     const items=readyList();
@@ -159,6 +184,7 @@ export function handleGalleryClick(control:HTMLElement,actions:Actions):boolean{
   }else if(d.mallRemove){
     const item=model().items.find(x=>x.id===d.mallRemove);
     if(item){
+      if(!window.confirm(t('mallConfirmRemove',{item:item.title})))return true;
       session=removeShopItem(model(),item.id);
       if(!saveShopping(session,actions.storage))actions.notice(t('localStorageDenied'));
       if(item.photoId){
@@ -177,6 +203,9 @@ export function handleGallerySubmit(form:HTMLFormElement,actions:Actions):boolea
   if(form.id==='mall-shop-form'){
     try{
       session=setShop(model(),String(formData.get('shop')??''),String(formData.get('floor')??''));
+      draft={...(draft??initialCaptureDraft(session)),shop:session.shop,floor:session.floor};
+      editingContext=false;
+      actions.focus?.('[data-mall-context-toggle]');
       if(!saveShopping(session,actions.storage))actions.notice(t('localStorageDenied'));
     }catch(e){actions.notice(e instanceof Error?e.message:t('shopInvalidContext'));}
   }else if(form.id==='mall-link-form'){
@@ -184,6 +213,7 @@ export function handleGallerySubmit(form:HTMLFormElement,actions:Actions):boolea
       const id='link_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);
       session=addShopItem(model(),{id,title:String(formData.get('name')??''),source:'link',url:String(formData.get('url')??''),date:localISODate(new Date())});
       if(!saveShopping(session,actions.storage))actions.notice(t('localStorageDenied'));
+      draft={...(draft??initialCaptureDraft(session)),linkName:'',linkUrl:''};
       actions.notice(t('mallLinkAdded'));
     }catch(e){actions.notice(e instanceof Error?e.message:t('shopInvalidItem'));}
   }else return false;
@@ -196,18 +226,20 @@ export function handleGalleryFile(input:HTMLInputElement,actions:Actions):boolea
   if(!file)return true;
   if(!supportedPhoto(file)){actions.notice(t('mallBadPhoto',{size:MAX_PHOTO_BYTES/1_000_000}));actions.rerender();return true;}
   const id='photo_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,10);
-  const title=(document.getElementById('mall-capture-title') as HTMLInputElement|null)?.value.trim()||t('mallUnnamedPhoto',{count:model().items.length+1});
+  const title=(draft?.itemName??'').trim()||t('mallUnnamedPhoto',{count:model().items.length+1});
   // Snapshot the shop currently typed, even when the user did not press Save
   // context. Two photos saved out of order must keep their capture-time shop.
   let context:Pick<ShoppingSession,'shop'|'floor'>;
   try{
-    const store=(document.getElementById('mall-shop-name') as HTMLInputElement|null)?.value??model().shop;
-    const floor=(document.getElementById('mall-floor') as HTMLInputElement|null)?.value??model().floor;
+    const store=draft?.shop??model().shop;
+    const floor=draft?.floor??model().floor;
     session=setShop(model(),store,floor);
     context={shop:session.shop,floor:session.floor};
     if(!saveShopping(session,actions.storage))actions.notice(t('localStorageDenied'));
   }catch(e){actions.notice(e instanceof Error?e.message:t('shopInvalidContext'));actions.rerender();return true;}
-  saving.add(id);actions.rerender(); // The next photo need not wait for a model preview.
+  saving.add(id);
+  actions.focus?.('#mall-camera');
+  actions.rerender(); // The next photo need not wait for a model preview.
   void storePhoto(id,file).then(()=>{
     const current=model();
     const added=addShopItem({...current,shop:context.shop,floor:context.floor},
@@ -220,6 +252,10 @@ export function handleGalleryFile(input:HTMLInputElement,actions:Actions):boolea
   }).catch(()=>{
     actions.notice(t('mallPhotoFailed'));
     void deletePhoto(id).catch(()=>{});
-  }).finally(()=>{saving.delete(id);actions.rerender();});
+  }).finally(()=>{
+    saving.delete(id);
+    if(current==='capture')actions.focus?.('#mall-camera');
+    actions.rerender();
+  });
   return true;
 }
