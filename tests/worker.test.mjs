@@ -328,7 +328,7 @@ test('approved avatar loader checks pinned blob content and never forwards crede
   const avatar = { file: 'synthetic.png', url: 'https://raw.githubusercontent.com/fixture/immutable.png', baseRevision: await digest(gitBytes, 'SHA-1') };
   const network = async (url, init) => {
     assert.equal(url, avatar.url);
-    assert.equal(init.redirect, 'error');
+    assert.equal(init.redirect, 'manual');
     assert.equal(init.credentials, 'omit');
     assert.equal(init.headers, undefined);
     return new Response(bytes);

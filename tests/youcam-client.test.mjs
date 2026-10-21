@@ -113,7 +113,7 @@ test("replays the observed fixture shape: two uploads, cloth-v4, polling and res
   assert.deepEqual(JSON.parse(requests[4].init.body), { src_file_id: "src_id", ref_file_id: "ref_id", garment_category: "upper_body" });
   assert.equal(requests[5].url, api + taskPath + "/opaque_task_id");
   for (const request of requests) {
-    assert.equal(request.init.redirect, "error");
+    assert.equal(request.init.redirect, "manual");
     const headers = new Headers(request.init.headers);
     if (request.url.startsWith(api)) assert.equal(headers.get("authorization"), "Bearer " + key);
     else { assert.equal(headers.get("authorization"), null); assert.equal(request.init.credentials, "omit"); }
@@ -261,7 +261,7 @@ test("downloads reject non-image bodies, advertised oversize, streaming oversize
     const { client, requests } = queue([response]);
     await assert.rejects(client.downloadResult(asset), YouCamError);
     assert.equal(requests.length, 1);
-    assert.equal(requests[0].init.redirect, "error");
+    assert.equal(requests[0].init.redirect, "manual");
   }
 });
 

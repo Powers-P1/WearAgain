@@ -105,7 +105,8 @@ export class YouCamClient {
         method: payload === undefined ? "GET" : "POST",
         headers: { Authorization: `Bearer ${this.#apiKey}`, "Content-Type": "application/json", Accept: "application/json" },
         ...(payload === undefined ? {} : { body: JSON.stringify(payload) }),
-        signal, redirect: "error",
+        // Workers rejects redirect:"error"; "manual" returns 3xx, which is not 200/ok and fails closed.
+        signal, redirect: "manual",
       });
       const bytes = await this.#readBytes(response, MAX_JSON_BYTES, operation);
       let parsed: unknown;
@@ -146,7 +147,7 @@ export class YouCamClient {
     }
     if (headers.get("content-length") !== String(bytes.byteLength) || mime(headers.get("content-type")) !== image.contentType || headers.get("content-type") !== file.content_type) throw new YouCamError("protocol", operation);
     await this.#perform("upload", operation, async signal => {
-      const response = await this.#fetch(url, { method: "PUT", headers, body: bytes.buffer, signal, redirect: "error", credentials: "omit" });
+      const response = await this.#fetch(url, { method: "PUT", headers, body: bytes.buffer, signal, redirect: "manual", credentials: "omit" });
       await response.body?.cancel();
       if (!response.ok) throw new YouCamError("http", operation, response.status);
     });
@@ -180,7 +181,7 @@ export class YouCamClient {
     const operation = "downloadResult";
     const safeUrl = this.#assetUrl(url, operation);
     return this.#perform("download", operation, async signal => {
-      const response = await this.#fetch(safeUrl, { method: "GET", signal, redirect: "error", credentials: "omit" });
+      const response = await this.#fetch(safeUrl, { method: "GET", signal, redirect: "manual", credentials: "omit" });
       if (!response.ok) { await response.body?.cancel(); throw new YouCamError("http", operation, response.status); }
       const contentType = mime(response.headers.get("content-type")?.split(";")[0]?.trim());
       if (!contentType) { await response.body?.cancel(); throw new YouCamError("protocol", operation); }
