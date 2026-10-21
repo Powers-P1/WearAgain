@@ -32,7 +32,7 @@ export async function fetchAvatar(avatar, fetchImpl = fetch) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15_000);
   try {
-    const response = await fetchImpl(avatar.url, { signal: controller.signal, redirect: 'error', credentials: 'omit' });
+    const response = await fetchImpl(avatar.url, { signal: controller.signal, redirect: 'manual', credentials: 'omit' });
     if (!response.ok) throw new Error();
     const bytes = await readBounded(response.body, 9_999_999);
     const prefix = new TextEncoder().encode(`blob ${bytes.length}\0`);
