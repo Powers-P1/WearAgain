@@ -1,6 +1,6 @@
 # Deploy (Cloudflare free tier)
 
-PR3 implements the Worker, YouCam client and SQLite ledger. `web/` is still a placeholder for PR4. This document is an operator handoff; code review/tests do not establish that the new version has been deployed.
+PR3 implements the Worker, YouCam client and SQLite ledger. PR4 adds the static Pages frontend, guided tour, avatar selection and demo PWA. This document is an operator handoff; code review/tests do not establish that the new version has been deployed.
 
 ## URLs
 
@@ -10,6 +10,19 @@ PR3 implements the Worker, YouCam client and SQLite ledger. `web/` is still a pl
 ## Local verification
 
 Use Node 24, then `npm ci --ignore-scripts` and `npm run check`. Tests use synthetic responses and block external requests; they require no secret. The local workerd emulator binds a loopback port. `npx wrangler dev --config worker/wrangler.toml` is for manual local serving, not a deployment. Keep live disabled during fixture work.
+
+`npm run build:web` writes the complete Pages site to **`web/dist`**. `npm run dev:web` serves that build at `http://localhost:4173`; it does not build or deploy automatically. `npm run check` includes the web typecheck and production build. Runtime tests use bounded cleanup retries for transient Windows file locks, and CI runs on Ubuntu and Windows.
+
+### Public Pages build settings
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `PUBLIC_API_ORIGIN` | `https://wearagain-api.oli-struska.workers.dev` | Public Worker origin. An HTTPS origin, or localhost/127.0.0.1 for local development. |
+| `PUBLIC_CONTACT_EMAIL` | unset | Retail pilot contact address. With no value, `/retailers` displays `UNKNOWN` and disables copy; no address is invented. |
+
+These are public build inputs, never credentials. Do not put `YOUCAM_API_KEY`, `ANTHROPIC_API_KEY`, a session token or a signed URL into the Pages environment or source. Set the pilot address before the public submission, then rebuild. The contact button only copies this text; no form sends anything.
+
+The routes are `/`, `/app/` and `/retailers/`, with redirects from the extensionless directory names. The service worker precaches canonical paths, avoiding Pages' automatic `index.html` redirects. It registers only when the demo is opened, stores an explicit public-asset list and never caches live/API/authenticated requests or uploads. Publishing new recordings requires rebuilding the bundle and precache version; see [FRONTEND.md](FRONTEND.md).
 
 ## Live configuration
 
@@ -38,7 +51,8 @@ Export `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in the shell; never co
 curl -X POST -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" \
   -d '{"name":"wearagain","production_branch":"main"}' \
   https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects
-npx wrangler pages deploy web --project-name wearagain --branch main
+npm run build:web
+npx wrangler pages deploy web/dist --project-name wearagain --branch main
 npx wrangler deploy --config worker/wrangler.toml
 ```
 
@@ -65,7 +79,7 @@ Do not reconcile an unknown reservation by age or by assuming every HTTP error w
 
 ## Recorded demo assets
 
-The demo loader is implemented, but `fixtures/youcam/demo-manifest.json` currently has no entries because no generated try-on outputs were supplied. Follow [API.md](API.md#recorded-demo-handoff) to add approved synthetic-avatar recordings and publish them under `web/demo/renders/`. Base avatars and flat-colour test PNGs are not generated outfit previews. Demo calls require no secret and make no provider requests.
+The demo loader is implemented, but `fixtures/youcam/demo-manifest.json` currently has no entries because no generated try-on outputs were supplied. Follow [API.md](API.md#recorded-demo-handoff) and [FRONTEND.md](FRONTEND.md#recording-handoff) to add approved synthetic-avatar recordings under `web/demo/renders/`; the build copies only manifest-listed outputs to `web/dist/demo/renders/`. Base avatars and flat-colour test PNGs are not generated outfit previews. The current app exposes an explicitly labelled synthetic solver walkthrough and unavailable-preview states. Recorded-image mode becomes available when matching recordings exist. Demo requires no secret and makes no provider requests.
 
 ## Post-deploy checks owned by the team
 

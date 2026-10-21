@@ -5,3 +5,4 @@ export * from "./rendering.js";
 export * from "./selection.js";
 export * from "./assessment.js";
 export * from "./tools.js";
+export * from "./avatar.js";

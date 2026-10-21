@@ -1,15 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
+import { testPng } from './helpers/image.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const now = 1_792_598_400_000;
 const requestHash = 'a'.repeat(64);
+
+async function cleanupRuntime(mf, directory) {
+  try { await mf.dispose(); }
+  finally {
+    // Windows can retain SQLite/workerd handles briefly after dispose resolves.
+    // Bound retries for transient EBUSY/EPERM/ENOTEMPTY; keep real failures visible.
+    await rm(directory, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
+  }
+}
 
 async function bundle(source) {
   const result = await build({
@@ -64,7 +74,7 @@ test('workerd SQLite reserves atomically and persists settlement and ambiguous h
     }};
   `);
   let mf = emulator(script, directory, externalRequests);
-  t.after(async () => { await mf.dispose(); await rm(directory, { recursive: true, force: true }); });
+  t.after(() => cleanupRuntime(mf, directory));
   const request = (path, body) => mf.dispatchFetch('https://runtime.test' + path, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
   });
@@ -110,7 +120,7 @@ test('production Worker bundles and serves demo, signed sessions and SQLite with
       ALLOWED_ORIGINS: 'https://wearagain.pages.dev',
     },
   });
-  t.after(async () => { await mf.dispose(); await rm(directory, { recursive: true, force: true }); });
+  t.after(() => cleanupRuntime(mf, directory));
   const origin = 'https://wearagain.pages.dev';
   const call = (path, init = {}) => mf.dispatchFetch('https://worker.test' + path, init);
   let response = await call('/health');
@@ -156,4 +166,113 @@ test('production Worker bundles and serves demo, signed sessions and SQLite with
   assert.equal((await response.json()).error, 'invalid_image');
   assert.deepEqual((await (await call('/api/ledger', { headers })).json()).total, ledger.total);
   assert.deepEqual(externalRequests, []);
+});
+
+test('actual workerd native fetch completes the YouCam protocol and refuses redirects without leaking Bearer', { timeout: 30_000 }, async (t) => {
+  const directory = await mkdtemp(join(tmpdir(), 'wearagain-native-fetch-'));
+  const fixture = JSON.parse(await readFile(new URL('../fixtures/youcam/cloth_tryon_task.synthetic.json', import.meta.url), 'utf8'));
+  const png = testPng(90);
+  const api = 'https://yce-api-01.makeupar.com';
+  const asset = 'https://yce-us.s3-accelerate.amazonaws.com';
+  const key = 'offline-native-fetch-key';
+  const externalRequests = [];
+  let redirectAt = null;
+  let polls = 0;
+  const script = await bundle(`
+    import { YouCamClient } from './src/youcam/index.ts';
+    export default {async fetch(request) {
+      // These are the real workerd global fetch paths, never an injected JS mock.
+      // The provider boundary below is intercepted outside the Worker isolate.
+      const options = {apiKey:${JSON.stringify(key)}};
+      if (new URL(request.url).pathname === '/injected-global') options.fetchImpl = fetch;
+      const client = new YouCamClient(options);
+      try {
+        const bytes = new Uint8Array(${JSON.stringify([...png])});
+        const person = await client.uploadImage({bytes,contentType:'image/png',fileName:'person.png'});
+        const garment = await client.uploadImage({bytes,contentType:'image/png',fileName:'garment.png'});
+        const task = await client.createTask({srcFileId:person.fileId,refFileId:garment.fileId});
+        const pending = await client.getTask(task.taskId);
+        const completed = await client.getTask(task.taskId);
+        if (completed.status !== 'success') throw new Error('Expected fixture success');
+        const image = await client.downloadResult(completed.resultUrl);
+        return Response.json({pending:pending.status,taskId:task.taskId,contentType:image.contentType,bytes:[...image.bytes]});
+      } catch (error) {
+        return Response.json({kind:error.kind,operation:error.operation,httpStatus:error.httpStatus,confirmedNoCharge:error.confirmedNoCharge},{status:502});
+      }
+    }};
+  `);
+  const mf = emulator(script, directory, externalRequests, {
+    durableObjects: {},
+    async outboundService(request) {
+      const url = new URL(request.url);
+      const stage = url.origin === api && url.pathname === '/s2s/v2.0/file/cloth' ? 'file'
+        : url.origin === asset && url.pathname.startsWith('/fixture-upload/') ? 'upload'
+        : url.origin === api && url.pathname === '/s2s/v2.0/task/cloth-v4' ? 'create'
+        : url.origin === api && url.pathname === '/s2s/v2.0/task/cloth-v4/fixture_task' ? 'poll'
+        : url.origin === asset && url.pathname === '/fixture-result.png' ? 'download' : 'blocked';
+      const body = await request.arrayBuffer();
+      externalRequests.push({ stage, url: request.url, method: request.method,
+        authorization: request.headers.get('Authorization'), bytes: new Uint8Array(body),
+        contentType: request.headers.get('Content-Type') });
+      // Even an accidental redirect never reaches DNS/public HTTP.
+      if (stage === 'blocked') return new Response('External network is disabled.', { status: 599 });
+      if (stage === redirectAt) return new Response(null, { status: 302, headers: { Location: 'https://must-never-connect.invalid/credential-trap' } });
+      if (stage === 'file') {
+        const input = JSON.parse(new TextDecoder().decode(body)).files[0];
+        const output = structuredClone(fixture.file_api_response);
+        Object.assign(output.data.files[0], {
+          file_name: input.file_name, content_type: input.content_type, file_id: 'fixture_' + input.file_name,
+          requests: [{ method: 'PUT', url: `${asset}/fixture-upload/${input.file_name}`, headers: { 'Content-Type': input.content_type, 'Content-Length': String(input.file_size) } }],
+        });
+        return Response.json(output);
+      }
+      if (stage === 'upload') return new Response(null, { status: 200 });
+      if (stage === 'create') {
+        const output = structuredClone(fixture.create_task_response);
+        output.data.task_id = 'fixture_task';
+        return Response.json(output);
+      }
+      if (stage === 'poll') {
+        if (polls++ === 0) return Response.json(fixture.poll_running);
+        const output = structuredClone(fixture.poll_success);
+        output.data.results.url = `${asset}/fixture-result.png`;
+        return Response.json(output);
+      }
+      return new Response(png, { headers: { 'Content-Type': 'image/png' } });
+    },
+  });
+  t.after(() => cleanupRuntime(mf, directory));
+
+  for (const path of ['/default-global', '/injected-global']) {
+    externalRequests.length = 0; polls = 0;
+    const response = await mf.dispatchFetch('https://runtime.test' + path);
+    const result = await response.json();
+    assert.equal(response.status, 200, JSON.stringify(result));
+    assert.deepEqual(result, { pending: 'pending', taskId: 'fixture_task', contentType: 'image/png', bytes: [...png] });
+    assert.deepEqual(externalRequests.map(request => [request.stage, request.method]), [
+      ['file', 'POST'], ['upload', 'PUT'], ['file', 'POST'], ['upload', 'PUT'],
+      ['create', 'POST'], ['poll', 'GET'], ['poll', 'GET'], ['download', 'GET'],
+    ]);
+    assert.deepEqual(JSON.parse(new TextDecoder().decode(externalRequests[4].bytes)), {
+      src_file_id: 'fixture_person.png', ref_file_id: 'fixture_garment.png', garment_category: 'upper_body',
+    });
+    for (const request of externalRequests) {
+      assert.equal(request.authorization, ['file', 'create', 'poll'].includes(request.stage) ? `Bearer ${key}` : null);
+      if (request.stage === 'upload') {
+        assert.deepEqual(request.bytes, png);
+        assert.equal(request.contentType, 'image/png');
+      }
+    }
+  }
+
+  for (const [stage, operation] of [['file', 'uploadImage'], ['upload', 'uploadImage'], ['create', 'createTask'], ['poll', 'getTask'], ['download', 'downloadResult']]) {
+    externalRequests.length = 0; polls = 0; redirectAt = stage;
+    const response = await mf.dispatchFetch('https://runtime.test/default-global');
+    assert.equal(response.status, 502);
+    assert.deepEqual(await response.json(), { kind: 'http', operation, httpStatus: 302, confirmedNoCharge: false });
+    assert.equal(externalRequests.at(-1).stage, stage);
+    assert.equal(externalRequests.filter(request => request.stage === stage).length, 1);
+    assert.ok(externalRequests.every(request => request.stage !== 'blocked'));
+    for (const request of externalRequests.filter(request => ['upload', 'download'].includes(request.stage))) assert.equal(request.authorization, null);
+  }
 });

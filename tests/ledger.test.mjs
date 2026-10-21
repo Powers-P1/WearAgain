@@ -207,16 +207,22 @@ test("session budgets are separate while the daily key budget remains shared", (
 
 test("restarting a real SQLite-backed store preserves task ownership and outstanding reservations", (t) => {
   const directory = mkdtempSync(join(tmpdir(), "wearagain-ledger-"));
-  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  let openStore;
+  // A single hook makes the close-before-delete order explicit on Windows.
+  // Keep the current connection here even if a later assertion throws.
+  t.after(() => {
+    openStore?.close();
+    rmSync(directory, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
+  });
   const filename = join(directory, "ledger.sqlite");
-  const firstStore = createSqlStorage(filename);
+  const firstStore = openStore = createSqlStorage(filename);
   const first = new Ledger(firstStore, LIMITS);
   const attached = submitted(first);
   first.markPending("session-1", "render-1", "poll_timeout", NOW + 1000);
   first.claimRequestSlot(NOW);
   firstStore.close();
-  const secondStore = createSqlStorage(filename);
-  t.after(() => secondStore.close());
+  openStore = undefined;
+  const secondStore = openStore = createSqlStorage(filename);
   const second = new Ledger(secondStore, LIMITS);
   assert.equal(second.get("session-1", "render-1").taskId, attached.taskId);
   assert.equal(second.get("session-1", "render-1").reason, "poll_timeout");
