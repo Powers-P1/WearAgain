@@ -13,7 +13,7 @@ import { tripPage, surprisePage, balancePage, handlePlansClick, handlePlansChang
 import { itemPicture, configurePhotoMedia } from './ui.js';
 import { storePhoto, supportedPhoto } from './photo-store.js';
 import { stopCamera } from './camera.js';
-import { morningPage, handleMorningInput, handleMorningClick, submitMorning } from './morning-ui.js';
+import { morningPage, handleMorningInput, handleMorningClick, submitMorning, stopMorningDictation } from './morning-ui.js';
 import { overviewPage, reviewItemPage, handleOverviewClick, handleOverviewMonthChange } from './overview-ui.js';
 import { galleryPage, handleGalleryInput, handleGalleryClick, handleGallerySubmit, handleGalleryFile } from './gallery-ui.js';
 import { handleStylistClick, savedPage, stylistPage, submitStylist } from './stylist-ui.js';
@@ -151,8 +151,6 @@ function wardrobe(): string {
     '<button class="mobile-add" type="button" data-nav="add">+ ' + msg('addItem') + '</button></div></div>' +
     '<div class="desktop-header-actions"><button class="button button-outline" type="button" data-nav="stylist">' + msg('styleAnOutfit') + '</button>' +
     '<button class="button button-primary" type="button" data-nav="add">' + icon('plus') + ' ' + msg('addItem') + '</button></div></div>' +
-    '<div class="wardrobe-shortcuts"><button type="button" class="text-link" data-nav="overview">' + msg('overviewNav') + ' →</button>' +
-    '<button type="button" class="text-link" data-nav="morning">' + msg('morningNav') + ' →</button></div>' +
     '<div class="wardrobe-tools"><label class="search-field">' + icon('search') +
     '<input type="search" name="q" id="wardrobe-search" aria-label="' + msg('searchWardrobe') +
     '" placeholder="' + msg('searchWardrobe') + '" value="' + safe(search) + '"/></label>' +
@@ -166,6 +164,8 @@ function wardrobe(): string {
     '<footer class="wardrobe-end"><span>' + msg('piecesMorePossibilities') + '</span>' +
     '<button type="button" data-nav="profile" class="text-link desktop-only">' + msg('discoverYourStyle') + ' ' + icon('arrow') + '</button>' +
     '<button type="button" data-nav="stylist" class="text-link mobile-only">' + msg('styleFromWardrobe') + ' ' + icon('arrow') + '</button></footer>' +
+    '<div class="wardrobe-shortcuts"><button type="button" class="text-link" data-nav="overview">' + msg('overviewNav') + ' →</button>' +
+    '<button type="button" class="text-link" data-nav="morning">' + msg('morningNav') + ' →</button></div>' +
     '<p class="demo-explainer">' + msg('sampleWardrobe') + '</p></section>';
 }
 function profile(): string {
@@ -174,7 +174,7 @@ function profile(): string {
     '<h1 id="profile-title">' + t('styleHeadline') + '</h1>' +
     '<p class="intro-subtitle">' + msg('styleGuidance') + '</p>' +
     '<form id="style-form"><label class="visually-hidden" for="style-description">' + msg('describeStyle') + '</label>' +
-    '<textarea maxlength="5000" id="style-description" name="style" rows="6">' + safe(data.style) + '</textarea>' +
+    '<textarea maxlength="5000" id="style-description" name="style" rows="4">' + safe(data.style) + '</textarea>' +
     '<p class="field-hint">' + msg('changeAnytime') + '</p>' +
     '<h2>' + msg('seeLooksOnYou') + '</h2>' +
     '<div class="model-options"><div class="model-choice chosen"><img src="/assets/demo-portrait.webp" alt="' + msg('demoModel') + '" />' +
@@ -182,9 +182,8 @@ function profile(): string {
     '<button class="model-choice model-unavailable" type="button" disabled aria-label="' + msg('ownPhotoUnavailable') + '">' +
     '<span class="camera-placeholder">' + icon('camera') + '</span><span>' + msg('ownPhoto') + '</span></button></div>' +
     '<p class="privacy-line">' + icon('lock') + ' ' + msg('photoPrivacy') + '</p>' +
-    '<p class="field-hint">' + msg('photoFuture') + '</p>' +
-    '<p class="field-hint">' + msg('styleFitDisclaimer') + '</p>' +
-    '<button type="submit" class="button button-primary full-width">' + msg('saveMyStyle') + '</button></form>' +
+    '<button type="submit" class="button button-primary full-width">' + msg('saveMyStyle') + '</button>'+
+    '<details class="profile-photo-help"><summary>About your preview</summary><p class="field-hint">' + msg('photoFuture') + '</p><p class="field-hint">' + msg('styleFitDisclaimer') + '</p></details></form>' +
     '<div class="feature-links"><button data-nav="trip">' + msg('tripNav') + '</button><button data-nav="surprise">' + msg('surpriseNav') + '</button><button data-nav="saved">' + msg('savedLooks') + '</button></div>' +
     (canInstall()?'<button type="button" class="text-link" data-pwa-install>'+msg('mktPwaInstall')+'</button>':'')+'</section>';
 }
@@ -279,9 +278,11 @@ function render(): void {
   }
   const targetSelector=requestedFocus||(same?selector:'');
   requestedFocus='';
-  const whyOpen=same&&!!root!.querySelector('.purchase-certificate[open]');
+  const disclosureKey=(element:HTMLDetailsElement)=>element.id||element.className.trim()||element.querySelector('summary')?.textContent?.trim()||'';
+  const openDisclosures=new Set(same?Array.from(root!.querySelectorAll<HTMLDetailsElement>('main details[open]')).map(disclosureKey):[]);
   const current = route();
   if(current.screen!=='gallery')stopCamera();
+  if(current.screen!=='morning')stopMorningDictation();
   const active: NavId = current.screen === 'item' || current.screen === 'add' ? 'wardrobe'
     : current.screen==='review'||current.screen==='balance'?'overview'
     : current.screen==='surprise'?'profile'
@@ -307,9 +308,8 @@ function render(): void {
       current.screen==='morning'||current.screen==='trip'?'stylist':
       current.screen==='overview'||current.screen==='review'||current.screen==='balance'?'wardrobe':active
     ) + '</div>';
-  if(whyOpen){
-    const details=root!.querySelector<HTMLDetailsElement>('.purchase-certificate');
-    if(details)details.open=true;
+  for(const details of root!.querySelectorAll<HTMLDetailsElement>('main details')){
+    if(openDisclosures.has(disclosureKey(details)))details.open=true;
   }
   // Mobile Stylist hides its h1. An existing but display:none heading
   // cannot be focused - skip invisible targets instead of landing on BODY.
@@ -404,6 +404,9 @@ root.addEventListener('input', event => {
 });
 root.addEventListener('change', event => {
   const target=event.target;
+  if(target instanceof HTMLSelectElement && target.id==='review-availability' && target.dataset.statusItem && Object.hasOwn(AVAILABILITY,target.value)){
+    persist(setAvailability(data,target.dataset.statusItem,target.value as Availability));message ||= t('statusChanged');render();return;
+  }
   if(target instanceof HTMLSelectElement && handlePurchaseChange(target)){render();return;}
   if(target instanceof HTMLInputElement && handlePlansChange(target,{wardrobe:data,storage,rerender:render,notice:value=>{message=value;},navigate}))return;
   if(target instanceof HTMLInputElement && target.id==='wardrobe-photo'){
@@ -453,7 +456,7 @@ root.addEventListener('submit', event => {
 });
 if(!publicRoute)window.addEventListener('hashchange', render);
 if(!publicRoute)document.addEventListener('visibilitychange',()=>{
-  if(document.hidden)stopCamera();
-  else if(route().screen==='gallery')render();
+  if(document.hidden){stopCamera();stopMorningDictation();}
+  else if(route().screen==='gallery'||route().screen==='morning')render();
 });
 render();

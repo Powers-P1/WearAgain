@@ -54,17 +54,17 @@ test('review #16: mobile camera has a real focusable tile before name, finds and
   const src=await source('../web2/src/gallery-ui.ts');
   const css=await source('../web2/src/gallery.css');
   const camera=src.slice(src.indexOf('function camera():string{'),src.indexOf('function readyList():'));
-  for(const v of ['mall-context-summary','mall-capture-label','mall-capture-title','mall-queue-panel','mall-link-panel'])
+  for(const v of ['mall-context-summary','mall-camera-entry','mall-capture-title','mall-queue-panel','mall-link-panel'])
     assert.ok(camera.includes(v),'missing '+v);
-  assert.ok(camera.indexOf('mall-capture-label')<camera.indexOf('mall-capture-title'));
+  assert.ok(camera.indexOf('mall-camera-entry')<camera.indexOf('mall-capture-title'));
   assert.ok(camera.indexOf('mall-capture-title')<camera.indexOf('mall-queue-panel'));
   assert.ok(camera.indexOf('mall-queue-panel')<camera.indexOf('mall-link-panel'));
   assert.match(camera,/id="mall-camera"/);
   assert.match(camera,/type="file"/);
   assert.match(camera,/data-mall-camera-start/);
   assert.match(camera,/data-mall-camera-shutter/);
-  assert.match(css,/\.mall-capture-label:focus-within\s*\{[^}]*outline:\s*3px/);
-  assert.match(css,/\.mall-capture-label\{min-height:150px/);
+  assert.match(camera,/<button type="button" class="mall-camera-entry" data-mall-camera-start/);
+  assert.match(camera,/class="mall-file-fallback mall-file-choice" for="mall-camera"/);
 });
 
 test('review #16: photo deletion requires consent with a 44px target',async()=>{
@@ -92,6 +92,6 @@ test('review #16: UI draft sync and fallback focus are wired for captures and ro
   assert.match(morning,/spoken=target\.value/);
   assert.match(morning,/t\(morningHeadingKey\(looks\.length\)/);
   assert.match(morning,/t\('morningTapToSave'\)/);
-  assert.match(morning,/outfitBoard\(look.itemIds,wardrobe,true\)/);
-  assert.match(overview,/outfitBoard\(suggested.itemIds,wardrobe\)/);
+  assert.match(morning,/outfitVisual\(look.itemIds,wardrobe,true\)/);
+  assert.match(overview,/outfitVisual\(suggested.itemIds,wardrobe\)/);
 });

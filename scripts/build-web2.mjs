@@ -15,6 +15,7 @@ await mkdir(join(dest, 'fonts'), { recursive: true });
 await mkdir(join(dest, 'icons'), { recursive: true });
 // Local licensed webfonts are static public assets. No network CSS dependency.
 await cp(join(root, 'web2/public/fonts'), join(dest, 'fonts'), { recursive: true });
+await cp(join(root, 'web2/public/illustrations'), join(dest, 'assets/illustrations'), { recursive: true });
 await writeFile(join(dest,'_headers'),(await readFile(join(root,'web2/_headers'),'utf8')).replaceAll('__API_ORIGIN__',apiOrigin.origin));
 // Replace the former root-scope PWA with a one-time cleanup worker; keep
 // the optional new app PWA independently scoped under /app/sw.js.
@@ -52,7 +53,7 @@ for (const [name, x, y] of photos) {
 // The avatar in the design is a portrait, not a full-body white-tee render.
  // Crop the approved board-03 synthetic portrait separately for the UI.
 await sharp(join(root, 'docs/mockups/v2/WearAgain-03-Personalizacja-i-wyjazd.png'))
-  .extract({ left: 139, top: 541, width: 144, height: 167 })
+  .extract({ left: 121, top: 548, width: 150, height: 160 })
   .resize({ width: 360 }).webp({ quality: 88 })
   .toFile(join(dest, 'assets/demo-portrait.webp'));
 

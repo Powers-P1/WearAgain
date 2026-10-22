@@ -1,14 +1,14 @@
-00:00:00.099 WearAgain: your wardrobe, your stylist, a reason to buy less. This walkthrough uses saved examples, not fresh API calls.
-00:00:08.137 Start with what you own. See your pieces and whether they are ready, in the wash or awaiting repair.
-00:00:15.153 Describe an occasion in your own words. This demo prepares verified wardrobe recipes; live AI interpretation is a future integration.
-00:00:20.200 See the actual pieces, shown separately. A saved single-garment preview stays separate from the complete outfit.
-00:00:26.259 Save an outfit, open it again and record it as worn. Availability is checked before reuse.
-00:00:32.361 Assign a saved look to a trip occasion. The packing list contains the pieces you selected, without duplicates.
-00:00:39.367 Before buying, compare two genuine saved YouCam previews: one shop garment and one owned top. They are separate renders.
-00:00:46.393 Your wear / do-not-wear ratings feed the minimum-basket solver. The recommended basket uses the sample prices and stated needs.
-00:00:52.431 Sometimes the best basket is empty. This separate example proves that existing pieces can cover all stated needs.
-00:00:58.542 Shopping without waiting: collect photos, review over coffee and keep a return list by shop and floor. Here the previews are saved examples.
-00:01:04.609 Return only for the pieces you shortlisted. Live previews require explicit opt-in; this recording makes no provider requests.
-00:01:09.618 Your wardrobe dashboard: recorded wear history, readiness and decisions to keep, repair, sell or pass on.
-00:01:15.652 For retailers: an illustrative product page with wardrobe context. This is a demonstration, not a merchant checkout.
-00:01:21.678 For judges: a three-step guided demo with genuine API provenance and a reproducible decision certificate. Style preview, not size fit.
+00:00:00.136 WearAgain: your wardrobe, your stylist, a reason to buy less. This walkthrough uses saved examples, not fresh API calls.
+00:00:08.179 Start with what you own. See your pieces and whether they are ready, in the wash or awaiting repair.
+00:00:15.190 Describe an occasion in your own words. This demo prepares verified wardrobe recipes; live AI interpretation is a future integration.
+00:00:20.248 An illustrative full look sits beside the actual wardrobe pieces. Genuine single-garment recordings remain separately inspectable.
+00:00:26.306 Save an outfit, open it again and record it as worn. Availability is checked before reuse.
+00:00:32.408 Assign a saved look to a trip occasion. The packing list contains the pieces you selected, without duplicates.
+00:00:39.420 Before buying, compare two genuine saved YouCam previews: one shop garment and one owned top. They are separate renders.
+00:00:46.440 Your wear / do-not-wear ratings feed the minimum-basket solver. The recommended basket uses the sample prices and stated needs.
+00:00:52.484 Sometimes the best basket is empty. This separate example proves that existing pieces can cover all stated needs.
+00:00:58.609 Shopping without waiting: collect photos, review over coffee and keep a return list by shop and floor. Here the previews are saved examples.
+00:01:04.672 Return only for the pieces you shortlisted. Live previews require explicit opt-in; this recording makes no provider requests.
+00:01:09.688 Your wardrobe dashboard: recorded wear history, readiness and decisions to keep, repair, sell or pass on.
+00:01:15.724 For retailers: an illustrative product page with wardrobe context. This is a demonstration, not a merchant checkout.
+00:01:21.760 For judges: a three-step guided demo with genuine API provenance and a reproducible decision certificate. Style preview, not size fit.

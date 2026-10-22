@@ -6,6 +6,7 @@ on:
       - 'web2/**'
       - 'scripts/build-web2.mjs'
       - 'tests/web2-*'
+      - 'tests/browser/web2-*.mjs'
       - '.github/workflows/web2-visual.yml'
   workflow_dispatch:
 
@@ -44,6 +45,7 @@ jobs:
             sleep 1
           done
           npm run qa:web2
+          npm run qa:web2:states
           mkdir -p screenshots
           for viewport in '390 844' '1280 800'; do
             read -r width height <<<"$viewport"
@@ -130,5 +132,6 @@ jobs:
           path: |
             screenshots/
             test-results/web2/
+            test-results/web2-states/
           if-no-files-found: warn
           retention-days: 14

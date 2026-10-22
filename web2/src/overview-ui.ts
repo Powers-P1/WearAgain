@@ -4,7 +4,7 @@ import {
 } from './daily.js';
 import { AVAILABILITY, availabilityLabel, setAvailability, type WardrobeItem, type WardrobeState } from './state.js';
 import { morningLooks, type AttentionItem } from './daily.js';
-import { itemPicture, outfitBoard } from './ui.js';
+import { itemPicture, outfitVisual } from './ui.js';
 import { loadSaved } from './stylist.js';
 import { t, type TranslationKey } from './i18n.js';
 import './daily.css';
@@ -49,7 +49,7 @@ export function overviewMonthOptions(
     }));
 }
 export function handleOverviewMonthChange(control: Pick<HTMLSelectElement,'id'|'value'>): boolean {
-  if (control.id !== 'overview-month') return false;
+  if (control.id !== 'overview-month' && control.id !== 'overview-mobile-month') return false;
   if (MONTH_KEY.test(control.value)) selectedOverviewMonth=control.value;
   return true;
 }
@@ -58,10 +58,9 @@ const reasons:Readonly<Record<AttentionItem['kind'],TranslationKey>>={
 };
 function attentionRow(item:WardrobeItem,kind:AttentionItem['kind']):string{
   const label=kind==='no_log'?t('overviewLogNotProof'):availabilityLabel(item.availability);
-  const demoCondition=['coat','dress','bag'].includes(item.id)&&kind!=='no_log';
   return '<button type="button" class="overview-attention-row" data-overview-review="'+esc(item.id)+'">'+
     '<span class="overview-attention-image">'+draw(item)+'</span><span class="overview-attention-content">'+
-    '<small>'+esc(t(demoCondition?'overviewSampleStatus':reasons[kind]))+'</small><strong>'+esc(item.name)+'</strong><span>'+esc(label)+'</span></span>'+
+    '<small>'+esc(t(reasons[kind]))+'</small><strong>'+esc(item.name)+'</strong><span>'+esc(label)+'</span></span>'+
     '<span class="overview-attention-action">'+esc(t(kind==='repair'?'overviewPlanRepair':'overviewBrowseItem'))+'</span>'+
     '<span class="overview-attention-arrow" aria-hidden="true">→</span></button>';
 }
@@ -72,7 +71,7 @@ export function overviewPage(wardrobe:WardrobeState,daily:DailyState,decisions:D
   const profile=wardrobe.style||t('overviewNoProfile');
   const insight=metrics.loggedWearEntries>0?t('overviewLoggedNote'):t('overviewNoHistory');
   return '<section class="page overview-view" aria-labelledby="overview-title"><header class="overview-header">'+
-    '<div><p class="overview-eyebrow">'+esc(t('overviewEyebrow'))+'</p><h1 id="overview-title">'+esc(t('overviewTitle'))+'</h1>'+
+    '<div><h1 id="overview-title">'+esc(t('overviewTitle'))+'</h1>'+
     '<p>'+esc(t('overviewSubtitle'))+'</p></div>'+
     '<button class="button button-primary overview-add" data-nav="add" type="button">+ '+esc(t('addItem'))+'</button></header>'+
     '<div class="overview-tabs"><button type="button" data-nav="overview" aria-current="page">'+esc(t('overviewTab'))+'</button>'+
@@ -88,28 +87,29 @@ export function overviewPage(wardrobe:WardrobeState,daily:DailyState,decisions:D
     '<div><strong>'+metrics.loggedThisMonth+'</strong><span>'+esc(t('overviewMetricWorn'))+'</span></div>'+
     '<div><strong>'+metrics.awaitingUser+'</strong><span>'+esc(t('overviewMetricWaiting'))+'</span></div></div>'+
     '<p class="overview-evidence">'+esc(insight)+'</p>'+
-    '<div class="overview-columns"><div class="overview-left"><h2>'+esc(t('overviewAttention'))+'</h2>'+
+    '<div class="overview-columns"><div class="overview-left"><h2><span class="overview-desktop-label">'+esc(t('overviewAttention'))+'</span><span class="overview-mobile-label">'+metrics.attention.length+' pieces need attention</span></h2>'+
     (metrics.attention.length?'<div class="overview-attention-list">'+metrics.attention.map(record=>{
       const item=wardrobe.items.find(x=>x.id===record.id);
       return item?attentionRow(item,record.kind):'';
     }).join('')+'</div>':'<p class="overview-empty">'+esc(t('overviewNothingFlagged'))+'</p>')+
+    (metrics.categoryOverlap.length?'<section class="overview-categories"><h3>'+esc(t('overviewCompareCategory'))+'</h3>'+
+
+    '<div class="overview-category-thumbnails">'+wardrobe.items.filter(item=>item.category===metrics.categoryOverlap[0]).slice(0,3).map(item=>'<span>'+draw(item)+'</span>').join('')+'</div>'+
+    '<button class="text-link" type="button" data-nav="balance">'+esc(t('balanceCompare'))+' →</button></section>':'')+
     '<section class="overview-gap"><h2>'+esc(t('overviewRealGaps'))+'</h2>'+
     '<p>'+esc(t('overviewMissingUnknown'))+'</p>'+
     '<button class="text-link" type="button" data-nav="balance">'+esc(t('balanceNav'))+' →</button>'+
-    '<p class="overview-evidence">'+esc(t('overviewGapProof'))+'</p></section>'+
-    (metrics.categoryOverlap.length?'<section class="overview-categories"><h3>'+esc(t('overviewCompareCategory'))+'</h3>'+
-    '<p>'+esc(t('overviewOverlapOnly'))+'</p>'+
-    '<div class="overview-category-thumbnails">'+wardrobe.items.filter(item=>item.category===metrics.categoryOverlap[0]).slice(0,3).map(item=>'<span>'+draw(item)+'</span>').join('')+'</div>'+
-    '<button class="text-link" type="button" data-nav="balance">'+esc(t('balanceCompare'))+' →</button></section>':'')+
+    '</section>'+
     '</div><aside class="overview-today"><div class="overview-today-photo">'+
-    (suggested?outfitBoard(suggested.itemIds,wardrobe):
+    (suggested?outfitVisual(suggested.itemIds,wardrobe):
       '<div class="overview-no-photo">'+esc(t('stylistUnrendered'))+'</div>')+
     '</div><h2>'+esc(t('overviewFromYourWardrobe'))+'</h2>'+
     '<p>'+esc(suggested?suggested.itemIds.map(id=>wardrobe.items.find(x=>x.id===id)?.name??id).join(' · '):t('morningNoneReady'))+'</p>'+
     '<button type="button" class="button button-primary full-width" data-nav="morning">'+esc(t('overviewMorningCTA'))+'</button>'+
-    '<p class="overview-evidence">'+esc(t('outfitBoardNote'))+'</p>'+
+
     '<button class="text-link" data-nav="profile" type="button">'+esc(t('overviewAdjustStyle'))+' →</button>'+
     '<p class="overview-profile">'+esc(profile)+'</p></aside></div>'+
+    '<details class="overview-mobile-insights"><summary>Wardrobe numbers</summary><div class="overview-mobile-counts"><p><strong>'+metrics.items+'</strong> '+esc(t('overviewMetricItems'))+'</p><p><strong>'+metrics.loggedThisMonth+'</strong> '+esc(t('overviewMetricWorn'))+'</p><p><strong>'+metrics.awaitingUser+'</strong> '+esc(t('overviewMetricWaiting'))+'</p></div><label for="overview-mobile-month">'+esc(t('overviewChooseMonth'))+'<select id="overview-mobile-month">'+overviewMonthOptions(daily).map(option=>'<option value="'+esc(option.value)+'" '+(option.value===month?'selected':'')+'>'+esc(option.label)+'</option>').join('')+'</select></label><p class="overview-evidence">'+esc(insight)+'</p></details>'+
     '<p class="overview-bottom-note">'+esc(t('overviewUserDecides'))+'</p></section>';
 }
 let stagedFor:string|null=null;
@@ -130,10 +130,9 @@ export function reviewItemPage(id:string,wardrobe:WardrobeState,daily:DailyState
     (log.length?' · '+esc(t('overviewLastLogged',{date:log[0]!.date})):'')+'</p>'+
     '<section class="review-status"><h2>'+esc(t('overviewCondition'))+'</h2>'+
     '<p>'+esc(t('overviewConditionManual'))+'</p>'+
-    '<div class="review-status-buttons" role="group" aria-label="'+esc(t('statusControl'))+'">'+
+    '<label class="review-condition-control" for="review-availability"><span>'+esc(t('status'))+'</span><select id="review-availability" data-status-item="'+esc(item.id)+'" aria-label="'+esc(t('statusControl'))+'">'+
     (Object.keys(AVAILABILITY) as Array<keyof typeof AVAILABILITY>).map(key=>
-      '<button type="button" data-status="'+key+'" data-status-item="'+esc(item.id)+'" aria-pressed="'+(item.availability===key)+
-      '" class="'+(item.availability===key?'selected':'')+'">'+esc(availabilityLabel(key))+'</button>').join('')+'</div></section>'+
+      '<option value="'+key+'" '+(item.availability===key?'selected':'')+'>'+esc(availabilityLabel(key))+'</option>').join('')+'</select></label></section>'+
     '<section class="review-decision"><h2>'+esc(t('overviewWhatNext'))+'</h2>'+
     '<div class="review-decision-options" role="radiogroup" aria-label="'+esc(t('overviewDecisionLabel'))+'">'+
     ([['keep','overviewKeep'],['repair','overviewRepair'],['donate','overviewDonate'],['sell','overviewSell']] as const)

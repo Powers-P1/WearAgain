@@ -113,6 +113,13 @@
 .mkt-retail-hero h1>span,.mkt-retail-hero h1>em,.mkt-judges-hero h1>em{display:block;}
 .mkt-retail-hero h1{font-size:clamp(65px,6.2vw,103px);}
 .mkt-retail-hero .mkt-secondary-action{display:flex;margin:12px 0 18px;}
+.mkt-floating-product{display:grid;grid-template-columns:80px minmax(0,1fr);gap:12px;align-items:center;width:250px;padding:12px}
+.mkt-floating-product>img{width:80px;height:118px;object-fit:contain;background:var(--mkt-stone)}
+.mkt-floating-product strong{font:400 23px/1.1 var(--serif)}
+.mkt-landing-limits{margin:0 clamp(20px,5vw,80px);padding:12px 0;border-bottom:1px solid var(--mkt-line);font-size:13px;color:var(--muted)}
+.mkt-landing-limits>summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
+.mkt-landing-limits .mkt-judge-disclosures{margin:12px 0;border:0}
+.mkt-product-wardrobe-action{margin-top:18px;background:var(--mkt-ink);color:var(--mkt-bg)!important;min-height:50px}
 .mkt-judges-hero .mkt-secondary-action{display:flex;margin:0 0 20px;min-height:44px}
 .mkt-retail-context{grid-template-columns:1fr 1fr;gap:65px;}
 .mkt-retail-samples{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;background:var(--mkt-stone);padding:25px;}
@@ -263,6 +270,18 @@
 .mkt-judge-context ul{padding-left:20px;margin-top:20px;}
 .mkt-judge-context li{font-size:12px;margin:8px 0;line-height:1.55;}
 @media(min-width:1390px){.mkt-site{margin:auto;}}
+@media(min-width:751px){
+ .mkt-hero{padding:35px clamp(20px,5vw,80px) 48px;min-height:0;gap:42px}
+ .mkt-hero-art>.mkt-photo{min-height:450px;height:510px;max-height:540px}
+ .mkt-retail-hero .mkt-eyebrow,.mkt-judges-hero .mkt-eyebrow{display:none}
+ .mkt-hero-copy>p:not(.mkt-eyebrow){margin:18px 0;font-size:16px;line-height:1.55}
+ .mkt-hero-copy>.mkt-judges-role{margin:10px 0 18px;font-size:13px!important}
+ .mkt-judges-hero .mkt-secondary-action{margin:0 0 8px}.mkt-evidence-links{margin:4px 0 9px}
+ .mkt-story,.mkt-retail-context{padding:55px clamp(20px,5vw,80px)}
+ .mkt-pilot,.mkt-youcam-band{padding:48px clamp(20px,5vw,80px)}
+ .mkt-last-story,.mkt-moments,.mkt-review-index{padding:48px clamp(20px,5vw,80px)}
+ .mkt-moment>span{font:400 26px/1.15 var(--serif)}.mkt-moment p{min-height:0}.mkt-moment b{min-height:36px}
+}
 @media(max-width:1120px){
  .mkt-header{gap:15px;}
  .mkt-header-link{display:none;}
@@ -360,6 +379,13 @@
  .mkt-judge-disclosures-grid{grid-template-columns:1fr;gap:20px;}
  .mkt-verdict-amount{display:block;}
  .mkt-verdict-amount strong,.mkt-verdict-amount span{display:block;}
+ .mkt-guide-heading .mkt-eyebrow{display:none}.mkt-guide-heading{padding-top:15px}.mkt-guide-heading h1{font-size:42px}
+ .mkt-guided .mkt-guide-heading h1{font-size:42px}
+ .mkt-judge-steps{margin-top:10px}.mkt-guide-heading>a{display:none}
+ .mkt-merchant-shot{height:280px}.mkt-product-details>.mkt-eyebrow{display:none}.mkt-product-details h1{font-size:42px}
+ .mkt-product-price{margin-top:12px}.mkt-product-wardrobe-action{margin-top:13px}
+ .mkt-product .mkt-product-details h1{font-size:42px}.mkt-product .mkt-product-details h2{font-family:var(--sans);font-size:13px;font-weight:600;letter-spacing:0}
+ .mkt-hero .mkt-eyebrow{display:none}.mkt-hero{padding-top:28px}.mkt-landing-limits{margin:0 20px}
 }
 .mkt-walkthrough{padding-top:36px;margin-top:24px;border-top:1px solid var(--mkt-line);scroll-margin-top:30px}
 .mkt-walkthrough>p{margin:15px 0!important;max-width:70ch}

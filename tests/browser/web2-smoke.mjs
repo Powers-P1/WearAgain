@@ -15,22 +15,23 @@ try{
  const page=await context.newPage();page.on('pageerror',e=>errors.push(String(e)));
  const go=hash=>page.goto(base+'/app/#'+hash);
  const click=selector=>page.locator(selector).click();
+ const expand=async selector=>{if(!await page.locator(selector).evaluate(el=>el.open))await page.locator(selector+'>summary').click();};
  await go('check');
  const ratings=await page.locator('.purchase-rating-buttons').boundingBox();assert.ok(ratings.y+ratings.height<775);
  await click('.purchase-actions [data-purchase-candidate="all-round"]');assert.match(await page.locator('.purchase-verdict').innerText(),/worth|Worth/i);
  await click('.purchase-demo-settings summary');await click('[data-purchase-clear]');assert.equal(await page.locator('[data-purchase-review]').count(),1);
- await click('.purchase-demo-settings summary');await click('[data-purchase-replay]');steps.push('Pair rating / recommendation / incomplete result');
+ await click('[data-purchase-replay]');steps.push('Pair rating / recommendation / incomplete result');
  await go('stylist');await click('#stylist-form [type=submit]');await page.locator('.show-result').waitFor();
  await click('.stylist-details [data-save-look]');await go('saved');assert.equal(await page.locator('.saved-look-item').count(),1);
- await click('[data-saved-open]');assert.equal(await page.locator('.outfit-board-piece').count()>2,true);
- await click('[data-saved-wear]');await go('overview');assert.match(await page.locator('main').innerText(),/1 outfit|1 logged|1 recorded|recorded morning|logged/i);steps.push('Save / open / wear actual complete outfit');
+ await click('[data-saved-open]');await page.locator('.saved-detail-layout').waitFor();assert.equal(await page.locator('.stylist-garment').count(),4);assert.match(await page.locator('.outfit-illustration').innerText(),/Illustrative styling/);
+ await click('[data-saved-wear]');await go('overview');await click('.overview-mobile-insights summary');assert.match(await page.locator('.overview-mobile-counts').innerText(),/4 pieces with a logged wear/);steps.push('Save / open / wear actual complete outfit');
  await go('saved');await click('[data-saved-open]');await click('[data-saved-trip]');await click('[data-trip-assign-pending="dinner"]');
  assert.equal(await page.locator('.trip-packing-row').count(),4);await page.locator('[data-trip-packed]').first().check();
  await page.reload();assert.equal(await page.locator('[data-trip-packed]:checked').count(),1);
- await click('[data-trip-shared="yes"]');await page.locator('#trip-companion-name input').fill('Alex');await click('#trip-companion-name button');
+ await click('[data-trip-shared="yes"]');await click('.trip-companion>summary');await page.locator('#trip-companion-name input').fill('Alex');await click('#trip-companion-name button');
  assert.match(await page.locator('.trip-companion').innerText(),/0 companion pieces/);
  for(const [name,category] of [['Alex shirt','tops'],['Alex trousers','bottoms'],['Alex shoes','shoes']]){
-  await click('.companion-wardrobe summary');await page.locator('#trip-companion-piece [name=name]').fill(name);
+  await expand('.companion-wardrobe details');await page.locator('#trip-companion-piece [name=name]').fill(name);
   await page.locator('#trip-companion-piece [name=category]').selectOption(category);await click('#trip-companion-piece [type=submit]');
  }
  await click('[data-trip-companion-event="dinner"]');
@@ -39,9 +40,9 @@ try{
  await page.locator('[data-trip-packed^=companion_]').first().check();await page.reload();await click('[data-trip-shared="yes"]');
  assert.equal(await page.locator('[data-trip-packed^=companion_]:checked').count(),1);
  steps.push('Trip assignment / both wardrobes / separate packing persistence');
- await go('surprise');await page.locator('input[value="300"]').check();await page.locator('[name=need]').fill('A plain navy scarf');await click('#surprise-form [type=submit]');await click('[data-surprise-skip]');
+ await go('surprise');await page.locator('input[value="300"]').check();await click('.surprise-need summary');await page.locator('[name=need]').fill('A plain navy scarf');await click('#surprise-form [type=submit]');await click('[data-surprise-skip]');
  await page.reload();assert.equal(await page.locator('input[value="300"]').isChecked(),true);assert.equal(await page.locator('[name=need]').inputValue(),'A plain navy scarf');steps.push('Surprise preferences / budget / skip month');
- await go('balance');await page.locator('#wardrobe-need-form input').fill('Rainproof shoes');await click('#wardrobe-need-form button');await page.reload();assert.match(await page.locator('.balance-needs').innerText(),/Rainproof shoes/);steps.push('Confirmed wardrobe needs persistence');
+ await go('balance');await click('.balance-add-need summary');await page.locator('#wardrobe-need-form input').fill('Rainproof shoes');await click('#wardrobe-need-form button');await page.reload();assert.match(await page.locator('.balance-needs').innerText(),/Rainproof shoes/);steps.push('Confirmed wardrobe needs persistence');
  await go('add');await page.locator('[name=name]').fill('QA personal coat');await page.locator('[name=category]').selectOption('tops');
  await page.locator('#wardrobe-photo').setInputFiles(repo+'/web2/dist/assets/items/coat.webp');await click('#add-form [type=submit]');await page.waitForURL(/#wardrobe$/);
  await page.reload();const own=page.getByRole('button',{name:/QA personal coat/});assert.equal(await own.count(),1);await own.locator('img[src^="blob:"]').waitFor();steps.push('Personal wardrobe photo persists in IndexedDB');
@@ -60,9 +61,9 @@ try{
  });
  await go('gallery');assert.equal(apiCalls,0);
  await click('[data-mall-context-toggle]');await page.locator('#mall-shop-name').fill('QA shop');await page.locator('#mall-floor').fill('Floor 1');
- await page.locator('#mall-capture-title').fill('First coat');await page.locator('#mall-camera').setInputFiles(repo+'/web2/dist/assets/items/coat.webp');
+ await click('.mall-item-name summary');await page.locator('#mall-capture-title').fill('First coat');await page.locator('#mall-camera').setInputFiles(repo+'/web2/dist/assets/items/coat.webp');
  await page.waitForFunction(()=>document.querySelector('.mall-queue-items')?.textContent?.includes('First coat'));
- assert.equal(apiCalls,0);assert.match(await page.locator('.mall-queue-items').innerText(),/QA shop · Floor 1/);
+ assert.equal(apiCalls,0);assert.match(await page.locator('.mall-queue-items').textContent(),/QA shop · Floor 1/);
  await click('.mall-live-controls summary');await page.locator('[name=garmentOnly]').check();await click('#mall-live-form [type=submit]');
  await page.waitForFunction(()=>document.querySelector('.mall-status-ready')!==null);assert.equal(submitted,1);
  await click('[data-mall-camera-start]');await page.waitForFunction(()=>document.querySelector('#mall-viewfinder')?.videoWidth>0);
@@ -77,7 +78,7 @@ try{
  steps.push('No upload without opt-in / mocked YouCam protocol / continuous fake camera / actual result blob / coffee shortlist survives reload');
  await page.goto(base+'/judges/demo/');await page.evaluate(()=>scrollTo(0,document.body.scrollHeight));await click('.mkt-guide-actions [data-guide-step="preview"]');assert.equal(await page.evaluate(()=>scrollY),0);
  assert.match(await page.locator('[aria-current=step]').innerText(),/02\s*Try-on evidence/);steps.push('Jury next step scroll and current-step semantics');
- await page.goto(base+'/retail/demo/');await click('.mkt-product-details [data-retail-panel-toggle]');assert.equal(await page.locator('.mkt-retail-panel').count(),0);await click('.mkt-product-details [data-retail-panel-toggle]');await click('[data-retail-save]');assert.equal(await page.locator('.mkt-saved-note').count(),1);steps.push('Retail panel open / close / save');
+ await page.goto(base+'/retail/demo/');await click('.mkt-retail-panel [data-retail-panel-toggle]');assert.equal(await page.locator('.mkt-retail-panel').count(),0);await click('.mkt-product-details [data-retail-panel-open]');await click('[data-retail-save]');assert.equal(await page.locator('.mkt-saved-note').count(),1);steps.push('Retail panel open / close / save');
  await page.goto(base+'/judges/#walkthrough');const video=page.locator('.mkt-walkthrough video');
  await video.evaluate(el=>el.play());await page.waitForFunction(()=>document.querySelector('video')?.currentTime>.5);
  const duration=await video.evaluate(el=>{el.pause();return el.duration;});assert.ok(duration>=60&&duration<=180);

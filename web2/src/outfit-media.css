@@ -8,8 +8,6 @@
 .outfit-board-compact .outfit-board-piece img{aspect-ratio:auto;object-fit:contain;min-height:0}
 .outfit-board-compact figcaption{display:none}
 .outfit-board-compact .no-photo{min-height:35px;font-size:10px}
-.stylist-photo:has(.outfit-board){background:none;aspect-ratio:auto;overflow:visible}
-.stylist-photo>.outfit-board{width:100%;min-height:430px}
 .stylist-preview-detail{margin-top:12px;color:var(--muted);font-size:12px;line-height:1.5}
 .stylist-preview-detail summary{cursor:pointer;min-height:44px;display:flex;align-items:center;gap:8px}
 .stylist-preview-detail img{width:100%;max-height:400px;object-fit:contain;background:var(--stone)}
@@ -33,3 +31,14 @@
  .saved-look-item .outfit-board{height:300px}
  .saved-look-item .outfit-board-piece img{max-height:130px}
 }
+
+.outfit-illustration{position:relative;margin:0;min-width:0;background:var(--stone);overflow:hidden}
+.outfit-illustration>img{display:block;width:100%;height:100%;object-fit:contain}
+.outfit-illustration>figcaption{position:absolute;bottom:7px;left:7px;right:7px;width:max-content;max-width:calc(100% - 14px);padding:4px 6px;background:#f8f6f1ed;font-size:10px;line-height:1.3;color:var(--olive)}
+.outfit-illustration-compact>figcaption{left:3px;bottom:3px;right:3px;font-size:8px;padding:3px;width:auto}
+.stylist-photo>.outfit-illustration{width:100%;height:100%}
+.stylist-photo>.outfit-board{width:100%;height:100%;grid-auto-rows:minmax(0,1fr)}
+.stylist-photo>.outfit-board .outfit-board-piece img{aspect-ratio:auto}
+.saved-look-item>.outfit-illustration{height:340px}
+.saved-detail-layout>.outfit-illustration{height:560px}
+@media(max-width:800px){.saved-detail-layout>.outfit-illustration{height:420px}.saved-look-item>.outfit-illustration{height:390px}}

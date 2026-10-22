@@ -1,6 +1,6 @@
 import { morningLooks, morningHeadingKey, localISODate, storeDaily, wearToday, type DailyState } from './daily.js';
 import { proposeLooks, type OccasionSuggestion } from './stylist.js';
-import { outfitBoard } from './ui.js';
+import { outfitVisual, illustrationFor } from './ui.js';
 import type { WardrobeState } from './state.js';
 import { t } from './i18n.js';
 import './daily.css';
@@ -23,6 +23,11 @@ interface DictationRecognizer {
 type DictationCtor=new()=>DictationRecognizer;
 let recognizer:DictationRecognizer|null=null;
 let listening=false;
+let typing=false;
+export function stopMorningDictation(): void {
+  const active=recognizer;recognizer=null;listening=false;
+  try{active?.stop();}catch{/* Already ended by the browser. */}
+}
 function voiceConstructor():DictationCtor|null {
   const withSpeech=window as Window & {SpeechRecognition?:DictationCtor;webkitSpeechRecognition?:DictationCtor};
   return withSpeech.SpeechRecognition??withSpeech.webkitSpeechRecognition??null;
@@ -35,7 +40,7 @@ const svg=(name:'mic'|'check'|'arrow')=>{
   return '<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">'+path+'</svg>';
 };
 function photoFor(look:OccasionSuggestion,wardrobe:WardrobeState):string{
-  return outfitBoard(look.itemIds,wardrobe,true);
+  return outfitVisual(look.itemIds,wardrobe,true);
 }
 /** Keep the typed brief before rerenders caused by voice controls or async events. */
 export function handleMorningInput(target:HTMLTextAreaElement):boolean {
@@ -58,19 +63,19 @@ export function morningPage(wardrobe:WardrobeState,daily:DailyState):string{
   const looks=prepared(wardrobe);
   const today=localISODate(new Date());
   const logged=daily.wears.find(row=>row.date===today);
+  const illustrated=looks.length>0&&looks.every(look=>illustrationFor(look.itemIds,wardrobe));
   return '<section class="page morning-view" aria-labelledby="morning-title">'+
-    '<div class="morning-top"><p class="morning-eyebrow">'+esc(t('morningEyebrow'))+'</p>'+
-    '<button class="text-link" type="button" data-nav="stylist">'+esc(t('morningBackStylist'))+' →</button></div>'+
     (stage==='brief'?
       '<div class="morning-intro"><h1 id="morning-title">'+esc(t('morningHeadline'))+'</h1>'+
       '<p>'+esc(t('morningIntro'))+'</p></div>'+
-      '<form id="morning-form" class="morning-form"><label for="morning-request">'+svg('mic')+' '+esc(t('morningBriefLabel'))+'</label>'+
-      '<textarea id="morning-request" name="request" rows="5" maxlength="500" required>'+esc(spoken)+'</textarea>'+
+      '<form id="morning-form" class="morning-form"><div class="morning-voice-stage"><button type="button" class="morning-dictate" data-morning-voice aria-pressed="'+listening+'" aria-label="'+esc(t(listening?'morningStopListening':'morningStartListening'))+'">'+svg('mic')+'</button>'+
+      '<p>'+esc(t(listening?'morningStopListening':'morningStartListening'))+'</p></div>'+
+      '<label class="visually-hidden" for="morning-request">'+esc(t('morningBriefLabel'))+'</label>'+
+      '<textarea id="morning-request" class="'+(typing?'':'morning-quoted')+'" name="request" rows="3" maxlength="500" required '+(typing?'':'readonly')+'>'+esc(spoken)+'</textarea>'+
+      '<button type="button" class="text-link morning-type" data-morning-type>'+(typing?'Done editing':'I’d rather type')+'</button>'+
       '<p class="morning-chips">'+esc(t('morningChips'))+'</p>'+
-      '<button type="button" class="morning-dictate" data-morning-voice aria-pressed="'+listening+'">'+svg('mic')+
-      ' '+esc(t(listening?'morningStopListening':'morningStartListening'))+'</button>'+
-      '<details class="morning-voice-help"><summary>'+esc(t('morningAboutDictation'))+'</summary><p class="morning-help">'+esc(t('morningVoiceDisclosure'))+'</p></details>'+
       '<button type="submit" class="button button-primary full-width">'+esc(t('morningPrepare'))+' '+svg('arrow')+'</button>'+
+      '<details class="morning-voice-help"><summary>'+esc(t('morningAboutDictation'))+'</summary><p class="morning-help">'+esc(t('morningVoiceDisclosure'))+'</p></details>'+
       '<p class="morning-help">'+esc(t('morningOfflineNote'))+'</p></form>':
     stage==='preparing'?
       '<div class="morning-wait"><h1 id="morning-title">'+esc(t('morningPreparing'))+'</h1>'+
@@ -82,14 +87,13 @@ export function morningPage(wardrobe:WardrobeState,daily:DailyState):string{
       '<p>'+svg('check')+' '+esc(t('morningNoIron'))+'</p><p>'+svg('check')+' '+esc(t('morningReadyOnly'))+'</p></div>'+
       '<p class="morning-help">'+esc(t('morningNoBackground'))+'</p></div>':
       '<div class="morning-ready"><div class="morning-intro"><h1 id="morning-title">'+esc(t(morningHeadingKey(looks.length),{count:looks.length}))+'</h1>'+
-      '<p>'+esc(t('morningReadySubtitle'))+'</p></div>'+
-      (looks.length?'<div class="morning-looks" role="radiogroup" aria-label="'+esc(t('morningChoose'))+'">'+
+      '<p>'+esc(t('morningReadySubtitle'))+'</p>'+(illustrated?'<p class="morning-illustrative">Illustrative styling · demo model · style, not size fit</p>':'')+'</div>'+
+      (looks.length?'<div class="morning-looks '+(illustrated?'morning-looks-illustrated':'')+'" role="radiogroup" aria-label="'+esc(t('morningChoose'))+'">'+
         looks.map(look=>'<button type="button" role="radio" aria-checked="'+(look.id===selected)+
           '" tabindex="'+(look.id===selected?'0':'-1')+'" class="morning-look '+(look.id===selected?'selected':'')+'" data-morning-select="'+esc(look.id)+'">'+
           '<span class="morning-look-photo">'+photoFor(look,wardrobe)+'</span>'+
           '<span class="morning-look-desc"><strong>'+esc(look.title)+'</strong>'+
-          '<small>'+esc(t('morningReadyBadge'))+'</small>'+
-          '<span>'+esc(lookNames(look,wardrobe))+'</span></span>'+
+          '<small>'+esc(t('morningReadyBadge'))+'</small></span>'+
           '<span class="morning-radio" aria-hidden="true"></span></button>').join('')+'</div>'+
         '<button type="button" class="button button-primary full-width morning-wear-button" data-morning-wear>'+
         esc(t('morningWearThis'))+'</button>'+
@@ -98,21 +102,23 @@ export function morningPage(wardrobe:WardrobeState,daily:DailyState):string{
       (logged?'<p class="morning-logged" role="status">'+svg('check')+' '+esc(t('morningTodayRecorded',{name:logged.lookTitle}))+'</p>':'')+
       '<button type="button" class="text-link morning-restart" data-morning-reset>'+
         esc(t('morningNewRequest'))+' →</button>'+
-      '<p class="morning-help">'+esc(t('outfitBoardNote'))+'</p></div>')+
+      '<details class="morning-pieces"><summary>Pieces in this look</summary><p class="morning-help">'+esc(looks.find(look=>look.id===selected)?lookNames(looks.find(look=>look.id===selected)!,wardrobe):'')+'</p></details></div>')+
+    '<button class="text-link morning-back" type="button" data-nav="stylist">'+esc(t('morningBackStylist'))+' →</button>'+
     '</section>';
 }
 export function handleMorningClick(button:HTMLElement,actions:Actions):boolean{
+  if(button.hasAttribute('data-morning-type')){typing=!typing;actions.rerender();if(typing)document.getElementById('morning-request')?.focus();return true;}
   if(button.hasAttribute('data-morning-voice')){
     if(listening&&recognizer){
       recognizer.stop();listening=false;actions.rerender();return true;
     }
     const Ctor=voiceConstructor();
-    if(!Ctor){actions.notice(t('morningVoiceUnavailable'));actions.rerender();return true;}
+    if(!Ctor){typing=true;actions.notice(t('morningVoiceUnavailable'));actions.rerender();document.getElementById('morning-request')?.focus();return true;}
     try{
       const speech=new Ctor(); recognizer=speech;
       speech.lang='en-US';speech.interimResults=false;
       speech.onresult=event=>{
-        if(stage!=='brief')return;
+        if(recognizer!==speech||stage!=='brief')return;
         const text=event.results[0]?.[0]?.transcript?.trim();
         if(text){
           spoken=text;
@@ -162,11 +168,12 @@ export function submitMorning(form:HTMLFormElement,actions:Actions):boolean{
   if(request.length<3||request.length>500){actions.notice(t('morningInvalidRequest'));actions.rerender();return true;}
   if(recognizer&&listening){recognizer.stop();listening=false;}
   spoken=request;stage='preparing';actions.rerender();
+  if(window.location.hash==='#morning')window.scrollTo({top:0,behavior:'instant'});
   const token=++outstanding;
   // Offline example: resolved locally; NEVER assert that the browser continues
   // work when closed, creates three photos or schedules OS notifications.
   void proposeLooks({occasion:request,date:localISODate(new Date()),style:actions.wardrobe.style},actions.wardrobe)
-    .then(value=>{if(token!==outstanding)return;currentLooks=value.looks;selected=currentLooks[0]?.id??null;stage='ready';actions.rerender();})
+    .then(value=>{if(token!==outstanding)return;currentLooks=value.looks;selected=currentLooks[0]?.id??null;stage='ready';actions.rerender();if(window.location.hash==='#morning')window.scrollTo({top:0,behavior:'instant'});})
     .catch(error=>{if(token!==outstanding)return;stage='brief';actions.notice(error instanceof Error?error.message:t('morningInvalidRequest'));actions.rerender();});
   return true;
 }

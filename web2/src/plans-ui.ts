@@ -4,7 +4,7 @@ import { type DailyState } from './daily.js';
 import { addTripEvent, assignTripLook, companionPackingIds, newId, packingIds, pendingTripLook, readNeeds, readSurprise, readTrip, saveLocal,
   updateTrip, TRIP_KEY, SURPRISE_KEY, NEEDS_KEY, type TripPlan, type SurprisePreferences, type WardrobeNeed } from './plans.js';
 import { storePhoto, supportedPhoto } from './photo-store.js';
-import { esc, icon, itemPicture, outfitBoard } from './ui.js';
+import { esc, icon, itemPicture, outfitBoard, outfitVisual } from './ui.js';
 import { t } from './i18n.js';
 import './plans.css';
 
@@ -12,6 +12,7 @@ type Store = Pick<Storage, 'getItem' | 'setItem'> | undefined;
 type Actions = { readonly wardrobe: WardrobeState; readonly storage: Store; readonly rerender: () => void; readonly notice: (value: string) => void; readonly navigate: (path: string) => void };
 let trip: TripPlan | null = null, surprise: SurprisePreferences | null = null, needs: WardrobeNeed[] | null = null;
 let shared = false, editTrip = false, selectedEvent = '', choosingCompanion = false, balanceCategory: Category = 'tops';
+let balanceExpanded = false;
 function initialise(store: Store): void { trip ??= readTrip(store); surprise ??= readSurprise(store); needs ??= readNeeds(store); }
 const heading = (title: string, subtitle: string) => '<header class="feature-heading"><h1>' + esc(title) + '</h1><p>' + esc(subtitle) + '</p></header>';
 const dateLabel = (date: string) => new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(date));
@@ -27,14 +28,20 @@ export function tripPage(wardrobe: WardrobeState, store: Store): string {
   const available = choices(wardrobe, store);
   const packing = packingIds(plan).flatMap(id => wardrobe.items.filter(item => item.id === id));
   const companionPacking=companionPackingIds(plan).flatMap(id=>plan.companion.items.filter(item=>item.id===id));
+  const featured = plan.events.find(event => event.outfit)?.outfit ?? available[0];
+  const companionEvent = plan.events.find(event => event.companionItemIds.length);
+  const visual = '<div class="trip-visual' + (shared?' trip-visual-shared':'') + '"><section class="trip-person"><h2>' + esc(t('tripMyWardrobe')) + '</h2>' +
+    (featured ? outfitVisual(featured.itemIds,wardrobe) + '<p>' + esc(featured.title) + '</p>' : '<div class="trip-person-empty">'+icon('hanger')+'<p>'+esc(t('morningNoneReady'))+'</p></div>') +
+    (plan.events.length?'<button type="button" class="text-link" data-trip-select-event="'+esc(plan.events[0]!.id)+'">'+esc(t('tripChooseOutfit'))+' →</button>':'<button type="button" class="text-link" data-trip-add-occasion>'+esc(t('tripAddEvent'))+' →</button>')+'</section>' +
+    (shared?'<section class="trip-person"><h2>'+esc(plan.companionName||'Travel companion')+'</h2>'+
+      (companionEvent?outfitBoard(companionEvent.companionItemIds,plan.companion):'<div class="trip-person-empty">'+icon('hanger')+'<p>Bring your companion’s wardrobe along.</p><button class="text-link" type="button" data-trip-setup>'+esc(t('tripAddCompanion'))+' →</button></div>')+'</section>':'')+'</div>';
   return '<section class="page trip-view">' + heading(plan.destination + ', ' + t('tripTitle').toLowerCase().replace('away, ', ''), t('tripSubtitle')) +
     '<div class="trip-dates"><span>' + esc(dateLabel(plan.from)) + ' — ' + esc(dateLabel(plan.until)) + '</span><button type="button" class="text-link" data-trip-edit>' + esc(t('tripEdit')) + '</button></div>' +
     (editTrip ? '<form id="trip-edit-form" class="feature-form"><label>' + esc(t('tripDestination')) + '<input name="destination" required maxlength="100" value="' + esc(plan.destination) + '" /></label><div class="feature-form-row"><label>' +
       esc(t('tripStart')) + '<input name="from" type="date" required value="' + plan.from + '" /></label><label>' + esc(t('tripEnd')) + '<input name="until" type="date" required value="' + plan.until + '" /></label></div><button class="button button-primary" type="submit">' + esc(t('tripSave')) + '</button></form>' : '') +
     '<div class="feature-tabs" role="group" aria-label="' + esc(t('tripNav')) + '"><button type="button" data-trip-shared="no" aria-pressed="' + !shared + '">' + esc(t('tripMyWardrobe')) + '</button><button type="button" data-trip-shared="yes" aria-pressed="' + shared + '">' + esc(t('tripOurWardrobes')) + '</button></div>' +
     (pending ? '<section class="trip-pending"><h2>' + esc(t('tripChooseEvent')) + '</h2>' + outfitBoard(pending.itemIds, wardrobe, true) + '<p>' + esc(pending.title) + '</p></section>' : '') +
-    (shared ? companionPanel(plan) : '') +
-    '<div class="trip-layout"><div><div class="trip-event-list">' + plan.events.map(event => {
+    '<div class="trip-layout"><div>' + visual + (shared ? companionPanel(plan) : '') + '<div class="trip-event-list">' + plan.events.map(event => {
       const ready = event.outfit?.itemIds.every(id => wardrobe.items.some(item => item.id === id && item.availability === 'ready'));
       return '<article class="trip-event"><div class="trip-event-heading"><div><small>' + esc(dateLabel(event.date)) + '</small><h2>' + esc(event.label) + '</h2></div><button type="button" data-trip-remove-event="' + esc(event.id) + '" class="icon-button" aria-label="' + esc(t('tripRemoveEvent')) + '">' + icon('close') + '</button></div>' +
         (event.outfit ? '<div class="trip-event-outfit">' + outfitBoard(event.outfit.itemIds, wardrobe, true) + '<div><strong>' + esc(event.outfit.title) + '</strong><p class="' + (ready ? 'ready-copy' : 'not-ready-copy') + '">' + esc(t(ready ? 'tripReady' : 'tripNotReady')) + '</p></div></div>' : '') +
@@ -45,25 +52,26 @@ export function tripPage(wardrobe: WardrobeState, store: Store): string {
     (!plan.events.length ? '<p>' + esc(t('tripNoEvents')) + '</p>' : '') +
     (selected ? '<section class="trip-outfit-picker" aria-labelledby="trip-picker-title"><h2 id="trip-picker-title">' + esc(choosingCompanion ? t('tripCompanionReady') : t('tripChooseOutfit')) + '</h2><p>' + esc(selected.label) + '</p>' +
       (choosingCompanion ? '<form id="trip-companion-outfit"><input type="hidden" name="event" value="' + esc(selected.id) + '" /><div class="companion-piece-choices">' + plan.companion.items.map(item => '<label><input type="checkbox" name="piece" value="' + esc(item.id) + '" ' + (item.availability !== 'ready' ? 'disabled' : '') + ' />' + itemPicture(item) + '<span>' + esc(item.name) + '</span></label>').join('') + '</div><button class="button button-primary" type="submit">' + esc(t('tripOutfitUse')) + '</button></form>' :
-      '<div class="trip-outfit-choices">' + available.map((look, i) => '<button type="button" data-trip-choose-look="' + i + '">' + outfitBoard(look.itemIds, wardrobe, true) + '<strong>' + esc(look.title) + '</strong></button>').join('') + '</div>' +
+      '<div class="trip-outfit-choices">' + available.map((look, i) => '<button type="button" data-trip-choose-look="' + i + '">' + outfitVisual(look.itemIds, wardrobe, true) + '<strong>' + esc(look.title) + '</strong></button>').join('') + '</div>' +
       '<button class="button button-outline" data-nav="stylist" type="button">' + esc(t('stylistPageTitle')) + icon('arrow') + '</button>') + '</section>' : '') +
     '<details class="trip-add-event"><summary>' + icon('plus') + esc(t('tripAddEvent')) + '</summary><form id="trip-event-form" class="feature-form"><label>' + esc(t('tripEventName')) + '<input name="label" required maxlength="160" /></label><label>' + esc(t('tripEventDate')) + '<input name="date" type="date" required min="' + plan.from + '" max="' + plan.until + '" value="' + plan.from + '" /></label><button class="button button-outline" type="submit">' + esc(t('tripEventAdd')) + '</button></form></details></div>' +
     '<aside class="trip-packing"><h2>' + esc(t('tripPacking')) + '</h2>' + (packing.length ? packing.map(item => '<label class="trip-packing-row"><input type="checkbox" data-trip-packed="' + esc(item.id) + '" ' + (plan.packed.includes(item.id) ? 'checked' : '') + ' /><span class="trip-packing-photo">' + itemPicture(item) + '</span><span>' + esc(item.name) + '</span></label>').join('') : '<p>' + esc(t('tripPackingEmpty')) + '</p>') +
     (shared&&companionPacking.length?'<h3>'+esc(plan.companionName)+'</h3>'+companionPacking.map(item=>'<label class="trip-packing-row"><input type="checkbox" data-trip-packed="companion_'+esc(item.id)+'" '+(plan.packed.includes('companion_'+item.id)?'checked':'')+' /><span class="trip-packing-photo">'+itemPicture(item)+'</span><span>'+esc(item.name)+'</span></label>').join(''):'')+'</aside></div></section>';
 }
 function companionPanel(plan: TripPlan): string {
-  return '<section class="trip-companion"><form id="trip-companion-name" class="companion-name-form"><label>' + esc(t('tripCompanionName')) + '<input name="name" required maxlength="80" value="' + esc(plan.companionName) + '" /></label><button class="button button-outline" type="submit">' + esc(t(plan.companionName ? 'tripSave' : 'tripAddCompanion')) + '</button></form><p class="feature-note">' + esc(t('tripCompanionNote')) + '</p>' +
+  return '<details class="trip-companion"><summary>'+esc(plan.companionName||t('tripAddCompanion'))+' · Wardrobe settings</summary><form id="trip-companion-name" class="companion-name-form"><label>' + esc(t('tripCompanionName')) + '<input name="name" required maxlength="80" value="' + esc(plan.companionName) + '" /></label><button class="button button-outline" type="submit">' + esc(t(plan.companionName ? 'tripSave' : 'tripAddCompanion')) + '</button></form><p class="feature-note">' + esc(t('tripCompanionNote')) + '</p>' +
     (plan.companionName ? '<div class="companion-wardrobe"><strong>' + esc(t('tripCompanionPieces', { count: plan.companion.items.length })) + '</strong>' + (!plan.companion.items.length ? '<p>' + esc(t('tripCompanionEmpty')) + '</p>' : '') +
-      '<details><summary>' + icon('plus') + esc(t('tripAddPiece')) + '</summary><form id="trip-companion-piece" class="feature-form"><label>' + esc(t('itemName')) + '<input name="name" required maxlength="80" /></label><label>' + esc(t('category')) + '<select name="category">' + CATEGORIES.map(category => '<option value="' + category + '">' + esc(categoryLabel(category)) + '</option>').join('') + '</select></label><label>' + esc(t('wardrobePhotoLabel')) + '<input type="file" name="photo" accept="image/jpeg,image/png,image/webp" /></label><button type="submit" class="button button-primary">' + esc(t('tripAddPiece')) + '</button></form></details></div>' : '') + '</section>';
+      '<details><summary>' + icon('plus') + esc(t('tripAddPiece')) + '</summary><form id="trip-companion-piece" class="feature-form"><label>' + esc(t('itemName')) + '<input name="name" required maxlength="80" /></label><label>' + esc(t('category')) + '<select name="category">' + CATEGORIES.map(category => '<option value="' + category + '">' + esc(categoryLabel(category)) + '</option>').join('') + '</select></label><label>' + esc(t('wardrobePhotoLabel')) + '<input type="file" name="photo" accept="image/jpeg,image/png,image/webp" /></label><button type="submit" class="button button-primary">' + esc(t('tripAddPiece')) + '</button></form></details></div>' : '') + '</details>';
 }
 export function surprisePage(store: Store): string {
   initialise(store); const value = surprise!;
   return '<section class="page surprise-view">' + heading(t('surpriseTitle'), t('surpriseIntro')) + '<img class="surprise-photo" src="/assets/surprise-scarf.webp" alt="' + esc(t('surprisePhotoAlt')) + '" />' +
     '<form id="surprise-form" class="feature-form"><fieldset class="surprise-budgets"><legend>' + esc(t('surpriseBudget')) + '</legend><div>' + ([100, 200, 300] as const).map(budget => '<label><input type="radio" name="budget" value="' + budget + '" ' + (value.budget === budget ? 'checked' : '') + ' /><span>' + budget + ' PLN</span></label>').join('') + '</div></fieldset>' +
-    '<div class="surprise-wallet"><span>' + esc(t('surpriseWallet')) + '</span><strong>0 PLN<small>' + esc(t('surpriseWalletDemo')) + '</small></strong></div><label>' + esc(t('surpriseNeed')) + '<textarea name="need" maxlength="500" rows="3" placeholder="' + esc(t('surpriseNeedHint')) + '">' + esc(value.need) + '</textarea></label>' +
+    '<div class="surprise-wallet"><span>' + esc(t('surpriseWallet')) + '</span><strong>0 PLN<small>' + esc(t('surpriseWalletDemo')) + '</small></strong></div>' +
     '<ul class="surprise-promises"><li>' + icon('check') + esc(t('surpriseSkip')) + '</li><li>' + icon('check') + esc(t('surpriseReturn')) + '</li></ul>' +
+    '<button type="submit" class="button button-primary full-width">' + esc(t('surpriseSave')) + '</button><details class="surprise-need"><summary>' + esc(t('surpriseNeed')) + '</summary><label>' + esc(t('surpriseNeed')) + '<textarea name="need" maxlength="500" rows="3" placeholder="' + esc(t('surpriseNeedHint')) + '">' + esc(value.need) + '</textarea></label></details><p class="feature-note">' + esc(t('surprisePending')) + '</p>'+
     '<details class="surprise-rules"><summary>' + esc(t('surpriseRules')) + '</summary><ol><li>' + esc(t('surpriseRule1')) + '</li><li>' + esc(t('surpriseRule2')) + '</li><li>' + esc(t('surpriseRule3')) + '</li></ol></details>' +
-    '<button type="submit" class="button button-primary full-width">' + esc(t('surpriseSave')) + '</button><p class="feature-note">' + esc(t('surprisePending')) + '</p></form><button type="button" class="text-link" data-surprise-skip>' + esc(t(value.skipNext ? 'surpriseResume' : 'surprisePause')) + '</button><p class="feature-note">' + esc(t(value.skipNext ? 'surprisePaused' : 'surpriseOptional')) + '</p></section>';
+    '</form><button type="button" class="text-link" data-surprise-skip>' + esc(t(value.skipNext ? 'surpriseResume' : 'surprisePause')) + '</button><p class="feature-note">' + esc(t(value.skipNext ? 'surprisePaused' : 'surpriseOptional')) + '</p></section>';
 }
 export function balancePage(wardrobe: WardrobeState, daily: DailyState, store: Store): string {
   initialise(store);
@@ -72,12 +80,12 @@ export function balancePage(wardrobe: WardrobeState, daily: DailyState, store: S
     '<div class="balance-layout"><div><div class="balance-category-list" role="group" aria-label="' + esc(t('category')) + '">' + CATEGORIES.map(category => {
       const group = wardrobe.items.filter(item => item.category === category);
       return '<button type="button" data-balance-category="' + category + '" aria-pressed="' + (category === balanceCategory) + '"><strong>' + esc(categoryLabel(category)) + '</strong><span>' + esc(t('balanceCategory', { count: group.length, ready: group.filter(item => item.availability === 'ready').length })) + '</span></button>';
-    }).join('') + '</div><h2>' + esc(t('balanceCompare')) + '</h2><p class="feature-note">' + esc(t('balanceNoDuplicateClaim')) + '</p><div class="balance-pieces">' + items.map(item => {
+    }).join('') + '</div><h2>' + esc(t('balanceCompare')) + '</h2><p class="feature-note">' + esc(t('balanceNoDuplicateClaim')) + '</p><div class="balance-pieces">' + (balanceExpanded?items:items.slice(0,3)).map(item => {
       const count = daily.wears.filter(wear => wear.itemIds.includes(item.id)).length;
       return '<button type="button" data-overview-review="' + esc(item.id) + '"><span>' + itemPicture(item) + '</span><strong>' + esc(item.name) + '</strong><small>' + esc(t(count ? 'balanceWears' : 'balanceNoLog', { count })) + '</small></button>';
-    }).join('') + '</div></div><aside class="balance-needs"><h2>' + esc(t('balanceGaps')) + '</h2><p>' + esc(t('balanceGapHint')) + '</p>' +
+    }).join('') + '</div>'+(items.length>3?'<button type="button" class="text-link balance-expand" data-balance-expand>'+ (balanceExpanded?'Show fewer pieces':'Compare all '+items.length+' pieces') +' →</button>':'')+'</div><aside class="balance-needs"><h2>' + esc(t('balanceGaps')) + '</h2><p>' + esc(t('balanceGapHint')) + '</p>' +
     '<div>' + (needs!.length ? needs!.map(need => '<article><strong>' + esc(need.label) + '</strong><button class="text-link" type="button" data-need-resolve="' + esc(need.id) + '">' + esc(t('balanceGapDone')) + '</button></article>').join('') : '<p class="feature-note">' + esc(t('balanceNoGaps')) + '</p>') + '</div>' +
-    '<form id="wardrobe-need-form" class="feature-form"><label>' + esc(t('balanceAddGap')) + '<input name="need" required maxlength="160" /></label><button type="submit" class="button button-outline">' + esc(t('balanceAddGap')) + '</button></form></aside></div></section>';
+    '<details class="balance-add-need"><summary>' + esc(t('balanceAddGap')) + '</summary><form id="wardrobe-need-form" class="feature-form"><label>' + esc(t('balanceAddGap')) + '<input name="need" required maxlength="160" /></label><button type="submit" class="button button-outline">' + esc(t('balanceAddGap')) + '</button></form></details></aside></div></section>';
 }
 function persistTrip(actions: Actions, message: string): void {
   actions.notice(saveLocal(TRIP_KEY, trip, actions.storage) ? message : t('localStorageDenied'));
@@ -85,6 +93,8 @@ function persistTrip(actions: Actions, message: string): void {
 }
 export function handlePlansClick(button: HTMLElement, actions: Actions): boolean {
   initialise(actions.storage); const d = button.dataset;
+  if(button.hasAttribute('data-trip-add-occasion')){const panel=document.querySelector<HTMLDetailsElement>('.trip-add-event');if(panel){panel.open=true;panel.scrollIntoView({behavior:'smooth',block:'start'});panel.querySelector<HTMLInputElement>('input[name=label]')?.focus({preventScroll:true});}return true;}
+  if(button.hasAttribute('data-trip-setup')){actions.rerender();const panel=document.querySelector<HTMLDetailsElement>('.trip-companion');if(panel){panel.open=true;panel.scrollIntoView({behavior:'smooth',block:'start'});}return true;}
   if (button.hasAttribute('data-trip-edit')) editTrip = !editTrip;
   else if (d.tripShared) shared = d.tripShared === 'yes';
   else if (d.tripRemoveEvent) { trip = { ...trip!, events: trip!.events.filter(event => event.id !== d.tripRemoveEvent) }; persistTrip(actions, t('tripSaved')); return true; }
@@ -92,7 +102,8 @@ export function handlePlansClick(button: HTMLElement, actions: Actions): boolean
   else if (d.tripChooseLook !== undefined || d.tripAssignPending) {
     const look = d.tripAssignPending ? pendingTripLook() : choices(actions.wardrobe, actions.storage)[Number(d.tripChooseLook)];
     if (look) { trip = assignTripLook(trip!, d.tripAssignPending ?? selectedEvent, look, actions.wardrobe); selectedEvent = ''; persistTrip(actions, t('tripOutfitSaved')); return true; }
-  } else if (d.balanceCategory && CATEGORIES.includes(d.balanceCategory as Category)) balanceCategory = d.balanceCategory as Category;
+  } else if(button.hasAttribute('data-balance-expand')) balanceExpanded=!balanceExpanded;
+  else if (d.balanceCategory && CATEGORIES.includes(d.balanceCategory as Category)) { balanceCategory = d.balanceCategory as Category; balanceExpanded=false; }
   else if (d.needResolve) { needs = needs!.filter(need => need.id !== d.needResolve); if (!saveLocal(NEEDS_KEY, { version: 1, entries: needs }, actions.storage)) actions.notice(t('localStorageDenied')); }
   else if (button.hasAttribute('data-surprise-skip')) { surprise = { ...surprise!, skipNext: !surprise!.skipNext }; actions.notice(saveLocal(SURPRISE_KEY, surprise, actions.storage) ? t(surprise.skipNext ? 'surprisePaused' : 'surpriseSaved') : t('localStorageDenied')); }
   else return false;

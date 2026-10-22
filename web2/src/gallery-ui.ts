@@ -65,6 +65,10 @@ function image(item:ShopItem,cssClass:string,preview=false):string{
 const queueStatus=(item:ShopItem):JobStatus|null=>renderQueue?.jobs.find(job=>job.itemId===item.id)?.status??null;
 const isReady=(item:ShopItem):boolean=>item.status==='saved_preview'||queueStatus(item)==='ready';
 const countsForView=()=>({...shoppingCounts(model()),ready:model().items.filter(isReady).length});
+const orderedItems=():readonly ShopItem[]=>[
+  ...model().items.filter(item=>item.source!=='recorded').slice().reverse(),
+  ...model().items.filter(item=>item.source==='recorded'),
+];
 function statusLabel(item:ShopItem):string{
   const status=queueStatus(item);
   if(status){const keys={queued:'mallJobQueued',submitting:'mallJobSubmitting',processing:'mallJobProcessing',ready:'mallJobReady',error:'mallJobError',unknown:'mallJobUnknown'} as const;return t(keys[status]);}
@@ -89,8 +93,6 @@ function camera():string{
   const values=draft??initialCaptureDraft(model());
   const context=(values.shop||t('mallShopUnknown'))+' · '+(values.floor||t('mallFloorUnknown'));
   return '<div class="mall-capture-layout"><section class="mall-capture-panel">'+
-    '<h2>'+esc(t('mallPhotoHeadline'))+'</h2>'+
-    '<p class="mall-lead mall-camera-lead">'+esc(t('mallCameraFirstLead'))+'</p>'+
     '<div class="mall-context-summary"><span>'+esc(t('mallNowAt'))+' <strong>'+esc(context)+'</strong></span>'+
     '<button type="button" data-mall-context-toggle aria-expanded="'+editingContext+'">'+
       esc(t(editingContext?'mallCloseContext':'mallChangeContext'))+'</button></div>'+
@@ -102,35 +104,33 @@ function camera():string{
       '<button type="submit" data-mall-context-save class="button button-outline">'+esc(t('mallUpdateContext'))+'</button></form>'+
       '<p class="mall-small">'+esc(t('mallContextNotVerified'))+'</p>':'')+
     (cameraActive()?'<div class="mall-camera-viewfinder"><video id="mall-viewfinder" autoplay muted playsinline aria-label="'+esc(t('mallCameraView'))+'"></video><span>'+esc(t('mallFrameHint'))+'</span></div><div class="mall-camera-toolbar"><button type="button" class="mall-file-fallback" data-mall-view="coffee">'+esc(t('mallCoffeeTab'))+'</button><button type="button" class="mall-shutter" data-mall-camera-shutter aria-label="'+esc(t('mallShutter'))+'"></button><button type="button" class="icon-button" data-mall-camera-stop aria-label="'+esc(t('mallCameraStop'))+'">'+icon('close')+'</button></div><label for="mall-camera" class="mall-file-fallback">'+esc(t('mallChooseFile'))+'</label><input id="mall-camera" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" />':
-    '<button type="button" class="mall-open-camera button button-primary full-width" data-mall-camera-start>'+icon('camera')+esc(t('mallOpenCamera'))+'</button><label class="mall-capture-label" for="mall-camera">'+
-      '<span class="mall-camera-symbol" aria-hidden="true">＋</span>'+
-      '<strong>'+esc(t('mallTakePhoto'))+'</strong>'+
-      '<small>'+esc(t('mallTakePhotoHint'))+'</small>'+
+    '<button type="button" class="mall-camera-entry" data-mall-camera-start>'+icon('camera')+'<strong>'+esc(t('mallOpenCamera'))+'</strong><span>'+esc(t('mallFrameHint'))+'</span></button><label class="mall-file-fallback mall-file-choice" for="mall-camera">'+
+      esc(t('mallChooseFile'))+
       '<input id="mall-camera" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" />'+
     '</label>')+
-    '<label for="mall-capture-title" class="mall-field-label">'+esc(t('mallOptionalItemName'))+'</label>'+
-    '<input id="mall-capture-title" class="mall-text-input" maxlength="100" placeholder="'+esc(t('mallNewItemExample'))+'" value="'+esc(values.itemName)+'" />'+
+    '<details class="mall-item-name"><summary>'+esc(t('mallOptionalItemName'))+'</summary><label for="mall-capture-title" class="visually-hidden">'+esc(t('mallOptionalItemName'))+'</label>'+
+    '<input id="mall-capture-title" class="mall-text-input" maxlength="100" placeholder="'+esc(t('mallNewItemExample'))+'" value="'+esc(values.itemName)+'" /></details>'+
     liveControls()+
     (saving.size?'<p class="mall-pending" role="status">'+esc(t('mallSaving',{count:saving.size}))+'</p>':'')+
     '</section>'+
     '<section class="mall-queue-panel"><div class="mall-queue-head"><h2>'+esc(t('mallToday'))+'</h2>'+
       '<span>'+esc(t(counts.all===1?'mallItemCountOne':'mallItemCount',{count:counts.all}))+'</span></div>'+
     '<p class="mall-queue-stats">'+esc(t('mallReadyCount',{ready:counts.ready,total:counts.all}))+'</p>'+
-    '<div class="mall-queue-items">'+model().items.map(item=>'<article class="mall-queue-item">'+image(item,'mall-thumb')+
+    '<div class="mall-queue-items">'+orderedItems().map(item=>'<article class="mall-queue-item"><button type="button" class="mall-queue-photo" data-mall-open="'+esc(item.id)+'" aria-label="'+esc(item.title+' · '+statusLabel(item))+'">'+image(item,'mall-thumb')+'</button>'+
       '<div><strong>'+esc(item.title)+'</strong><p>'+esc(location(item))+'</p>'+
       '<small class="mall-status-'+esc(queueStatus(item)??'photo')+'">'+esc(statusLabel(item))+'</small></div>'+
       (item.source!=='recorded'?'<button type="button" class="mall-remove" data-mall-remove="'+esc(item.id)+
         '" aria-label="'+esc(t('mallRemovePhoto'))+'">×</button>':'')+
       '</article>').join('')+'</div>'+
     '<button class="button button-primary full-width" type="button" data-mall-view="coffee">'+esc(t('mallReviewNow'))+'</button></section>'+
-    '<section class="mall-link-panel"><form id="mall-link-form" class="mall-link-form">'+
+    '<details class="mall-link-panel"><summary>'+esc(t('mallPasteLink'))+'</summary><form id="mall-link-form" class="mall-link-form">'+
       '<h3>'+esc(t('mallPasteLink'))+'</h3>'+
       '<label for="mall-link-name">'+esc(t('mallItemName'))+'</label>'+
       '<input id="mall-link-name" name="name" maxlength="100" required placeholder="'+esc(t('mallNewItemExample'))+'" value="'+esc(values.linkName)+'" />'+
       '<label for="mall-link-address">'+esc(t('mallLinkLabel'))+'</label>'+
       '<input id="mall-link-address" name="url" type="url" required placeholder="https://..." value="'+esc(values.linkUrl)+'" />'+
       '<button type="submit" data-mall-link-save class="button button-outline">'+esc(t('mallSaveLink'))+'</button>'+
-      '<p class="mall-small">'+esc(t('mallLinkNoFetch'))+'</p></form></section></div>';
+      '<p class="mall-small">'+esc(t('mallLinkNoFetch'))+'</p></form></details></div>';
 }
 /** Snapshot unsent edits immediately, so any legitimate rerender is lossless. */
 export function handleGalleryInput(input:HTMLInputElement):boolean {
@@ -145,7 +145,7 @@ export function handleGalleryInput(input:HTMLInputElement):boolean {
 }
 
 function readyList():readonly ShopItem[]{
-  return model().items.filter(item=>!showReady||isReady(item));
+  return orderedItems().filter(item=>!showReady||isReady(item));
 }
 function exampleCoffeeVerdict(item:ShopItem):string|null{
   if(item.source!=='recorded'||!item.id.startsWith('demo_'))return null;
@@ -163,10 +163,11 @@ function coffee():string{
   if(selected)selectedId=selected.id;
   const ready=model().items.filter(isReady).length;
   const pending=model().items.filter(item=>['queued','submitting','processing'].includes(queueStatus(item)??'')).length;
-  if(!reviewing)return '<section class="mall-coffee mall-coffee-list"><h2>'+esc(t('mallCoffeeQueueTitle'))+'</h2><p class="mall-lead">'+esc(t('mallQueueSummary',{ready,pending}))+'</p>'+
+  if(!reviewing)return '<section class="mall-coffee mall-coffee-list"><p class="mall-lead">'+esc(t('mallQueueSummary',{ready,pending}))+'</p>'+
     '<div class="mall-filter"><button type="button" data-mall-filter="all" aria-pressed="'+!showReady+'">'+esc(t('mallAll',{count:counts.all}))+'</button><button type="button" data-mall-filter="ready" aria-pressed="'+showReady+'">'+esc(t('mallReadyFilter',{count:ready}))+'</button></div>'+
+    '<button type="button" class="button button-primary full-width" data-mall-review-ready '+(!ready?'disabled':'')+'>'+esc(t('mallReviewReady'))+'</button>'+
     '<div class="mall-coffee-queue">'+choices.map(item=>'<button type="button" data-mall-open="'+esc(item.id)+'">'+image(item,'mall-thumb')+'<span><strong>'+esc(item.title)+'</strong><small>'+esc(location(item))+'</small><span>'+esc(statusLabel(item))+'</span></span>'+icon('arrow')+'</button>').join('')+'</div>'+
-    '<button type="button" class="button button-primary full-width" data-mall-review-ready '+(!ready?'disabled':'')+'>'+esc(t('mallReviewReady'))+'</button><button type="button" class="text-link" data-mall-view="capture">'+esc(t('mallMorePhotos'))+icon('arrow')+'</button></section>';
+    '<button type="button" class="text-link" data-mall-view="capture">'+esc(t('mallMorePhotos'))+icon('arrow')+'</button></section>';
   return '<section class="mall-coffee"><div class="mall-coffee-heading"><div><h2>'+esc(t('mallCoffeeHeadline'))+'</h2>'+
     '<p>'+esc(t('mallReadyCount',{ready:counts.ready,total:counts.all}))+'</p></div>'+
     '<div class="mall-filter" role="group"><button type="button" data-mall-filter="all" aria-pressed="'+(!showReady)+'">'+
@@ -193,13 +194,13 @@ function coffee():string{
 }
 function returnList():string{
   const groups=groupedReturns(model());const count=shoppingCounts(model()).returns;
-  return '<section class="mall-return-page"><h2>'+esc(t('mallReturnHeadline'))+'</h2><p class="mall-lead">'+esc(t('mallReturnDescription'))+'</p>'+
+  return '<section class="mall-return-page"><p class="mall-lead">'+esc(t('mallReturnDescription'))+'</p>'+
     '<p class="mall-return-count">'+esc(t('mallReturnList',{count}))+'</p>'+
     (groups.length?groups.map(group=>'<section class="mall-return-group"><h3>'+esc(group.shop||t('mallShopUnknown'))+'</h3>'+
       '<p>'+esc(group.floor||t('mallFloorUnknown'))+'</p>'+
       group.items.map(item=>'<article class="mall-return-row">'+image(item,'mall-thumb')+
         '<div><strong>'+esc(item.title)+'</strong><small>'+esc(t(item.status==='saved_preview'?'mallSavedPreview':item.status==='photo_only'?'mallOwnPhoto':'mallLinkOnly'))+'</small></div>'+
-        '<button type="button" data-mall-undo="'+esc(item.id)+'">'+esc(t('mallUndo'))+'</button></article>').join('')+
+        '<div class="mall-return-actions"><button type="button" data-mall-open="'+esc(item.id)+'">View photo</button><button type="button" data-mall-undo="'+esc(item.id)+'">'+esc(t('mallUndo'))+'</button></div></article>').join('')+
       '</section>').join(''):'<p class="mall-no-result">'+esc(t('mallNoReturns'))+'</p>')+
     '<p class="mall-small">'+esc(t('mallNoMaps'))+'</p>'+
     '<button type="button" class="button button-primary" data-mall-view="coffee">'+esc(t('mallBackToPreviews'))+'</button></section>';
@@ -210,21 +211,22 @@ export function galleryPage(store?:StorageLike,rerender?:()=>void):string{
   const focused=current==='coffee'&&reviewing;
   const item=model().items.find(row=>row.id===selectedId);
   return '<section class="page mall-view '+(focused?'mall-reviewing':'')+' '+(cameraActive()?'mall-camera-active':'')+'" aria-labelledby="mall-title"><header class="mall-intro"><div>'+
-    (focused?'<button type="button" class="back-link" data-mall-back>'+icon('left')+esc(t('mallBackToQueue'))+'</button>':'<p class="mall-eyebrow">'+esc(t('mallShoppingSession'))+'</p>')+'<h1 id="mall-title">'+esc(focused&&item?item.title:t('mallPageTitle'))+'</h1>'+
-    '<p>'+esc(focused&&item?location(item):t('mallHeadlineSub'))+'</p></div></header>'+(focused?'':tabbar())+
+    (focused?'<button type="button" class="back-link" data-mall-back>'+icon('left')+esc(t('mallBackToQueue'))+'</button>':'')+'<h1 id="mall-title">'+esc(focused&&item?item.title:current==='capture'?t('mallPhotoHeadline'):current==='coffee'?t('mallCoffeeQueueTitle'):t('mallReturnHeadline'))+'</h1>'+
+    (focused&&item?'<p>'+esc(location(item))+'</p>':current==='capture'?'<p>'+esc(t('mallHeadlineSub'))+'</p>':'')+'</div></header>'+(focused?'':tabbar())+
     (current==='capture'?camera():current==='coffee'?coffee():returnList())+'</section>';
 }
 export function handleGalleryClick(control:HTMLElement,actions:Actions):boolean{
   initialise(actions.storage,actions.rerender);
   const d=control.dataset;
-  if(control.hasAttribute('data-mall-camera-start')){editingContext=false;void startCamera().then(ok=>{if(!ok)actions.notice(t('mallCameraUnavailable'));actions.rerender();}).catch(()=>{actions.notice(t('mallCameraUnavailable'));actions.rerender();});return true;}
+  const previousView=current,previousReview=reviewing,previousSelected=selectedId;
+  if(control.hasAttribute('data-mall-camera-start')){editingContext=false;void startCamera().then(ok=>{if(!ok)actions.notice(t('mallCameraUnavailable'));actions.rerender();if(ok)window.scrollTo({top:0,behavior:'instant'});}).catch(()=>{actions.notice(t('mallCameraUnavailable'));actions.rerender();});return true;}
   if(control.hasAttribute('data-mall-camera-shutter')){void captureFrame().then(file=>capturePhoto(file,actions)).catch(()=>{actions.notice(t('mallCameraUnavailable'));actions.rerender();});return true;}
   if(control.hasAttribute('data-mall-camera-stop'))stopCamera();
   else if(control.hasAttribute('data-mall-live-pause'))renderQueue?.pause();
   else if(d.mallGenerate){renderQueue?.enqueue(d.mallGenerate);if(!renderQueue?.enabled){current='capture';liveFormOpen=true;}}
   else if(d.mallOpen){selectedId=d.mallOpen;reviewing=true;current='coffee';}
   else if(control.hasAttribute('data-mall-back'))reviewing=false;
-  else if(control.hasAttribute('data-mall-review-ready')){selectedId=model().items.find(isReady)?.id??null;reviewing=!!selectedId;showReady=true;}
+  else if(control.hasAttribute('data-mall-review-ready')){selectedId=orderedItems().find(isReady)?.id??null;reviewing=!!selectedId;showReady=true;}
   else if(d.mallView&&['capture','coffee','returns'].includes(d.mallView)){current=d.mallView as View;if(current==='coffee')reviewing=false;if(current!=='capture')stopCamera();}
   else if(control.hasAttribute('data-mall-context-toggle'))editingContext=!editingContext;
   else if(d.mallFilter){showReady=d.mallFilter==='ready';selectedId=null;}
@@ -256,7 +258,10 @@ export function handleGalleryClick(control:HTMLElement,actions:Actions):boolean{
       }
     }
   }else return false;
-  actions.rerender();return true;
+  actions.rerender();
+  if(previousView!==current||previousReview!==reviewing||(reviewing&&previousSelected!==selectedId))window.scrollTo({top:0,behavior:'instant'});
+  if(d.mallGenerate&&!renderQueue?.enabled)document.querySelector('.mall-live-controls')?.scrollIntoView({behavior:'instant',block:'start'});
+  return true;
 }
 export function handleGallerySubmit(form:HTMLFormElement,actions:Actions):boolean{
   initialise(actions.storage,actions.rerender);

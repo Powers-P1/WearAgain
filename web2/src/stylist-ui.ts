@@ -3,7 +3,7 @@ import {
   type SavedLook, type StylistBrief, type StylistResult, type OccasionSuggestion,
 } from './stylist.js';
 import { initialState, type WardrobeState, type WardrobeItem } from './state.js';
-import { outfitBoard, itemPicture } from './ui.js';
+import { outfitVisual, itemPicture } from './ui.js';
 import { stageTripLook } from './plans.js';
 import './outfit-media.css';
 import { t } from './i18n.js';
@@ -85,7 +85,7 @@ function lookPreview(wardrobe: WardrobeState, selection: StylistResult): string 
   const owned = look.itemIds
     .map(id => wardrobe.items.find(item => item.id === id))
     .filter((item): item is WardrobeItem => !!item);
-  const image = outfitBoard(look.itemIds, wardrobe);
+  const image = outfitVisual(look.itemIds, wardrobe);
   return '<section class="stylist-result"><div class="stylist-preview-column">' +
     '<div class="stylist-progress"><span>' + escapeHtml(t('stylistSuggestion',{index:selected+1,count:selection.looks.length})) + '</span>' +
     '<div class="stylist-arrows"><button type="button" data-look-prev aria-label="' + escapeHtml(t('stylistPrevious')) + '">' + svg('left') + '</button>' +
@@ -125,7 +125,7 @@ export function savedPage(storage?: Pick<Storage, 'getItem'>, wardrobe: Wardrobe
     if (!look) return '<section class="page"><h1>' + escapeHtml(t('savedMissing')) + '</h1><button class="text-link" data-nav="saved">' + escapeHtml(t('savedBack')) + '</button></section>';
     const ready = look.itemIds.every(id => wardrobe.items.some(item => item.id === id && item.availability === 'ready'));
     return '<section class="page saved-detail-view"><button class="back-link" data-nav="saved">' + svg('left') + escapeHtml(t('savedBack')) + '</button><h1>' + escapeHtml(look.title) + '</h1><p class="intro-subtitle">' + escapeHtml(look.occasion) + '</p>' +
-      '<div class="saved-detail-layout">' + outfitBoard(look.itemIds, wardrobe) + '<div><h2>' + escapeHtml(t('stylistAllOwned')) + '</h2>' +
+      '<div class="saved-detail-layout">' + outfitVisual(look.itemIds, wardrobe) + '<div><h2>' + escapeHtml(t('stylistAllOwned')) + '</h2>' +
       look.itemIds.map(id => wardrobe.items.find(item => item.id === id)).filter((item): item is WardrobeItem => !!item).map(item => '<div class="stylist-garment"><span class="stylist-item-photo">' + picture(item) + '</span><span>' + escapeHtml(item.name) + '</span></div>').join('') +
       (!ready ? '<p class="notice">' + escapeHtml(t('savedUnavailable')) + '</p>' : '') +
       '<div class="saved-detail-actions"><button class="button button-primary" data-saved-wear="' + escapeHtml(look.id) + '" ' + (!ready ? 'disabled' : '') + '>' + escapeHtml(t('savedWear')) + '</button>' +
@@ -134,7 +134,7 @@ export function savedPage(storage?: Pick<Storage, 'getItem'>, wardrobe: Wardrobe
   return '<section class="page saved-view"><h1>' + escapeHtml(t('stylistOutfitList')) + '</h1>' +
     '<p class="intro-subtitle">' + escapeHtml(t(saved.length===1?'stylistSavedCountOne':'stylistSavedCount',{count:saved.length})) + '</p>' +
     (saved.length ? '<div class="saved-look-list">' + saved.map(look =>
-      '<article class="saved-look-item">' + outfitBoard(look.itemIds, wardrobe, true) + '<h2>' + escapeHtml(look.title) + '</h2><p>' +
+      '<article class="saved-look-item">' + outfitVisual(look.itemIds, wardrobe, true) + '<h2>' + escapeHtml(look.title) + '</h2><p>' +
       escapeHtml(look.occasion) + '</p>' +
       (look.date ? '<p>' + escapeHtml(t('stylistSavedWhen',{date:look.date})) + '</p>' : '') +
       '<p>' + escapeHtml(t(look.itemIds.length===1?'stylistSavedItemsOne':'stylistSavedItems',{count:look.itemIds.length})) + '</p><div class="saved-look-actions"><button class="button button-outline" data-saved-open="' + escapeHtml(look.id) + '">' + escapeHtml(t('savedOpen')) + '</button><button data-saved-remove="' + escapeHtml(look.id) + '">' + escapeHtml(t('savedRemove')) + '</button></div></article>').join('') + '</div>' :
@@ -192,6 +192,7 @@ export function submitStylist(form: HTMLFormElement, actions: UIActions): void {
     generated = true;
     selected = 0;
     actions.rerender();
+    if(window.location.hash==='#stylist')window.scrollTo({top:0,behavior:'instant'});
   }).catch(error => {
     if (token !== requestSequence) return;
     actions.notice(error instanceof Error ? error.message : t('stylistInvalidProposal'));

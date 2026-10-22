@@ -55,7 +55,7 @@
 .stylist-empty-thumbnail { display: grid; place-items: center; width: 100%; height: 100%; color: var(--muted); }
 .stylist-reason { font-size: 13px; line-height: 1.6; margin: 20px 0; }
 .stylist-details .button { min-height: 47px; }
-.stylist-trip-link { display: block; border: 0; background: transparent; margin: 11px auto 0; padding: 3px 0; color: var(--muted); font-size: 12px; text-decoration: underline; text-underline-offset: 2px; cursor: not-allowed; }
+.stylist-trip-link { display: block; border: 0; background: transparent; margin: 11px auto 0; padding: 3px 0; color: var(--muted); font-size: 12px; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
 .stylist-next-link { display: flex; justify-content: center; margin: 10px auto 0; font-weight: 400; }
 .stylist-disclaimer { color: var(--muted); font-size: 11px; line-height: 1.5; margin-top: 9px; }
 .stylist-mobile-back { display: none; }
@@ -75,7 +75,7 @@
 }
 @media (max-width: 800px) {
   .stylist-view { max-width: 590px; }
-  .stylist-intro { border: 0; padding: 7px 0 16px; }
+  .stylist-view .stylist-intro { display:none; }
   .stylist-intro h1 { display: none; }
   .stylist-intro p { display: none; }
   .stylist-saved-link { margin-left: auto; font-size: 12px; margin-top: 0; }
@@ -94,23 +94,24 @@
   .stylist-view.show-result .stylist-form { display: none; }
   .stylist-mobile-back { background: transparent; border: 0; align-items: center; padding: 6px 0; gap: 5px; font-size: 12px; }
   .stylist-view.show-result .stylist-mobile-back { display:none; }
-  .stylist-view.show-result .stylist-result-appbar {display:flex;align-items:center;justify-content:space-between;margin:1px 0 16px;min-height:44px;border-bottom:1px solid var(--line);}
+  .stylist-view.show-result .stylist-result-appbar {display:flex;align-items:center;justify-content:space-between;margin:0 0 8px;min-height:44px;border-bottom:1px solid var(--line);}
   .stylist-result-appbar span {font-size:12px;font-weight:600;}
   .stylist-result-appbar button {border:0;background:transparent;font-size:21px;width:42px;height:42px;}
   .stylist-mobile-back .icon { width: 15px; height: 15px; }
   .stylist-result { display: flex; flex-direction: column; gap: 0; }
-  .stylist-progress { margin-top: 11px; }
-  .stylist-photo { aspect-ratio: 1.02; max-height: none; }
-  .stylist-caption { font-size: 32px; margin-top: 10px; }
-  .stylist-details { padding: 15px 0 0; }
-  .stylist-details h2 { font-size: 26px; }
+  .stylist-progress { margin-top:0; margin-bottom:8px; }
+  .stylist-photo { aspect-ratio: auto; height:35dvh; max-height:340px; }
+  .stylist-photo .outfit-illustration>img{object-fit:cover;object-position:center top}
+  .stylist-caption { font-size:29px; margin-top:9px; }
+  .stylist-details { padding:10px 0 0; }
+  .stylist-details h2 { font-size:23px; }
   .stylist-detail-count { margin-top: 3px; }
   .stylist-garments { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 7px; margin: 13px 0; }
   .stylist-garment { display: flex; flex-direction: column; border: 0!important; padding: 0; gap: 5px; align-items: start; min-height: 0; font-size: 10px; }
   .stylist-item-photo { flex: 0 0 auto; width: 100%; height: auto; aspect-ratio: 1; }
   .stylist-garment > span:last-child { line-height: 1.2; }
-  .stylist-reason { margin: 12px 0 15px; font-size: 12px; }
-  .stylist-trip-link { display: none; }
+  .stylist-reason { margin:8px 0 12px;font-size:12px; }
+  .stylist-trip-link { display:block; min-height:44px; }
   .stylist-disclaimer { margin-top: 7px; }
   .saved-view h1 { margin-top: 18px; }
 }
@@ -119,10 +120,10 @@
   .stylist-garments { gap: 5px; }
 }
 
-/* Board 07: desktop editor/preview/property strip is a tall editorial portrait,
-   while the single YouCam top remains honestly labelled on the image. */
+/* Board 07: form, editorial portrait and actual pieces. Provider evidence is
+   separately inspectable; an illustration is never labelled as a recording. */
 @media(min-width:801px){
- .stylist-photo{aspect-ratio:.75;max-height:540px}
+ .stylist-photo{aspect-ratio:.66;height:540px;max-height:540px}
  .stylist-photo>img{object-fit:cover;object-position:center top}
  .stylist-result{grid-template-columns:minmax(0,1.15fr) minmax(195px,.85fr);gap:19px}
  .stylist-layout{gap:25px}

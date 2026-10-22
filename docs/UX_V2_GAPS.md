@@ -10,7 +10,9 @@ retained the previous consumer landing, so board 13 is not a replacement target.
   separate previews and wear choice precede the verdict. Technical evidence is
   collapsed. Skip a nonchosen piece leads to the actual alternative; Keep my own
   appears for the zero-purchase result or an explicitly confirmed own equivalent.
-- Stylist, morning and overview: actual outfit pieces form the main composition.
+- Stylist, morning, saved looks, trip and overview: clearly labelled full-look
+  editorial illustrations restore the boards' visual hierarchy for unchanged
+  demo recipes. Personal/altered recipes show the actual pieces separately.
   A white-shirt recording is never presented as evidence of a four-piece outfit.
 - Saved looks: visual list, detail, wear today, trip reuse and removal. Availability
   is checked again when wearing; no saved outfit adds purchased stock implicitly.
@@ -22,7 +24,7 @@ retained the previous consumer landing, so board 13 is not a replacement target.
   An upload/preview failure does not change the user's opinion of the garment.
 - Retail/jury: approved editorial imagery restored, distinct product/styling
   illustrations, actual API provenance retained, quieter guided steps and correct
-  scroll/focus. A real captioned 93-second walkthrough is included.
+  scroll/focus. A real captioned walkthrough of the final UI is included.
 - Consumer v1 landing source and CSS are unchanged. The shared How it works link
   uses the existing `#how-it-works` anchor. Installation no longer covers actions.
 
@@ -40,7 +42,7 @@ mobile app layouts at 390x844 and desktop at 1280x900 were also checked.
 | Layout / density | 08 uses three readable columns; old view mixed solver controls with clothing and actions. | Three open regions, supporting details collapsed; one mobile sequence with wear actions visible in the first 390x844 viewport. |
 | Palette / containers | 05-08, 14-17 use warm ivory, stone, dark olive, hairlines and open whitespace. | Existing tokens retained; no new gradient, heavy shadow or nested dashboard shell. |
 | Typography / controls | Large serif hierarchy, plain sans labels, quiet outlined icons. | Cormorant Garamond / DM Sans retained, explicit control sizes, corrected hanger, 44px main mobile targets. Programmatic heading focus does not draw a black frame. |
-| Outfit imagery | 07/09/12 illustrate complete looks, while available provider results prove only single garments. | Actual item composition replaces the misleading lone shirt. Separate provider evidence remains inspectable; no fabricated layered try-on. |
+| Outfit imagery | 07/09/12 illustrate complete looks, while provider results prove single garments. | Three ImageGen editorial assets are restricted to unchanged demo recipes, visibly labelled and separate from actual provider recordings. Personal recipes retain actual piece compositions. See `mockups/v2/ILLUSTRATION_ASSETS.md`. |
 | Purchase language | 02/08 allow an own-equivalent verdict with a reason. The fixture merely omitted one candidate. | Separate Skip, recommended alternative, zero purchase and explicit user-confirmed equivalence. No duplicate inferred from a cheaper basket. |
 | Shopping camera | 10/11 centre capture, then coffee review and return choice. | Continuous viewfinder/shutter, remembered shop, queue, direct Coffee review action and local shortlist. Explicit upload opt-in and demo model remain necessary. |
 | Retail / jury art | 14-16 use editorial photos and a distinct garment product view. | Approved illustrative crops restored. Genuine recordings have different labels and a separate evidence path. |
@@ -49,12 +51,40 @@ mobile app layouts at 390x844 and desktop at 1280x900 were also checked.
 
 ## Verification
 
+The final state suite exercises **66 scenarios at 390x844, 1280x800 and
+1536x1024**: 198 state checks, each with viewport and full-page screenshot.
+This covers the following states, rather than just route-entry screenshots:
+
+| Surface | Mobile and desktop coverage / final adjustment |
+| --- | --- |
+| Wardrobe | Four initial mobile pieces and stylist action; filtering, empty search, add and detail. Personal-photo persistence is covered by the interaction suite. |
+| Profile | Style entry/save and disclosed demo model; mobile save is visible, desktop uses two columns. |
+| Stylist / saved | Brief, all three proposals, genuine single-garment evidence, empty/list/detail, save, wear and trip reuse. Mobile save is above the bottom navigation. |
+| Purchase | Minimum result, recommendation, actual-own comparison, confirmed equivalence, incomplete ratings and zero-purchase result. Ratings precede the mobile verdict. |
+| Morning | Voice-first brief, typed fallback, three choices, selection, worn confirmation and no ready look. Desktop choices are three large portraits. Speech stops on leaving/hiding the app. |
+| Gallery | Idle/context, explicit fake-camera permission and shutter, capture, preview opt-in, unknown/error outcomes, coffee list, single preview, returns and reopening a return photo. Personal captures precede demo examples. |
+| Overview / review | Recorded counts, care rows, condition selector and saved keep decision. Mobile statistics/month remain available in a disclosure; desktop keeps the inline dashboard metrics. |
+| Balance | Three initial comparison photos, all-piece expansion, category change and confirmed needs. |
+| Trip | Own look, two-person empty/setup states, outfit picker, assignment, packing, empty trip and adding a new occasion. The interaction suite additionally fills a real local companion wardrobe and checks both packing lists after reload. |
+| Surprise | Budget, optional need, rules, save and skip-month state. The save action precedes optional fields. |
+| Public pages | Preserved v1 landing, compact retail/jury heroes, product panel open/closed/saved and three guided stages including zero purchase. The product wardrobe action opens/focuses the preview; resources and technical disclosures follow the guided experience. |
+
+Five explicit fidelity checks were repeated against the accepted boards and
+saved browser renders: layout hierarchy, warm neutral palette, serif/sans type,
+editorial asset framing and spacing/touch targets. The mobile condition select,
+three mobile morning rows, three-column desktop morning, two-column desktop
+profile and full camera toolbar were inspected visually. Illustrative outfit
+photos, actual demo counts, explicit upload opt-in and truthful empty companion
+states are intentional differences from the concept boards.
+
 `npm run check` validates strict types, domain and real local Worker/SQLite
 accounting tests, and both builds. `npm run qa:web2` checks the actual rendered
 mobile interaction path, persistence, fake continuous camera, opt-in, mocked
 live protocol, ready image blobs, jury navigation, retailer panel and video
 play/pause/seek/captions. External provider requests are blocked in this suite.
-CI takes additional route screenshots at mobile and desktop widths. QA outputs
+`npm run qa:web2:states` runs the state matrix above with a synthetic camera and
+mocked provider outcomes; no paid provider calls are made. CI also captures
+the route/reference comparisons. QA outputs
 and intermediate scripts stay outside tracked source; public walkthrough media
 is an intentional shipped asset, outside the PWA precache.
 

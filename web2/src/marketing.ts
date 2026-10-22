@@ -54,9 +54,8 @@ function retailLanding():string{
     link('/retail/#pilot',h('mktRetailSecondary'),'mkt-secondary-action')+
     '<small>'+h('mktRetailFictional')+'</small></div>'+
     '<div class="mkt-hero-art">'+artwork('/assets/editorial-retail.webp',candidate.label)+
-    '<div class="mkt-floating-card"><strong>'+h('mktRetailDemoOpenPanel')+'</strong>'+
-    '<span>'+escapeHtml(candidate.label)+'</span>'+
-    link('/retail/demo/',h('mktRetailPrimary'),'mkt-floating-cta')+'</div></div></section>'+
+    '<div class="mkt-floating-card mkt-floating-product">'+modelImage(candidate.imagePath,candidate.label)+'<div><strong>'+escapeHtml(candidate.label)+'</strong>'+
+    link('/retail/demo/',h('mktRetailDemoOpenPanel'),'mkt-floating-cta')+'</div></div></section>'+
     '<section class="mkt-retail-context"><a href="/retail/demo/" class="mkt-retail-window"><span>DEMO ATELIER</span><div class="mkt-retail-window-grid">'+
     modelImage(candidate.imagePath,candidate.label)+'<div><h3>'+escapeHtml(candidate.label)+'</h3><p>'+escapeHtml(money(candidate.priceMinor,candidate.currency))+'</p><strong>'+h('mktRetailDemoOpenPanel')+'</strong><div class="mkt-retail-window-items">'+
     wardrobePhoto('cashmere','Cream sweater')+wardrobePhoto('trousers','Beige trousers')+wardrobePhoto('loafers','Brown loafers')+'</div><span class="mkt-floating-cta">'+h('mktRetailPrimary')+'</span></div></div></a>'+
@@ -92,13 +91,13 @@ function retailerProduct():string{
     '<section class="mkt-product-details"><p class="mkt-eyebrow">'+h('mktRetailFictional')+'</p>'+
     '<h1>'+escapeHtml(candidate.label)+'</h1><strong class="mkt-product-price">'+escapeHtml(money(candidate.priceMinor,candidate.currency))+'</strong>'+
     '<p class="mkt-small-muted">'+h('mktRetailDemoPrice')+'</p>'+
+    '<button type="button" class="mkt-outline-button mkt-product-wardrobe-action" data-retail-panel-toggle data-retail-panel-open aria-expanded="'+openRetailPanel+'">'+h('mktRetailDemoOpenPanel')+' →</button>'+
     '<div class="mkt-product-rule"></div><p>'+h('mktRetailDemoColour')+'</p>'+
     '<div class="mkt-colour-swatch" aria-hidden="true"></div><h2>'+h('mktRetailDemoSize')+'</h2>'+
     '<div class="mkt-size-options" role="group" aria-label="'+h('mktRetailDemoSize')+'">'+selectedSizes+'</div>'+
     '<p class="mkt-small-muted">'+h('mktRetailDemoSizeGuide')+'</p>'+
     '<button type="button" class="mkt-button mkt-button-disabled" disabled title="'+h('mktRetailDemoCart')+'">'+h('mktRetailDemoCart')+'</button>'+
-    '<div class="mkt-product-rule"></div><button type="button" class="mkt-outline-button" data-retail-panel-toggle aria-expanded="'+openRetailPanel+'">'+
-    h('mktRetailDemoOpenPanel')+' →</button>'+
+    '<div class="mkt-product-rule"></div>'+
     '<p class="mkt-small-muted">'+h('mktRetailDemoNotIntegrated')+'</p></section>'+
     (openRetailPanel?'<aside class="mkt-retail-panel"><div class="mkt-panel-heading"><span>WearAgain</span>'+
       '<button type="button" data-retail-panel-toggle aria-label="'+h('mktRetailDemoClosePanel')+'">×</button></div>'+
@@ -158,7 +157,7 @@ function judgesLanding():string{
     '<p><strong>WearAgain</strong> · '+h('mktJudgesWearAgainRole')+'</p></div>'+
     '<small>'+h('mktJudgesNotComposited')+'</small>'+
     link(API,h('mktJudgeSeeApi'))+'</section>'+
-    judgeDisclosures()+
+    '<details class="mkt-landing-limits"><summary>'+h('mktJudgeDisclosureSection')+'</summary>'+judgeDisclosures()+'</details>'+
     '<section class="mkt-review-index"><h2>'+h('mktJudgesEvidenceHeading')+'</h2>'+
     ([
       ['mktJudgesEvidenceTech','mktJudgesEvidenceTechBody',API],
@@ -249,9 +248,7 @@ function guidedDemo():string{
   const next=pageIndex<3?(['wardrobe','preview','verdict'] as const)[pageIndex]:null;
   const prev=pageIndex>1?(['wardrobe','preview','verdict'] as const)[pageIndex-2]:null;
   return '<div class="mkt-site mkt-guided">'+siteHeader('judges')+
-    '<main id="main-content" tabindex="-1"><div class="mkt-guide-top">'+
-    '<span>'+h('mktJudgeNoAccount')+'</span><nav>'+link(CODE,h('mktJudgesCode'))+
-    link(SETUP,h('mktJudgesTests'))+'</nav></div>'+stepper()+
+    '<main id="main-content" tabindex="-1">'+stepper()+
     '<header class="mkt-guide-heading"><div><p class="mkt-eyebrow">'+h('mktJudgeProgress',{index:pageIndex})+'</p>'+
     '<h1>'+h('mktJudgeDemoTitle')+'</h1><p>'+h('mktJudgeDemoSubtitle')+'</p></div>'+
     link('/judges/',h('mktJudgesNav'))+'</header>'+
@@ -261,6 +258,7 @@ function guidedDemo():string{
       (next?'<button type="button" class="mkt-button mkt-button-dark" data-guide-step="'+next+'">'+
       h('mktJudgeNext',{title:t(next==='preview'?'mktJudgeStep2':'mktJudgeStep3')})+'</button>':
       link('/app/#check',h('mktJudgeGoApp'),'mkt-button mkt-button-dark'))+'</div>'+
+    '<div class="mkt-guide-top"><span>'+h('mktJudgeNoAccount')+'</span><nav>'+link(CODE,h('mktJudgesCode'))+link(SETUP,h('mktJudgesTests'))+'</nav></div>'+
     '<details class="mkt-guide-limits"><summary>'+h('mktJudgeDisclosureSection')+'</summary>'+judgeDisclosures()+'</details>'+
     '<p class="mkt-guided-note">'+h('mktJudgeLiveSeparate')+' '+
     link(API,h('mktJudgeSeeApi'))+'</p>'+
@@ -297,6 +295,10 @@ export function handleMarketingClick(target:HTMLElement,rerender:()=>void):boole
     if(target.dataset.judgeMode==='minimum'||target.dataset.judgeMode==='zero'){
       mode=target.dataset.judgeMode;rerender();return true;
     }
+  }
+  if(target.hasAttribute('data-retail-panel-open')){
+    openRetailPanel=true;rerender();
+    const panel=document.querySelector<HTMLElement>('.mkt-retail-panel');if(panel){panel.scrollIntoView({behavior:'instant',block:'start'});panel.setAttribute('tabindex','-1');panel.focus({preventScroll:true});}return true;
   }
   if(target.hasAttribute('data-retail-panel-toggle')){openRetailPanel=!openRetailPanel;rerender();return true;}
   if(target.dataset.retailSize&&['XS','S','M','L','XL'].includes(target.dataset.retailSize)){

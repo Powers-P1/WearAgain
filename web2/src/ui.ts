@@ -1,4 +1,4 @@
-import type { WardrobeItem, WardrobeState } from './state.js';
+import { initialState, type WardrobeItem, type WardrobeState } from './state.js';
 import { recordedPreviewForItem } from './stylist.js';
 import { readPhoto } from './photo-store.js';
 import { t } from './i18n.js';
@@ -59,4 +59,26 @@ export function outfitBoard(ids: readonly string[], wardrobe: WardrobeState, com
   return '<div class="outfit-board' + (compact ? ' outfit-board-compact' : '') + '" aria-label="' + esc(t('outfitBoardLabel')) + '">' +
     pieces.map(item => '<figure class="outfit-board-piece outfit-piece-' + esc(item.category) + '">' + itemPicture(item) +
       '<figcaption>' + esc(item.name) + '</figcaption></figure>').join('') + '</div>';
+}
+
+/** Editorial illustrations belong only to these unchanged demo recipes.
+ * They are never provider evidence or previews of a user's own photographs. */
+export function illustrationFor(ids: readonly string[], wardrobe: WardrobeState): string | null {
+  const recipes: readonly [string, readonly string[]][] = [
+    ['classic', ['blazer', 'recorded-work', 'trousers', 'loafers']],
+    ['soft', ['recorded-weekend', 'trousers', 'loafers']],
+    ['relaxed', ['recorded-evening', 'trousers', 'loafers']],
+  ];
+  const original = initialState();
+  const recipe = recipes.find(([, pieces]) => pieces.length === ids.length && pieces.every(id => ids.includes(id)));
+  if (!recipe || ids.some(id => {
+    const item = wardrobe.items.find(row => row.id === id), demo = original.items.find(row => row.id === id);
+    return !item || !demo || item.photoId || item.photo !== demo.photo || item.category !== demo.category || item.name !== demo.name || item.detail !== demo.detail;
+  })) return null;
+  return '/assets/illustrations/' + recipe[0] + '.webp';
+}
+export function outfitVisual(ids: readonly string[], wardrobe: WardrobeState, compact = false): string {
+  const source = illustrationFor(ids, wardrobe);
+  return source ? '<figure class="outfit-illustration' + (compact ? ' outfit-illustration-compact' : '') + '"><img src="' + source +
+    '" alt="Illustrative styling of the demo wardrobe" loading="lazy" /><figcaption>Illustrative styling · demo model</figcaption></figure>' : outfitBoard(ids, wardrobe, compact);
 }

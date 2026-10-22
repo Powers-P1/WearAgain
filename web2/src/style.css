@@ -214,17 +214,17 @@ p { line-height: 1.55; }
   .mobile-only { display: inline-flex; }
   .page { max-width: 610px; margin: 0 auto; }
   h1 { font-size: 44px; }
-  .page-intro { margin-top: 23px; }
+  .page-intro { margin-top:7px; }
   .page-intro p { margin-top: 8px; font-size: 13px; }
   .mobile-add { margin-top: 8px; font-size: 13px; }
-  .wardrobe-tools { margin-top: 17px; }
+  .wardrobe-tools { margin-top:12px; }
   .sort-label { display: none; }
   .search-field { height: 47px; flex-basis: 100%; }
   .category-tabs { gap: 29px; margin-top: 7px; justify-content: space-between; }
   .category-tab[data-cat='dresses'], .category-tab[data-cat='accessories'] { display: none; }
   .category-tab { font-size: 13px; }
-  .wardrobe-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 21px 15px; margin-top: 19px; }
-  .garment-photo { aspect-ratio: 0.86; }
+  .wardrobe-grid { grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 15px;margin-top:13px; }
+  .garment-photo { aspect-ratio:1.16; }
   .garment-title { font-size: 13px; margin-top: 9px; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
   .garment-detail { display: none; }
   .more-button { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; background: transparent; border: 0; padding: 5px 0; font-size: 12px; color: var(--muted); }
@@ -232,10 +232,10 @@ p { line-height: 1.55; }
   .wardrobe-end { margin-top: 18px; font-size: 12px; }
   .wardrobe-end > span { display: none; }
   .demo-explainer { margin-top: 14px; }
-  .profile-view .back-link, .edit-view .back-link, .detail-view .back-link { margin-top: 6px; margin-bottom: 27px; }
+  .profile-view .back-link, .edit-view .back-link, .detail-view .back-link { margin-top:0; margin-bottom:10px; }
   .profile-view h1 { font-size: 46px; }
-  .profile-view h2 { font-size: 27px; margin-top: 32px; }
-  .profile-view textarea { min-height: 172px; }
+  .profile-view h2 { font-size:27px;margin-top:23px; }
+  .profile-view textarea { min-height:130px; }
   .coming-soon { margin-top: 65px; }
   .detail-photo { height: 295px; }
 }
@@ -282,3 +282,18 @@ h1[tabindex="-1"]:focus,h2[tabindex="-1"]:focus,main:focus:not(:focus-visible){o
  .wardrobe-view .wardrobe-grid{margin-top:17px;row-gap:21px}
  .wardrobe-view .garment-photo{aspect-ratio:1.18}
 }
+
+.profile-photo-help{font-size:12px;color:var(--muted);margin-top:8px}.profile-photo-help summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
+.app-shell .button{border-radius:5px}
+@media(min-width:801px){
+ .profile-view{max-width:1100px}.profile-view>.back-link{margin-bottom:22px}.profile-view h1{font-size:56px}
+ .profile-view #style-form{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:12px 36px;margin-top:26px;align-items:start}
+ .profile-view textarea{grid-column:1;grid-row:1/span 3;height:285px;margin:0}
+ .profile-view #style-form>.field-hint{grid-column:1;grid-row:4;margin:0}
+ .profile-view #style-form>h2{grid-column:2;grid-row:1;margin:0;font-size:29px}
+ .profile-view .model-options{grid-column:2;grid-row:2;margin:0}.profile-view .model-choice img,.profile-view .camera-placeholder{height:185px}
+ .profile-view .privacy-line{grid-column:2;grid-row:3;margin:0;font-size:12px}
+ .profile-view #style-form>.button{grid-column:1;grid-row:5;margin:0}
+ .profile-view .profile-photo-help{grid-column:2;grid-row:4/span 2;margin:0}
+}
+@media(max-width:800px){.wardrobe-shortcuts{margin-top:14px}.profile-view .model-choice img,.profile-view .camera-placeholder{height:150px}.profile-view form>.button{margin-top:12px}.profile-view h1{font-size:43px}.profile-view .intro-subtitle{margin-top:9px}.profile-view textarea{margin-top:0;height:130px}.profile-view form{margin-top:20px}.profile-view>.back-link{display:none}.main-content:has(.stylist-view.show-result)>.mobile-bar{display:none}.profile-view .privacy-line{margin-top:15px}}
