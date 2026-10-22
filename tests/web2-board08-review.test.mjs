@@ -75,7 +75,7 @@ test('a candidate without exact saved evidence gets a neutral named tile, never 
   assert.match(desktop,/purchase-neutral-name/);
   assert.doesNotMatch(desktop,/data-recorded-garment=/);
   assert.doesNotMatch(mobile,/outerwear-cheap-a/);
-  assert.match(desktop,/Buy nothing/i);
+  assert.match(desktop,/Your wardrobe already covers it\./);
   ui.handlePurchaseClick({dataset:{purchaseDemo:'minimum'},hasAttribute:()=>false},
     {rerender:()=>{},notice:()=>{}});
 });

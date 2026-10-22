@@ -6,7 +6,8 @@ const get=p=>readFile(new URL('../'+p,import.meta.url),'utf8');
 test('desktop board 08 keeps three explicitly separate columns and mobile original',async()=>{
  const [ui,css]=await Promise.all([get('web2/src/purchase-ui.ts'),get('web2/src/purchase.css')]);
  assert.match(ui,/purchase-desktop-layout/);
- assert.match(ui,/candidateButtons\(\) \+ desktopPreview\(\) \+ desktopVerdict\(\)/);
+ assert.match(ui,/candidateButtons\('mobile'\) \+ previewColumn\(\) \+ verdictColumn\(\)/);
+ assert.match(ui,/candidateButtons\('desktop'\) \+ desktopPreview\(\) \+ desktopVerdict\(\)/);
  assert.match(ui,/purchase-model-stage/);
  assert.match(ui,/purchase-model-actions/);
  assert.match(ui,/purchase-desktop-products/);
