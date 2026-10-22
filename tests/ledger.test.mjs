@@ -10,6 +10,34 @@ const NOW = Date.parse("2026-10-21T12:00:00Z");
 const HASH = "a".repeat(64);
 const LIMITS = { totalUnits: 1000, dailyUnits: 60, sessionDailyUnits: 12 };
 
+test('expiry releases only positively unsubmitted new holds, preserving legacy and ambiguous holds',t=>{
+ const {ledger,storage}=setup(t);
+ for(const key of ['fresh','upload','legacy','submitting','ambiguous','pending'])reserve(ledger,key);
+ ledger.markPending('session-1','upload','upload_failed_before_submission',NOW+1);
+ storage.sql.exec("UPDATE render_reservations SET pre_submission_guard=0 WHERE render_key='legacy'");
+ ledger.markSubmitting('session-1','submitting',NOW+1);
+ ledger.markSubmitting('session-1','ambiguous',NOW+1);ledger.markPending('session-1','ambiguous','request_timeout',NOW+2);
+ ledger.markSubmitting('session-1','pending',NOW+1);ledger.attachTask('session-1','pending','real-task',NOW+2);
+ assert.equal(ledger.expireUnsubmitted(NOW+599999),0);assert.equal(ledger.expireUnsubmitted(NOW+600000),2);
+ assert.equal(ledger.expireUnsubmitted(NOW+900000),0);
+ assert.deepEqual(ledger.heldReservations(NOW+900000).map(r=>r.renderKey),['legacy','submitting','ambiguous','pending']);
+ assert.equal(ledger.summary('session-1',NOW+900000).total.reservedUnits,8);
+ assert.equal(storage.sql.exec('SELECT COUNT(*) AS n FROM reservation_release_audit').toArray()[0].n,2);
+ const restarted=new Ledger(storage,LIMITS);assert.equal(restarted.get('session-1','legacy').status,'reserved');
+});
+
+test('operator release requires explicit evidence, is audited and idempotent, and cannot refund success',t=>{
+ const {ledger,storage}=setup(t);reserve(ledger);ledger.markSubmitting('session-1','render-1',NOW+1);
+ const release={sessionId:'session-1',renderKey:'render-1',reason:'Provider operator confirmed no charge.',evidence:'Provider support receipt fixture-123',actor:'operator',now:NOW+2};
+ throwsCode(()=>ledger.releaseReservation({...release,evidence:''}),'invalid_input');
+ assert.equal(ledger.releaseReservation(release).status,'failed_free');assert.equal(ledger.releaseReservation({...release,now:NOW+3}).status,'failed_free');
+ throwsCode(()=>ledger.releaseReservation({...release,reason:'A different operator decision.'}),'conflict');
+ assert.equal(storage.sql.exec('SELECT COUNT(*) AS n FROM reservation_release_audit').toArray()[0].n,1);
+ submitted(ledger,'success');ledger.settleSuccess('session-1','success',NOW+1);
+ throwsCode(()=>ledger.releaseReservation({...release,renderKey:'success'}),'invalid_state');
+ assert.equal(ledger.summary('session-1',NOW+3).total.spentUnits,2);
+});
+
 function setup(t, limits = LIMITS) {
   const storage = createSqlStorage();
   t.after(() => storage.close());
