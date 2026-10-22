@@ -63,6 +63,9 @@ jobs:
                   "http://127.0.0.1:8788$route" "screenshots/$name-$width.png"
             done
           done
+          # Owner requested board-08 and overview checks at 1536x1024 too.
+          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "1536,1024" --full-page --wait-for-timeout 1100 "http://127.0.0.1:8788/app/#check" "screenshots/consumer-purchase-1536.png"
+          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "1536,1024" --full-page --wait-for-timeout 1100 "http://127.0.0.1:8788/app/#overview" "screenshots/consumer-overview-1536.png"
       - name: Capture references and board comparisons (no image substitutions)
         shell: bash
         run: |
@@ -80,6 +83,8 @@ jobs:
               npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "$width,$height" --wait-for-timeout 1100 "http://127.0.0.1:8788$route" "screenshots/viewport/$name-$width.png"
             done
           done
+          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "1536,1024" --wait-for-timeout 1100 "http://127.0.0.1:8788/app/#check" screenshots/viewport/consumer-purchase-1536.png
+          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "1536,1024" --wait-for-timeout 1100 "http://127.0.0.1:8788/app/#overview" screenshots/viewport/consumer-overview-1536.png
           npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "1280,800" --wait-for-timeout 1000 "https://wearagain.pages.dev/" screenshots/viewport/landing-live-v1-1280.png
           npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "390,844" --wait-for-timeout 1000 "https://wearagain.pages.dev/" screenshots/viewport/landing-live-v1-390.png
           node --input-type=module <<'JS'
