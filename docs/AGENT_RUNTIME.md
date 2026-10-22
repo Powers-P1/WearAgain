@@ -10,6 +10,8 @@ The occasion, purchase, packing and rediscover procedures share tools for the ac
 
 Every proposed outfit must use known, ready garments and include a dress plus shoes, or a top, bottom and shoes. Feedback receives the previous verified answer and a fresh wardrobe snapshot. The agent can recommend buying nothing; it cannot order, book, change a price or overwrite a human rating.
 
+Photo inspections and dated weather lookups retain small provenance records (tool, subject, time, status and safe details). Feedback receives those verified records without resending private image bytes when photo consent is off. Missing current-session photos do not erase a previous inspection. External weather errors carry a sanitized status such as `HTTP_503`; no fallback forecast or raw upstream error text is invented.
+
 ## Persistence and API
 
 - `POST /api/session`: existing six-hour anonymous signed capability; no provider key reaches the browser.

@@ -1,0 +1,52 @@
+.account-tools { margin:40px 0; padding-top:28px; border-top:1px solid var(--line,#ded9cf); }
+.account-tools details { margin:18px 0; border-top:1px solid var(--line,#ded9cf); padding-top:14px; }
+.account-tools summary { min-height:48px; cursor:pointer; font-size:16px; }
+.account-tools label { display:block; margin:14px 0 8px; font-size:15px; }
+.account-tools input,.account-tools select,.account-tools textarea { width:100%; max-width:100%; padding:12px; font:inherit; background:transparent; border:1px solid #b7b9ab; min-height:48px; }
+.account-tools article { margin:20px 0; }
+.account-tools .text-link { min-height:48px; margin-right:24px; }
+.account-tools p { font-size:15px; line-height:1.6; color:#62675e; }
+.agent-controls { padding:8px 0 16px; border-top:1px solid #ded9cf; }
+.stylist-context summary,.agent-controls summary { min-height:48px;display:flex;align-items:center;font-size:15px;cursor:pointer; }
+.stylist-context summary::after,.agent-controls summary::after { content:'+';margin-left:auto; }
+.stylist-context[open] summary::after,.agent-controls details[open] summary::after { content:'−'; }
+.agent-controls label { display:block; margin:12px 0; font-size:15px; }
+.agent-controls select,.agent-controls input[type=text],.agent-feedback textarea { display:block; width:100%; min-height:48px; padding:12px; font:inherit; background:transparent; border:1px solid #b7b9ab; }
+.agent-controls input[type=checkbox] { width:20px;height:20px;vertical-align:middle;margin:0 10px 0 0; }
+.agent-progress { padding:16px; background:#e8ece2; font-size:15px; line-height:1.6; }
+.agent-status { font-size:15px; line-height:1.6; }
+.agent-notes { margin:8px 0 16px; }
+.agent-notes summary,.agent-requirements summary { min-height:48px;cursor:pointer;display:flex;align-items:center;font-size:15px; }
+.agent-notes p,.agent-notes li { font-size:15px;line-height:1.6; }
+.agent-feedback { margin:28px 0; border-top:1px solid #ded9cf; padding-top:20px; }
+.agent-requirements label { display:block; margin:14px 0 8px; }
+.agent-requirements input,.agent-requirements textarea { display:block; width:100%; min-height:48px; padding:12px; font:inherit; border:1px solid #b7b9ab; background:transparent; }
+.agent-requirements textarea { min-height:110px; resize:vertical; margin-bottom:16px; }
+.agent-requirements ul { list-style:none; padding:0; }
+.agent-requirements button { min-height:48px; }
+.agent-requirements { margin:20px 0; padding:18px; border:1px solid #ded9cf; }
+.agent-requirements li { margin:10px 0; font-size:15px; }
+.agent-render-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:16px; }
+.agent-render-list img { width:100%; max-height:500px; object-fit:contain; }
+.personal-purchase { max-width:1300px; }
+.personal-purchase select,.personal-purchase input:not([type=checkbox]):not([type=file]) { padding:12px; min-height:48px; font:inherit; border:1px solid #b7b9ab; background:transparent; width:100%; }
+.personal-purchase input[type=file] { max-width:100%;font:inherit;min-height:48px;padding:12px 0; }
+.personal-purchase input[type=checkbox],.agent-controls input[type=checkbox] { accent-color:#30392f; }
+.personal-purchase label { display:block; margin:12px 0; font-size:15px; }
+.personal-purchase .personal-setup { margin:24px 0; padding:20px; border:1px solid #ded9cf; }
+.personal-purchase summary { min-height:48px; cursor:pointer; font-size:16px; }
+.personal-purchase .personal-pair { display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:24px 0; }
+.personal-pair figure { margin:0;min-width:0; }
+.personal-pair img { width:100%; height:260px;object-fit:contain; background:#eeece5; }
+.personal-purchase .personal-actions { display:flex;flex-wrap:wrap;gap:10px;margin:20px 0; }
+.personal-purchase .personal-actions button { min-height:48px; padding:12px 18px; }
+.personal-purchase .personal-verdict { padding:24px; border:1px solid #b7b9ab; margin:24px 0; }
+.personal-purchase .personal-fields { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px; }
+.personal-purchase .personal-fields .wide { grid-column:1/-1; }
+.personal-purchase .personal-choice { display:flex;gap:12px;align-items:center; }
+.personal-choice input[type=checkbox] { min-width:20px;width:20px;height:20px; }
+#personal-setup-form>div:not(.personal-fields) { padding:12px 0;border-bottom:1px solid #ded9cf; }
+#personal-setup-form>div:not(.personal-fields):not(:has(input[name=top]:checked))>label:nth-child(2),#personal-setup-form>div:not(.personal-fields):not(:has(input[name=top]:checked))>label:last-child { display:none; }
+.personal-verdict>.button { margin:10px 12px 0 0; }
+@media(max-width:600px){.personal-purchase .personal-fields{grid-template-columns:1fr}.personal-purchase .personal-fields .wide{grid-column:auto}.personal-purchase .personal-setup{padding:16px}.personal-pair img{height:210px}}
+@media(max-width:800px){.stylist-live textarea{min-height:140px}.stylist-live .occasion-suggestions{margin-bottom:14px}.stylist-live .agent-controls label{margin:8px 0}}

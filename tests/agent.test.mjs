@@ -78,3 +78,21 @@ test('private photos and sessions are deleted at their advertised durable expiry
  store.putAsset('alpha','photo','image/jpeg','PRIVATE',now);assert.equal(store.nextExpiry(),now+21600000);store.cleanup(now+21600000);assert.equal(store.asset('alpha','photo',now+21600000),null);assert.equal(store.nextExpiry(),now+86400000);
  assert.throws(()=>store.get('alpha',id,now+86400000),/agent_not_found/);assert.equal(store.sql.exec('SELECT COUNT(*) AS n FROM agent_sessions').toArray()[0].n,0);
 });
+
+test('a follow-up keeps verified photo-inspection provenance without resending a private image',async()=>{
+ const state=snapshot();state.wardrobe[0].photoId='private_photo';
+ const first=scripted([[call('get_profile'),call('get_wardrobe'),call('inspect_clothing_photo',{itemId:'topA'})],[call('submit_answer',answer)]]);
+ const result=await runStylist({snapshot:state,message:'Inspect my shirt',procedure:'occasion',apiKey:'key',now:()=>now,fetch:first.fetch,photo:async()=>({base64:'PRIVATE_IMAGE',mediaType:'image/jpeg'})});
+ assert.equal(result.evidence[0].status,'known');assert.equal(result.evidence[0].subject,'topA');assert.equal(JSON.stringify(result.evidence).includes('PRIVATE_IMAGE'),false);
+ const next=scripted([[call('get_profile'),call('get_wardrobe')],[call('submit_answer',answer)]]);
+ await runStylist({snapshot:snapshot(),message:'Use the other top',procedure:'occasion',previous:result.answer,previousEvidence:result.evidence,apiKey:'key',now:()=>now,fetch:next.fetch});
+ assert.ok(next.requests[0].messages[0].content.includes('Actual uploaded clothing image supplied'));assert.equal(JSON.stringify(next.requests).includes('PRIVATE_IMAGE'),false);
+});
+
+test('weather tools use actual dated responses and retain a sanitized external-failure reason',async()=>{
+ for(const failed of [false,true]){
+ const model=scripted([[call('get_profile'),call('get_wardrobe'),call('lookup_city',{query:'Warsaw'})],[call('get_weather',{cityId:'756135',date:'2026-10-23'})],[call('submit_answer',answer)]]),endpoints=[];
+ const transport=async(url,init)=>{if(String(url).startsWith('https://api.anthropic.com/'))return model.fetch(url,init);assert.equal(init.redirect,'manual','Workers reject redirect:error before any network request');endpoints.push(String(url));if(String(url).startsWith('https://geocoding-api.open-meteo.com/'))return Response.json({results:[{id:756135,name:'Warsaw',country_code:'PL',latitude:52.22977,longitude:21.01178}]});if(failed)return new Response('private upstream text',{status:503});return Response.json({daily:{time:['2026-10-23'],temperature_2m_min:[4],temperature_2m_max:[12],precipitation_probability_max:[35]}});};
+ const result=await runStylist({snapshot:snapshot(),message:'Dress for Warsaw today',procedure:'occasion',apiKey:'key',now:()=>now,fetch:transport});assert.equal(endpoints.length,2);assert.match(endpoints[1],/start_date=2026-10-23/);const weather=result.evidence.find(e=>e.tool==='get_weather');assert.equal(weather.status,failed?'UNKNOWN':'known');assert.equal(JSON.stringify(result).includes('private upstream text'),false);if(failed)assert.equal(weather.detail,'HTTP_503');else assert.match(weather.detail,/"value":12/);
+ }
+});

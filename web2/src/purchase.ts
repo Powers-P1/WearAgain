@@ -16,7 +16,7 @@ export function purchaseDemoFromSearch(search: string): PurchaseDemo {
   return new URLSearchParams(search).get('scenario') === 'zero' ? 'zero' : 'minimum';
 }
 export type PurchaseDecision = 'skip' | 'save';
-export type Rating = 'would_wear' | 'would_not_wear' | 'unrated';
+export type Rating = 'would_wear' | 'would_not_wear' | 'unrated' | 'render_error';
 export interface PurchaseSession {
   readonly demo: PurchaseDemo;
   readonly scenario: Scenario;
@@ -96,17 +96,17 @@ export function selectedRating(session: PurchaseSession): OutfitRating | null {
   return pair ? session.scenario.ratings.find(rating => rating.outfitId === pair.id) ?? null : null;
 }
 export function rateSelected(session: PurchaseSession, status: Rating): PurchaseSession {
-  if (!['would_wear', 'would_not_wear', 'unrated'].includes(status)) throw new Error(t('purchaseInvalidSelection'));
+  if (!['would_wear', 'would_not_wear', 'unrated','render_error'].includes(status)) throw new Error(t('purchaseInvalidSelection'));
   const pair = selectedPair(session);
   if (!pair) throw new Error(t('purchaseInvalidSelection'));
-  if (status !== 'unrated' && (!recordingFor('top', pair.topId) ||
+  if (status !== 'unrated'&&status!=='render_error' && (!recordingFor('top', pair.topId) ||
       !pair.outerwearId || !recordingFor('outerwear', pair.outerwearId))) {
     throw new Error(t('purchaseMissingEvidence'));
   }
   const scenario = parseScenario({
     ...session.scenario,
     ratings: session.scenario.ratings.map(rating =>
-      rating.outfitId === pair.id ? { outfitId: pair.id, status } : rating),
+      rating.outfitId === pair.id ? status==='render_error'?{outfitId:pair.id,status,reason:'User reported a preview error; this pair stays unresolved'}:{ outfitId: pair.id, status } : rating),
   });
   return { ...session, scenario, ratingsOrigin: 'edited' };
 }
@@ -136,6 +136,7 @@ export function computeDecision(session: PurchaseSession): SolveResult {
 export function candidatePosition(session: PurchaseSession): 'recommended' | 'not_required' | 'none' | 'unresolved' | 'infeasible' {
   const result = computeDecision(session);
   if (result.status !== 'solved') return result.status === 'incomplete' ? 'unresolved' : 'infeasible';
+  if(result.certificate.priceOptimality==='provisional'||result.certificate.selectionStability==='provisional')return 'unresolved';
   if (!result.basket.candidateIds.length) return 'none';
   return result.basket.candidateIds.includes(session.candidateId) ? 'recommended' : 'not_required';
 }

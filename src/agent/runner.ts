@@ -2,7 +2,7 @@ import {executeAgentTool} from '../core/tools.js';
 import {solveBasket} from '../core/solver.js';
 import type {AgentToolContext} from '../core/tools.js';
 import {AGENT_CAPS,AGENT_VERSION,PROCEDURES,identifier,list,parseAgentAnswer,parseAgentSnapshot,record,retrieveMemory,text,verifyAgentLook} from './contract.js';
-import type {AgentAnswer,AgentEvent,AgentMutation,AgentResult,AgentSnapshot,Procedure} from './contract.js';
+import type {AgentAnswer,AgentEvent,AgentEvidence,AgentMutation,AgentResult,AgentSnapshot,Procedure} from './contract.js';
 import {AI_MODEL,createAnthropicClient} from './provider.js';
 import type {AnthropicMessage,JsonRecord} from './provider.js';
 
@@ -35,23 +35,25 @@ For a purchase, read search_catalogue and solve_basket. Distinguish your subject
 Only save outfits/plans/shopping lists when the user requests it. Remember only preferences explicitly stated by this user; do not silently transform a temporary occasion into a permanent rule. Tool writes are bounded, verified local mutations. Finalize with submit_answer. Do not claim any save, render or weather lookup succeeded unless its tool result says so. You have six model requests, twelve total tool calls and 20,000 output tokens; finish early with relevant tools. Never book or buy anything.`;
 export interface AgentRuntime {
  readonly snapshot:AgentSnapshot;readonly message:string;readonly procedure:Procedure;readonly apiKey:string;
- readonly previous?:AgentAnswer|null;readonly fetch?:typeof fetch;readonly now?:()=>number;
+ readonly previous?:AgentAnswer|null;readonly previousEvidence?:readonly AgentEvidence[];readonly fetch?:typeof fetch;readonly now?:()=>number;
  readonly emit?:(event:AgentEvent)=>void|Promise<void>;
  readonly photo?:(photoId:string)=>Promise<{base64:string;mediaType:'image/jpeg'|'image/png'}|null>;
  readonly render?:(item:AgentSnapshot['wardrobe'][number],avatarId:string,kind:'top'|'outerwear')=>Promise<unknown>;
 }
 async function getJson(url:URL,transport:typeof fetch):Promise<unknown>{
- const response=await transport(url,{signal:AbortSignal.timeout(8000),redirect:'error'});if(!response.ok)throw Error('Unavailable');
+ const response=await transport(url.toString(),{signal:AbortSignal.timeout(8000),redirect:'manual',headers:{Accept:'application/json','User-Agent':'WearAgain/0.4 (+https://wearagain.pages.dev)'}});if(!response.ok)throw Error('HTTP_'+response.status);
  const reader=response.body?.getReader();if(!reader)throw Error('Unavailable');const chunks:Uint8Array[]=[];let size=0;
  try{for(;;){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>200000){await reader.cancel();throw Error('Response too large');}chunks.push(value);}}finally{reader.releaseLock();}
  const bytes=new Uint8Array(size);let offset=0;for(const c of chunks){bytes.set(c,offset);offset+=c.length;}return JSON.parse(new TextDecoder().decode(bytes)) as unknown;
 }
 const unknown=(reason:string)=>({status:'UNKNOWN',reason});
+const serviceFailure=(error:unknown)=>error instanceof Error&&/^HTTP_\d{3}$/.test(error.message)?error.message:error instanceof Error&&['AbortError','TimeoutError'].includes(error.name)?'timeout':error instanceof TypeError?'network_failure':'invalid_response';
 /** Provider loop and all user state are invocation-local. No cross-user singleton or hidden retry. */
 export async function runStylist(options:AgentRuntime):Promise<AgentResult>{
  const snapshot=parseAgentSnapshot(options.snapshot),now=options.now??Date.now,start=now(),transport=options.fetch??fetch;
  const deadline=AbortSignal.timeout(AGENT_CAPS.sessionMs);
- const events:AgentEvent[]=[],mutations:AgentMutation[]=[],renders:unknown[]=[],warnings:string[]=[];
+ const events:AgentEvent[]=[],evidence:AgentEvidence[]=[],mutations:AgentMutation[]=[],renders:unknown[]=[],warnings:string[]=[];
+ const observe=(tool:AgentEvidence['tool'],status:AgentEvidence['status'],subject:string,detail:string)=>evidence.push({tool,status,subject,capturedAt:new Date(now()).toISOString(),detail});
  const usage={inputTokens:0,outputTokens:0,modelCalls:0,toolCalls:0};let answer:AgentAnswer|null=null;
  const read=new Set<string>(),cities=new Map<string,{id:string;label:string;countryCode:string;latitude:number;longitude:number}>();
  const renderItems=new Set<string>();
@@ -60,7 +62,7 @@ export async function runStylist(options:AgentRuntime):Promise<AgentResult>{
  const catalogue=snapshot.catalogue??{shopId:'my-shop',currency:baseScenario.currency,source:'No catalogue supplied',capturedAt:new Date(start).toISOString(),products:[]};
  const context:AgentToolContext={scenario:baseScenario,renderState:{schemaVersion:1,renders:[],pairRatings:[]},catalogue,cities:[],weather:[],unitsPerImage:2};
  const mutate=(kind:AgentMutation['kind'],data:unknown)=>{const mutation={id:crypto.randomUUID(),kind,data};mutations.push(mutation);return {status:'verified',mutationId:mutation.id,commit:'Applied by the app only after the completed response; never a purchase.'};};
- const messages:AnthropicMessage[]=[{role:'user',content:JSON.stringify({task:text(options.message,2000),procedure:{id:options.procedure,...PROCEDURES[options.procedure]},date:snapshot.date,location:snapshot.location,allowRenders:snapshot.allowRenders,previousAnswer:options.previous??null,notice:'Retrieve current data with tools. No wardrobe or user rating is inferred.'})}];
+ const messages:AnthropicMessage[]=[{role:'user',content:JSON.stringify({task:text(options.message,2000),procedure:{id:options.procedure,...PROCEDURES[options.procedure]},date:snapshot.date,location:snapshot.location,allowRenders:snapshot.allowRenders,previousAnswer:options.previous??null,previousVerifiedEvidence:options.previousEvidence??[],notice:'Retrieve current data with tools. No wardrobe or user rating is inferred. Photos require consent each session. A missing photo this turn does not mean it was never inspected: use previousVerifiedEvidence for the prior inspection, and say unavailable for reinspection rather than denying that history.'})}];
  try{
   const client=createAnthropicClient({apiKey:options.apiKey,fetch:transport});
   for(let turn=0;turn<AGENT_CAPS.modelCalls;turn++){
@@ -86,7 +88,7 @@ export async function runStylist(options:AgentRuntime):Promise<AgentResult>{
       case 'inspect_clothing_photo':{
        const itemId=identifier(input.itemId),item=snapshot.wardrobe.find(i=>i.id===itemId),product=catalogue.products.find(p=>p.id===itemId);if(!item&&!product)throw Error('Unknown garment');
        const photoId=item?.photoId??snapshot.candidatePhotos?.[itemId],photo=photoId?await options.photo?.(photoId):null;
-       data=photo?{status:'known',itemId,source:'User supplied clothing photo; appearance evidence, not sizing'}:unknown('No clothing photo uploaded for this item');
+       data=photo?{status:'known',itemId,source:'User supplied clothing photo; appearance evidence, not sizing'}:unknown('No clothing photo was supplied for this item in this session');observe('inspect_clothing_photo',photo?'known':'UNKNOWN',itemId,photo?'Actual uploaded clothing image supplied to the model; no size verification.':'No current-session image available.');
        if(photo)images=[{type:'image',source:{type:'base64',media_type:photo.mediaType,data:photo.base64}}];break;
       }
       case 'search_catalogue':data=executeAgentTool({name:'search_catalogue',input:{shopId:catalogue.shopId,...(input.query?{query:text(input.query,100)}:{})}},context);break;
@@ -94,8 +96,8 @@ export async function runStylist(options:AgentRuntime):Promise<AgentResult>{
        const query=text(input.query,100),url=new URL('https://geocoding-api.open-meteo.com/v1/search');url.search=new URLSearchParams({name:query,count:'3',language:'en'}).toString();
        try{const raw=await getJson(url,transport);const values=record(raw)&&Array.isArray(raw.results)?raw.results:[];
         for(const r of values){if(record(r)&&typeof r.id==='number'&&typeof r.name==='string'&&typeof r.country_code==='string'&&typeof r.latitude==='number'&&typeof r.longitude==='number'&&Math.abs(r.latitude)<=90&&Math.abs(r.longitude)<=180){const city={id:String(r.id),label:r.name,countryCode:r.country_code,latitude:r.latitude,longitude:r.longitude};cities.set(city.id,city);}}
-        data={cities:[...cities.values()],source:'Open-Meteo geocoding',capturedAt:new Date(now()).toISOString()};
-       }catch{data=unknown('City lookup unavailable; choose a location manually later');}break;
+        data={cities:[...cities.values()],source:'Open-Meteo geocoding',capturedAt:new Date(now()).toISOString()};observe('lookup_city',cities.size?'known':'UNKNOWN',query,cities.size+' matching cities from Open-Meteo.');
+       }catch(error){const reason=serviceFailure(error);data=unknown('City lookup unavailable ('+reason+'); choose a location manually later');observe('lookup_city','UNKNOWN',query,reason);}break;
       }
       case 'get_weather':{
        const city=cities.get(text(input.cityId,100)),day=text(input.date,10);if(!city||!/^\d{4}-\d{2}-\d{2}$/.test(day)||!Number.isFinite(Date.parse(day)))throw Error('Resolve a city and valid date first');
@@ -104,8 +106,8 @@ export async function runStylist(options:AgentRuntime):Promise<AgentResult>{
        try{const url=new URL('https://api.open-meteo.com/v1/forecast');url.search=new URLSearchParams({latitude:String(city.latitude),longitude:String(city.longitude),daily:'temperature_2m_min,temperature_2m_max,precipitation_probability_max',start_date:day,end_date:day,timezone:'auto'}).toString();const raw=await getJson(url,transport);
         if(!record(raw)||!record(raw.daily)||!Array.isArray(raw.daily.time)||raw.daily.time[0]!==day)throw Error('Missing date');
         const value=(key:string)=>{const rows=raw.daily as Record<string,unknown>,values=rows[key];return Array.isArray(values)&&typeof values[0]==='number'&&Number.isFinite(values[0])?{status:'known',value:values[0]}:unknown('Missing observation');};
-        data={status:'known',city,date:day,source:'https://open-meteo.com/',capturedAt:new Date(now()).toISOString(),temperatureMinC:value('temperature_2m_min'),temperatureMaxC:value('temperature_2m_max'),rainProbabilityPercent:value('precipitation_probability_max')};
-       }catch{data=unknown('Weather service unavailable; no fallback forecast was invented');}break;
+        data={status:'known',city,date:day,source:'https://open-meteo.com/',capturedAt:new Date(now()).toISOString(),temperatureMinC:value('temperature_2m_min'),temperatureMaxC:value('temperature_2m_max'),rainProbabilityPercent:value('precipitation_probability_max')};observe('get_weather','known',city.label+' '+day,JSON.stringify(data));
+       }catch(error){const reason=serviceFailure(error);data=unknown('Weather service unavailable ('+reason+'); no fallback forecast was invented');observe('get_weather','UNKNOWN',city.label+' '+day,reason);}break;
       }
       case 'plan_render':case 'render_garment':{
        const itemId=identifier(input.itemId),product=catalogue.products.find(p=>p.id===itemId),owned=snapshot.wardrobe.find(i=>i.id===itemId);
@@ -152,5 +154,5 @@ export async function runStylist(options:AgentRuntime):Promise<AgentResult>{
    messages.push({role:'user',content:turn>=3?[...results,{type:'text',text:'Finish now with submit_answer using the verified data. Do not start more optional tools.'}]:results});
   }
  }catch{warnings.push('The AI session could not complete. Existing saved data and ratings remain unchanged. Paid preview states, if any, remain recorded by UnitLedger.');}
- return {version:AGENT_VERSION,model:AI_MODEL,status:answer?'completed':'incomplete',answer,events,mutations:answer?mutations:[],renders,usage,warnings};
+ return {version:AGENT_VERSION,model:AI_MODEL,status:answer?'completed':'incomplete',answer,events,evidence,mutations:answer?mutations:[],renders,usage,warnings};
 }

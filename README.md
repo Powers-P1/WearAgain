@@ -2,13 +2,15 @@
 
 WearAgain helps a shopper find the cheapest additional outerwear purchase that meets her declared outfit needs using tops she already owns. She judges pairs of separate garment previews; a deterministic solver chooses the basket and explains why every cheaper basket fails. The answer may be to buy nothing.
 
-Built for the YouCam API Skin AI & eCommerce VTO Hackathon. The planned AI Stylist proposes outfits; the deterministic core verifies them. Rendering remains per garment because the team's probe found that a second garment replaces the first. Three tops and three outerwear items need six successful images (12 YouCam units), reused across nine pair cards.
+Built for the YouCam API Skin AI & eCommerce VTO Hackathon. The live Sonnet 5.5 stylist uses real wardrobe tools and editable private preferences; the deterministic core verifies availability and purchase certificates. Rendering remains per garment because the team's probe found that a second garment replaces the first. Three tops and three outerwear items need six successful images (12 YouCam units), reused across nine pair cards.
 
 ## Current scope
 
 PR1 provides the exhaustive minimum-basket solver and certificate. PR2 adds per-element image state, revision-bound pair ratings, conservative selection of the next useful pair, requirement provenance, explicit wardrobe scoring/UNKNOWN, and pure typed tool contracts. PR3 adds the YouCam client, Worker routes and a SQLite Durable Object ledger with reservations, idempotency, daily limits and background reconciliation. Tests and CI require no key or provider calls.
 
-`web/` preserves the previous frontend. The redesigned mobile app and desktop wardrobe centre are in [`web2/`](web2/README.md), built to `web2/dist`; the consumer landing intentionally keeps its previous design. Six immutable single-garment YouCam recordings and a captioned walkthrough are included. Gallery live previews use the existing Worker and configured ledger after explicit opt-in; occasion/morning styling uses verified demo recipes. See [current UI scope](docs/UX_V2_GAPS.md), [Worker API](docs/API.md) and [release handoff](docs/DEPLOY_SWITCH_WEB2.md).
+`web/` preserves the previous frontend. The mobile-first PWA and desktop wardrobe centre are in [`web2/`](web2/README.md), built to `web2/dist`; the consumer landing keeps its earlier layout and imagery, with explicit mobile/install entry points. Six immutable single-garment YouCam recordings and a captioned walkthrough remain available without provider calls. Live occasion/morning styling, purchase advice, packing and rediscovery use the current user's wardrobe and memory. Saved examples remain a separate labelled mode.
+
+Create an empty local profile in **My style**, add clothes and availability, save a preference, then choose **Live AI** in Stylist. Follow-up feedback revises the answer; a chosen look can be saved and worn in the app. **Check purchase → Use my wardrobe** builds a certificate from your own declared needs, shop candidates, prices and human ratings. A provisional basket stays provisional until decisive pairs are rated. The answer can be **buy nothing**. Explicit wardrobe-file transfer moves clothing photos and saved state to another device; it is not cloud synchronization. See [agent tools/privacy/limits](docs/AGENT_RUNTIME.md), [current UI scope](docs/UX_V2_GAPS.md), [Worker API](docs/API.md) and [release handoff](docs/DEPLOY_SWITCH_WEB2.md).
 
 ## Run locally
 
@@ -40,7 +42,7 @@ All prices use safe-integer minor units in one scenario currency. Owned items co
 
 **A render error is not a dislike.** `render_error` and `unrated` count as zero current acceptances but remain unresolved. Certificates identify every cheaper basket and distinguish a proven minimum price from a provisional result. Equal-price winner stability is reported separately. The proof concerns the supplied catalogue and ratings, not physical fit or image accuracy.
 
-The live path must use `projectPairRatings` before solving (the tool adapter does this). Updating garment/base/pipeline revisions, attempt number or asset ID makes dependent decisions stale. A ready image is not acceptance, and an AI score of 100 cannot create a `would_wear` rating. The legacy solver remains available for synthetic replay fixtures.
+Provider-preview assessments use `projectPairRatings` before solving. Updating garment/base/pipeline revisions, attempt number or asset ID makes dependent decisions stale. The own-wardrobe purchase path also supports explicitly labelled direct clothing/photo assessments, with a separate revision-bound context; it does not fabricate provider render evidence. A ready image is not acceptance, and an AI score of 100 cannot create a `would_wear` rating. Synthetic replay fixtures remain a separate example.
 
 ## Project map
 

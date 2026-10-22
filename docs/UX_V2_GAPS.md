@@ -25,8 +25,32 @@ retained the previous consumer landing, so board 13 is not a replacement target.
 - Retail/jury: approved editorial imagery restored, distinct product/styling
   illustrations, actual API provenance retained, quieter guided steps and correct
   scroll/focus. A real captioned walkthrough of the final UI is included.
-- Consumer v1 landing source and CSS are unchanged. The shared How it works link
-  uses the existing `#how-it-works` anchor. Installation no longer covers actions.
+- Consumer v1 landing layout, CSS and imagery are retained. The hero now states
+  mobile-first usage and exposes installation/phone handoff, as subsequently
+  requested. The shared How it works link uses `#how-it-works`.
+
+## Functional completion - 23 October 2026
+
+Live Sonnet 5.5 is connected to the current v2 profile, complete wardrobe,
+availability, photos (explicit opt-in), editable memory, history, weather,
+catalogue, UnitLedger, solver and verified save tools. Four procedures support
+occasion, purchase, packing and rediscovery; follow-up feedback uses the previous
+answer and current data. Reload resumes the same durable session by SSE/polling.
+An error never silently substitutes a saved example.
+
+New device profiles start empty and isolate wardrobe, photos, memory and history.
+Explicit file transfer includes referenced clothing photos and allowlisted state;
+credentials, live sessions and personal try-on images are excluded. Own-data
+purchase requirements/candidates/prices/human assessments produce the actual
+minimum-basket certificate, including zero purchase, unresolved cheaper options,
+error states and recomputation after edits. Merchant stock/fees remain UNKNOWN.
+
+PWA entry is prominent on landing/jury. Mobile installation has an accessible X,
+native browser hook and truthful iOS guidance. Desktop QR preserves the selected
+demo. Approved app navigation works offline, including hash routes and the
+buy-nothing scenario; private/API responses never enter the public shell cache.
+The browser suite checks these states; physical OS installation remains a manual
+device check. Actual person-photo try-on remains an optional later feature.
 
 ## Fidelity ledger - 22 October 2026
 

@@ -1,4 +1,13 @@
-# Prepared web/ to web2/ Pages switch (NOT DEPLOYED)
+# web2 Pages release history
+
+**23 Oct 2026 update:** the owner confirmed v2 is already in production and
+subsequently authorized the agent/personalization release, preview first then
+production, through the existing vault token on Oliwia's account. The restrictions
+below describe the earlier 22 Oct handoff. They do not revoke that later explicit
+authorization. Existing account, Worker addresses/routes, secrets, DO identity and
+budget limits must remain unchanged. New live YouCam test allowance is exhausted
+by the recorded one-task/two-credit probe. See `validation/agent-v2-2026-10-23.md`
+and the appended release receipt for current validation/deployment status.
 
 **Status (22 Oct 2026):** code and release artifacts only. **Codex must not publish preview or production.** The team deploys using vault credentials on **Oliwia's Cloudflare account**. Damian's local Wrangler login is a different account; do not reauthenticate it or copy a token into the repository. Worker accounting, Durable Object identity/migrations, limits and secrets are unchanged; the config adds only the exact preview origin to the allowlist.
 

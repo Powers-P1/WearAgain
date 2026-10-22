@@ -1,6 +1,6 @@
 import {
   candidatePosition, choosePurchaseDemo, clearRatings, computeDecision, initialPurchase, itemLabel,
-  purchaseDemoFromSearch, rateSelected, recordDecision, recordingFor, replayRatings, selectCandidate,
+  rateSelected, recordDecision, recordingFor, replayRatings, selectCandidate,
   selectedPair, selectedRating, selectTop, type PurchaseDemo, type PurchaseSession, type Rating,
 } from './purchase.js';
 import type { SolveResult } from '../../src/core/index.js';
@@ -8,8 +8,10 @@ import { initialState, type WardrobeState } from './state.js';
 import { esc, icon, itemPicture } from './ui.js';
 import { t, type TranslationKey } from './i18n.js';
 import './purchase.css';
+import {nextUnresolvedAssessment} from '../../src/core/selection.js';
 
-let session: PurchaseSession = initialPurchase(purchaseDemoFromSearch(typeof window === 'undefined' ? '' : window.location.search));
+function launchDemo():PurchaseDemo{if(typeof window==='undefined')return 'minimum';const scenario=new URLSearchParams(window.location.search).get('scenario');if(scenario==='zero'||scenario==='minimum'){try{localStorage.setItem('wearagain:approved-demo:v1',scenario);}catch{}return scenario;}try{return localStorage.getItem('wearagain:approved-demo:v1')==='zero'?'zero':'minimum';}catch{return 'minimum';}}
+let session: PurchaseSession = initialPurchase(launchDemo());
 let comparisonId = '';
 let comparing = false;
 const equivalents = new Map<string, string>();
@@ -49,7 +51,7 @@ function previews(): string {
     ([['would_wear', 'purchaseDesktopWear', 'check'], ['would_not_wear', 'purchaseDesktopNotWear', 'close']] as const).map(([value, label, symbol]) =>
       '<button type="button" data-purchase-rating="' + value + '" aria-pressed="' + (canRate && rating?.status === value) + '" ' + (!canRate ? 'disabled' : '') + '>' +
       icon(symbol) + esc(t(label)) + '</button>').join('') + '</div>' +
-    '<button type="button" class="purchase-unsure" data-purchase-rating="unrated" aria-pressed="' + (rating?.status === 'unrated') + '">' + esc(t('purchaseUnsure')) + '</button></div>' +
+    '<div class="purchase-rating-aux"><button type="button" class="purchase-unsure" data-purchase-rating="unrated" aria-pressed="' + (rating?.status === 'unrated') + '">' + esc(t('purchaseUnsure')) + '</button><button type="button" class="purchase-unsure" data-purchase-rating="render_error" aria-pressed="'+(rating?.status==='render_error')+'">Render error</button></div></div>' +
     '<div class="purchase-top-picker" role="group" aria-label="' + esc(t('purchaseChooseOwned')) + '">' + session.scenario.tops.map(item =>
       '<button type="button" data-purchase-top="' + esc(item.id) + '" aria-pressed="' + (item.id === top.id) + '">' + esc(item.label) + '</button>').join('') + '</div>' +
     '<p class="purchase-fit-note">' + esc(canRate ? t('purchaseSeparate') + ' · ' + t('styleFitDisclaimer') : t('purchaseMissingEvidence')) + '</p></section>';
@@ -71,8 +73,10 @@ function verdict(wardrobe: WardrobeState): string {
   const titles: Record<typeof position, TranslationKey> = { recommended: 'purchaseWorthChecking', not_required: 'purchaseNotNeeded', none: 'purchaseOwnEnough', unresolved: 'purchaseNeedRatings', infeasible: 'purchaseNotFeasible' };
   const reasons: Record<typeof position, TranslationKey> = { recommended: 'purchaseRecommendedWhy', not_required: 'purchaseChosenAlternative', none: 'purchaseZeroWhy', unresolved: 'purchaseIncompleteWhy', infeasible: 'purchaseInfeasibleWhy' };
   const recommended = result.status === 'solved' ? result.basket.candidateIds[0] : undefined;
-  return '<section class="purchase-verdict" aria-labelledby="purchase-verdict-title" aria-live="polite"><h2 id="purchase-verdict-title">' + esc(own ? t('purchaseConfirmedEquivalent') : t(titles[position])) + '</h2>' +
-    '<p class="purchase-summary">' + esc(own ? t('purchaseConfirmedEquivalentNote', { item: own.name }) : t(reasons[position])) + '</p>' +
+  const provisional=result.status==='solved'&&(result.certificate.priceOptimality==='provisional'||result.certificate.selectionStability==='provisional');
+  const possible=result.status==='solved'?Math.min(result.basket.costMinor,...result.certificate.cheaperBaskets.filter(row=>row.couldBecomeFeasible).map(row=>row.basket.costMinor)):0;
+  return '<section class="purchase-verdict" aria-labelledby="purchase-verdict-title" aria-live="polite"><h2 id="purchase-verdict-title">' + esc(provisional?'Best confirmed basket so far: '+money(result.basket!.costMinor):own ? t('purchaseConfirmedEquivalent') : t(titles[position])) + '</h2>' +
+    '<p class="purchase-summary">' + esc(provisional?(possible<result.basket!.costMinor?money(possible)+' may still be possible after an unresolved pairing.':'The preferred choice at this price is still provisional.') :own ? t('purchaseConfirmedEquivalentNote', { item: own.name }) : t(reasons[position])) + '</p>' +
     (own ? '<div class="purchase-owned-evidence">' + itemPicture(own) + '<strong>' + esc(own.name) + '</strong></div>' : '') +
     (!own && result.status === 'solved' ? '<div class="purchase-basket"><span>' + esc(t('purchaseCheapestBasket')) + '</span><strong>' + esc(money(result.basket.costMinor)) + '</strong><p>' +
       esc(result.basket.candidateIds.map(id => itemLabel(id, id)).join(' + ') || t('purchaseBuyNothing')) + '</p></div>' : '') +
@@ -91,8 +95,8 @@ function verdict(wardrobe: WardrobeState): string {
 }
 export function purchasePage(wardrobe: WardrobeState = initialState()): string {
   return '<section class="page purchase-view '+(session.demo==='zero'?'purchase-zero-mode':'')+'" aria-labelledby="purchase-title"><header class="purchase-intro"><div><h1 id="purchase-title">' + esc(t('purchaseHeadline')) + '</h1><p>' + esc(t('purchaseSubheading')) + '</p></div>' +
-    '<div class="purchase-import-actions"><button type="button" class="button button-primary" data-nav="gallery">' + icon('camera') + esc(t('purchaseAddPhoto')) + '</button>' +
-    '<button type="button" class="text-link" data-nav="gallery">' + esc(t('purchasePasteLink')) + '</button></div></header>' +
+    '<div class="purchase-import-actions"><button type="button" class="button button-primary" data-nav="my-check">Use my wardrobe →</button>' +
+    '<button type="button" class="text-link" data-nav="gallery">' +icon('camera')+ ' Photo or link</button></div></header>' +
     '<div class="purchase-example-banner"><p>' + esc(t('purchaseExampleLabel')) + '</p><div class="purchase-demo-modes" role="group" aria-label="' + esc(t('purchaseChooseDemo')) + '">' +
     (['minimum','zero'] as const).map(mode=>'<button type="button" data-purchase-demo="'+mode+'" aria-pressed="'+(mode===session.demo)+'">'+esc(t(mode==='minimum'?'purchaseMinimumDemo':'purchaseZeroDemo'))+'</button>').join('')+'</div></div>'+
     '<div class="purchase-layout">' + candidates() + previews() + verdict(wardrobe) + '</div>' +
@@ -107,7 +111,7 @@ export function handlePurchaseChange(input: HTMLSelectElement): boolean {
 export function handlePurchaseClick(button: HTMLElement, actions: Actions): boolean {
   try {
     const d = button.dataset;
-    if (d.purchaseDemo) { session = choosePurchaseDemo(session, d.purchaseDemo as PurchaseDemo); equivalents.clear(); }
+    if (d.purchaseDemo) { session = choosePurchaseDemo(session, d.purchaseDemo as PurchaseDemo);try{localStorage.setItem('wearagain:approved-demo:v1',session.demo);}catch{} equivalents.clear(); }
     else if (d.purchaseCandidate) session = selectCandidate(session, d.purchaseCandidate);
     else if (d.purchaseTop) session = selectTop(session, d.purchaseTop);
     else if (d.purchaseRating) session = rateSelected(session, d.purchaseRating as Rating);
@@ -116,6 +120,8 @@ export function handlePurchaseClick(button: HTMLElement, actions: Actions): bool
     else if (d.purchaseChoice) session = recordDecision(session, session.candidateId, d.purchaseChoice as 'save' | 'skip');
     else if (d.purchaseEquivalent && actions.wardrobe?.items.some(item => item.id === d.purchaseEquivalent)) { equivalents.set(session.candidateId, d.purchaseEquivalent); comparing = false; }
     else if (button.hasAttribute('data-purchase-review')) {
+      const id=nextUnresolvedAssessment(session.scenario).outfitId,pair=session.scenario.outfits.find(row=>row.id===id);
+      if(pair){session=selectTop(session,pair.topId);if(pair.outerwearId&&session.scenario.outerwear.some(row=>row.id===pair.outerwearId&&row.kind==='candidate'))session=selectCandidate(session,pair.outerwearId);actions.rerender();}
       document.querySelector<HTMLElement>('.purchase-preview-column')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return true;
     } else return false;

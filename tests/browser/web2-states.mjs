@@ -78,7 +78,7 @@ try{
   const bucket={limitUnits:440,spentUnits:0,reservedUnits:0,remainingUnits:440},budget={utcDay:'2026-10-22',unitsPerRender:2,total:bucket,daily:bucket,sessionDaily:bucket};
   await page.route('https://wearagain-api.oli-struska.workers.dev/**',route=>{
    const path=new URL(route.request().url()).pathname;
-   if(path==='/api/session')return route.fulfill({json:{sessionToken:'qa-synthetic-token',unitsPerRender:2}});
+   if(path==='/api/session')return route.fulfill({json:{sessionToken:'qa-synthetic-token',expiresAt:Date.now()+3600000,unitsPerRender:2}});
    if(path==='/api/ledger')return route.fulfill({json:budget});
    if(path==='/api/renders'){submits++;const renderKey=String(submits).padStart(64,'b');return route.fulfill({json:{mode:'live',renderKey,status:mockOutcome==='unknown'?'pending':'error',accounting:mockOutcome==='unknown'?'reserved':'released',reservedUnits:mockOutcome==='unknown'?2:0,chargedUnits:0,reason:mockOutcome==='unknown'?null:'processing_failed',requiresReconciliation:mockOutcome==='unknown',assetId:null,imageUrl:null,statusUrl:'/api/renders/'+renderKey,imageRequiresDownload:false,budget}});}
    throw Error('Unexpected mock provider request '+path);

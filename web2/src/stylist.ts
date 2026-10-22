@@ -81,8 +81,8 @@ export function validateBrief(value: StylistBrief): StylistBrief {
   return { occasion, date: value.date, style };
 }
 function hasCompleteOutfit(items: readonly WardrobeItem[]): boolean {
-  return items.some(item => item.category === 'tops') &&
-    items.some(item => item.category === 'bottoms' || item.category === 'dresses') &&
+  return (items.some(item=>item.category==='dresses')||items.some(item => item.category === 'tops') &&
+    items.some(item => item.category === 'bottoms')) &&
     items.some(item => item.category === 'shoes');
 }
 /** Validator applies equally to fixture and agent proposals: AI cannot create garments or change their status. */
@@ -96,7 +96,7 @@ export function verifyLooks(raw: unknown, wardrobe: WardrobeState, source: 'demo
     if (typeof look.id !== 'string' || !/^[A-Za-z0-9_-]{1,50}$/.test(look.id) || seen.has(look.id) ||
       typeof look.title !== 'string' || look.title.length > 100 || !look.title.trim() ||
       typeof look.explanation !== 'string' || look.explanation.length > 320 || !look.explanation.trim() ||
-      !Array.isArray(look.itemIds) || look.itemIds.length < 3 || look.itemIds.length > 6 ||
+      !Array.isArray(look.itemIds) || look.itemIds.length < 2 || look.itemIds.length > 6 ||
       look.itemIds.some(id => typeof id !== 'string') || new Set(look.itemIds).size !== look.itemIds.length)
       throw new Error(t('stylistInvalidProposal'));
     const owned = look.itemIds.map(id => wardrobe.items.find(item => item.id === id));
@@ -178,7 +178,7 @@ export function persistSaved(entries: readonly SavedLook[], storage?: Pick<Stora
 export function saveChosen(entries: readonly SavedLook[], look: OccasionSuggestion, brief: StylistBrief, wardrobe: WardrobeState): SavedLook[] {
   const verified = verifyLooks([look], wardrobe, 'agent').looks[0]!;
   // This is an outfit choice, never a purchase or an automatically logged wear.
-  const id = 'saved_' + Date.now().toString(36) + '_' + look.id;
+  const id = 'saved_' + crypto.randomUUID().replaceAll('-','');
   return [{
     id, title: verified.title, occasion: brief.occasion,
     date: brief.date, itemIds: [...verified.itemIds],

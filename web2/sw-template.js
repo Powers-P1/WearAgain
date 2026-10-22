@@ -40,9 +40,13 @@ self.addEventListener('activate',event=>{
 function cachePath(req){
   if(req.method!=='GET'||req.headers.has('Authorization')||req.headers.has('Range'))return null;
   const url=new URL(req.url);
-  if(url.origin!==ORIGIN||url.hash)return null;
-  if(req.mode==='navigate'&&['/app','/app/','/app/index.html'].includes(url.pathname)&&!url.search)return '/app/';
-  if(url.search||!/^(?:\/assets\/|\/fonts\/|\/icons\/|\/demo\/|\/manifest\.webmanifest$)/.test(url.pathname))return null;
+  if(url.origin!==ORIGIN)return null;
+  if(req.mode==='navigate'&&['/app','/app/','/app/index.html'].includes(url.pathname)){
+    const entries=[...url.searchParams],keys=new Set(entries.map(([key])=>key));
+    if(keys.size===entries.length&&entries.every(([key,value])=>key==='scenario'?['minimum','zero'].includes(value):key==='judges'?value==='1':key==='source'?value==='pwa':false))return '/app/';
+    return null;
+  }
+  if(url.hash||url.search||!/^(?:\/assets\/|\/fonts\/|\/icons\/|\/demo\/|\/manifest\.webmanifest$)/.test(url.pathname))return null;
   return allowed.has(url.pathname)?url.pathname:null;
 }
 self.addEventListener('fetch',event=>{

@@ -1,17 +1,20 @@
 import { morningLooks, morningHeadingKey, localISODate, storeDaily, wearToday, type DailyState } from './daily.js';
-import { proposeLooks, type OccasionSuggestion } from './stylist.js';
-import { outfitVisual, illustrationFor } from './ui.js';
+import { proposeLooks,verifyLooks,type OccasionSuggestion } from './stylist.js';
+import { outfitVisual,outfitBoard,illustrationFor } from './ui.js';
+import {startLiveAgent} from './agent-client.js';
+import {activeProfile} from './profiles.js';
 import type { WardrobeState } from './state.js';
 import { t } from './i18n.js';
 import './daily.css';
 
-type Actions={readonly wardrobe:WardrobeState;readonly daily:DailyState;readonly storage:Pick<Storage,'setItem'>|undefined;
+type Actions={readonly wardrobe:WardrobeState;readonly daily:DailyState;readonly storage:Storage|undefined;
   readonly updateDaily:(next:DailyState)=>void;readonly rerender:()=>void;readonly notice:(s:string)=>void;};
 let stage:'brief'|'preparing'|'ready'='brief';
 let spoken=t('morningRequestExample');
 let selected:string|null=null;
 let currentLooks:readonly OccasionSuggestion[]=[];
 let outstanding=0;
+let liveResult=false,liveProgress='';
 interface DictationEvent { readonly results: ArrayLike<ArrayLike<{ readonly transcript:string }>>; }
 interface DictationRecognizer {
   lang:string; interimResults:boolean;
@@ -40,7 +43,7 @@ const svg=(name:'mic'|'check'|'arrow')=>{
   return '<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">'+path+'</svg>';
 };
 function photoFor(look:OccasionSuggestion,wardrobe:WardrobeState):string{
-  return outfitVisual(look.itemIds,wardrobe,true);
+  return liveResult?outfitBoard(look.itemIds,wardrobe,true):outfitVisual(look.itemIds,wardrobe,true);
 }
 /** Keep the typed brief before rerenders caused by voice controls or async events. */
 export function handleMorningInput(target:HTMLTextAreaElement):boolean {
@@ -52,6 +55,7 @@ function lookNames(look:OccasionSuggestion,wardrobe:WardrobeState):string{
   return look.itemIds.map(id=>wardrobe.items.find(item=>item.id===id)?.name??id).join(' · ');
 }
 function prepared(wardrobe:WardrobeState):readonly OccasionSuggestion[]{
+  if(liveResult){currentLooks=currentLooks.filter(look=>{try{verifyLooks([look],wardrobe,'agent');return true;}catch{return false;}});if(!currentLooks.some(l=>l.id===selected))selected=currentLooks[0]?.id??null;return currentLooks;}
   const stillReady=morningLooks(wardrobe);
   const selectedIds=new Set(stillReady.map(look=>look.id));
   currentLooks=currentLooks.filter(look=>selectedIds.has(look.id));
@@ -74,9 +78,10 @@ export function morningPage(wardrobe:WardrobeState,daily:DailyState):string{
       '<textarea id="morning-request" class="'+(typing?'':'morning-quoted')+'" name="request" rows="3" maxlength="500" required '+(typing?'':'readonly')+'>'+esc(spoken)+'</textarea>'+
       '<button type="button" class="text-link morning-type" data-morning-type>'+(typing?'Done editing':'I’d rather type')+'</button>'+
       '<p class="morning-chips">'+esc(t('morningChips'))+'</p>'+
+      '<label class="agent-status"><input type="checkbox" name="live"'+(wardrobe.exampleMode===false?' checked':'')+'>Use live AI with my wardrobe and saved preferences</label>'+
       '<button type="submit" class="button button-primary full-width">'+esc(t('morningPrepare'))+' '+svg('arrow')+'</button>'+
       '<details class="morning-voice-help"><summary>'+esc(t('morningAboutDictation'))+'</summary><p class="morning-help">'+esc(t('morningVoiceDisclosure'))+'</p></details>'+
-      '<p class="morning-help">'+esc(t('morningOfflineNote'))+'</p></form>':
+      '<p class="morning-help">Choose live AI for your own wardrobe. With live AI off, this replays the saved example without a model request.</p></form>':
     stage==='preparing'?
       '<div class="morning-wait"><h1 id="morning-title">'+esc(t('morningPreparing'))+'</h1>'+
       '<p>'+esc(t('morningPreparingHint'))+'</p><div class="morning-prep-row">'+
@@ -85,7 +90,7 @@ export function morningPage(wardrobe:WardrobeState,daily:DailyState):string{
           '<div class="morning-no-preview">'+esc(item.name)+'</div>')+'</div>').join('')+'</div>'+
       '<div class="morning-checks"><p>'+svg('check')+' '+esc(t('morningOwnedOnly'))+'</p>'+
       '<p>'+svg('check')+' '+esc(t('morningNoIron'))+'</p><p>'+svg('check')+' '+esc(t('morningReadyOnly'))+'</p></div>'+
-      '<p class="morning-help">'+esc(t('morningNoBackground'))+'</p></div>':
+      '<p class="morning-help" role="status">'+esc(liveResult?liveProgress||'Live AI runs through the Worker. Reopen Stylist to resume the same request.':t('morningNoBackground'))+'</p></div>':
       '<div class="morning-ready"><div class="morning-intro"><h1 id="morning-title">'+esc(t(morningHeadingKey(looks.length),{count:looks.length}))+'</h1>'+
       '<p>'+esc(t('morningReadySubtitle'))+'</p>'+(illustrated?'<p class="morning-illustrative">Illustrative styling · demo model · style, not size fit</p>':'')+'</div>'+
       (looks.length?'<div class="morning-looks '+(illustrated?'morning-looks-illustrated':'')+'" role="radiogroup" aria-label="'+esc(t('morningChoose'))+'">'+
@@ -167,9 +172,10 @@ export function submitMorning(form:HTMLFormElement,actions:Actions):boolean{
   const request=String(data.get('request')??'').trim();
   if(request.length<3||request.length>500){actions.notice(t('morningInvalidRequest'));actions.rerender();return true;}
   if(recognizer&&listening){recognizer.stop();listening=false;}
-  spoken=request;stage='preparing';actions.rerender();
+  liveResult=data.get('live')==='on';liveProgress='';spoken=request;stage='preparing';actions.rerender();
   if(window.location.hash==='#morning')window.scrollTo({top:0,behavior:'instant'});
   const token=++outstanding;
+  if(liveResult){let base:Storage|undefined;try{base=window.localStorage;}catch{}void startLiveAgent({profile:activeProfile(base),wardrobe:actions.wardrobe,storage:actions.storage,message:request+' Use only ready clothes; no ironing today.',procedure:'occasion',date:localISODate(new Date()),location:'',allowPhotos:false,allowRenders:false,onEvent:event=>{liveProgress=event.message;if(window.location.hash==='#morning')actions.rerender();}}).then(value=>{if(token!==outstanding)return;if(!value.result.answer||value.result.status!=='completed')throw Error('AI could not complete the request. Existing wardrobe data is unchanged.');currentLooks=verifyLooks(value.result.answer.looks,actions.wardrobe,'agent').looks;selected=currentLooks[0]?.id??null;stage='ready';actions.rerender();}).catch(error=>{if(token!==outstanding)return;stage='brief';actions.notice(error instanceof Error?error.message:'Live AI unavailable.');actions.rerender();});return true;}
   // Offline example: resolved locally; NEVER assert that the browser continues
   // work when closed, creates three photos or schedules OS notifications.
   void proposeLooks({occasion:request,date:localISODate(new Date()),style:actions.wardrobe.style},actions.wardrobe)
