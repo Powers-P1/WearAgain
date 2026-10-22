@@ -305,7 +305,7 @@ function render(): void {
   ];
   const focusTarget=focusCandidates.find(el=>el.getClientRects().length>0 &&
     window.getComputedStyle(el).visibility!=='hidden');
-  if(focusTarget && (hasRendered||routeKey!=='')){
+  if(focusTarget && hasRendered){
     if(!focusTarget.matches('button,input,textarea,select,a[href],[tabindex]'))
       focusTarget.setAttribute('tabindex','-1');
     focusTarget.focus({preventScroll:true});

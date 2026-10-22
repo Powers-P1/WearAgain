@@ -71,7 +71,7 @@ export const en = {
   mktRetailDemoColour: 'Colour · illustrative',
   mktRetailDemoSize: 'Select a sample size',
   mktRetailDemoSizeGuide: 'A retailer would supply the size guide. WearAgain does not pick size.',
-  mktRetailDemoProductArt: 'Separate garment illustration - not a rendered full outfit',
+  mktRetailDemoProductArt: 'Saved single-garment model image - not a retailer catalogue photograph',
   mktRetailDemoPrice: 'Sample scenario price, not a retailer offer',
   mktRetailDemoCart: 'Merchant checkout not connected in this demo',
   mktRetailDemoOpenPanel: 'See it with my wardrobe',

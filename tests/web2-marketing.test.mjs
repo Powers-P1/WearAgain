@@ -107,3 +107,9 @@ test('review screenshot URLs select real guided preview/verdict steps without in
  assert.match(workflow,/judges-demo-verdict\|\/judges\/demo\/\?step=verdict/);
  assert.match(workflow,/actions\/upload-artifact@v4/);
 });
+
+test('PR-E deep links do not draw programmatic focus outline on first app paint',async()=>{
+  const main=await read('../web2/src/main.ts');
+  assert.match(main,/if\(focusTarget && hasRendered\)\{/);
+  assert.doesNotMatch(main,/hasRendered\|\|routeKey!==''/);
+});
