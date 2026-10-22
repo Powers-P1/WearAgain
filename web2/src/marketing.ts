@@ -44,7 +44,7 @@ function footer():string{
     link('/judges/',h('mktFooterDocs'))+'</nav></div>'+
     '<p>'+h('mktFooterPrivacyDescription')+'</p><small>'+h('mktFooterRights')+'</small></footer>';
 }
-function landing():string{
+export function unusedBoard13Landing():string{
   const recorded=demoEvidence();
   return '<div class="mkt-site mkt-consumer">'+siteHeader('home')+
     '<main id="main-content" tabindex="-1">'+
