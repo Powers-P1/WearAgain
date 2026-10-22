@@ -113,3 +113,44 @@ test('PR-E deep links do not draw programmatic focus outline on first app paint'
   assert.match(main,/if\(focusTarget && hasRendered\)\{/);
   assert.doesNotMatch(main,/hasRendered\|\|routeKey!==''/);
 });
+
+test('judge certificate labels unmet needs and explains the zero-purchase no-cheaper result',()=>{
+  marketing.handleMarketingClick({dataset:{guideStep:'verdict'}},()=>{});
+  marketing.handleMarketingClick({dataset:{judgeMode:'minimum'}},()=>{});
+  const minimum=marketing.marketingPage('/judges/demo');
+  assert.match(minimum,/Unsatisfied needs:/);
+  assert.match(minimum,/For work|For evenings/);
+  assert.doesNotMatch(minimum,/No cheaper basket exists/);
+  marketing.handleMarketingClick({dataset:{judgeMode:'zero'}},()=>{});
+  const zero=marketing.marketingPage('/judges/demo');
+  assert.match(zero,/No cheaper basket exists; buying nothing is the cheapest/);
+  assert.doesNotMatch(zero,/<ul><\/ul>/);
+  assert.doesNotMatch(zero,/Unsatisfied needs:/);
+  marketing.handleMarketingClick({dataset:{judgeMode:'minimum'}},()=>{});
+  marketing.handleMarketingClick({dataset:{guideStep:'wardrobe'}},()=>{});
+});
+test('judges pages and each guided step include implementation, concept and quantified limits',()=>{
+  const pages=[marketing.marketingPage('/judges')];
+  for(const step of ['wardrobe','preview','verdict']){
+    marketing.handleMarketingClick({dataset:{guideStep:step}},()=>{});
+    pages.push(marketing.marketingPage('/judges/demo'));
+  }
+  for(const html of pages){
+    assert.match(html,/Implemented now/);
+    assert.match(html,/Concept \/ not yet/);
+    assert.match(html,/Limits of this demo/);
+    assert.match(html,/Style preview, not size fit/);
+    assert.match(html,/2 units/);
+    assert.match(html,/24 hours/);
+    assert.match(html,/no fresh tasks|not live YouCam calls/i);
+    assert.match(html,/No conversion, returns or impact improvements have been measured/);
+    assert.match(html,/private.*reviewer access/);
+    assert.doesNotMatch(html,/https:\/\/wearagain\.pages\.dev\/app\//);
+  }
+  marketing.handleMarketingClick({dataset:{guideStep:'wardrobe'}},()=>{});
+});
+test('guided note gutters beat the site-wide paragraph margin reset',async()=>{
+  const css=await read('../web2/src/marketing.css');
+  assert.match(css,/\.mkt-guided main > \.mkt-guided-note\{margin:14px clamp\(20px,5vw,80px\)/);
+  assert.match(css,/\.mkt-guided main > \.mkt-guided-note\{margin:15px 20px;/);
+});

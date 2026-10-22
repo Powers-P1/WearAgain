@@ -7,7 +7,6 @@ import './marketing.css';
 const CODE='https://github.com/Powers-P1/WearAgain';
 const SETUP=CODE+'/blob/main/README.md';
 const API=CODE+'/blob/main/docs/API.md';
-const CURRENT_LIVE_CLIENT='https://wearagain.pages.dev/app/';
 let step:DemoStep='wardrobe';
 let stepQueryLoaded=false;
 let mode:PurchaseDemo='minimum';
@@ -150,6 +149,15 @@ function retailerProduct():string{
       '<p class="mkt-small-muted">'+h('mktRetailDemoPrivacy')+'</p></aside>':'')+
     '</div></main>'+footer()+'</div>';
 }
+function judgeDisclosures():string{
+  return '<section class="mkt-judge-disclosures" aria-label="'+h('mktJudgeDisclosureSection')+'">'+
+    '<div class="mkt-judge-disclosures-grid">'+
+    '<div><h2>'+h('mktJudgeImplementedHeading')+'</h2><p>'+h('mktJudgeImplementedBody')+'</p></div>'+
+    '<div><h2>'+h('mktJudgeConceptHeading')+'</h2><p>'+h('mktJudgeConceptBody')+'</p></div>'+
+    '<div><h2>'+h('mktJudgeLimitsHeading')+'</h2><p>'+h('mktJudgeLimitsBody')+'</p>'+
+    '<p class="mkt-judge-limit-source">'+link(API,h('mktJudgeSeeApi'))+'</p></div>'+
+    '</div></section>';
+}
 function judgesLanding():string{
   const evidence=demoEvidence();
   const segments=[
@@ -181,6 +189,7 @@ function judgesLanding():string{
     '<p><strong>WearAgain</strong> · '+h('mktJudgesWearAgainRole')+'</p></div>'+
     '<small>'+h('mktJudgesNotComposited')+'</small>'+
     link(API,h('mktJudgeSeeApi'))+'</section>'+
+    judgeDisclosures()+
     '<section class="mkt-review-index"><h2>'+h('mktJudgesEvidenceHeading')+'</h2>'+
     ([
       ['mktJudgesEvidenceTech','mktJudgesEvidenceTechBody',API],
@@ -251,10 +260,13 @@ function verdictStep():string{
     (result.status==='solved'?h(result.certificate.priceOptimality==='proven'?'mktJudgeVerdictProven':'mktJudgeVerdictProvisional'):
       h('mktJudgeVerdictIncomplete'))+'</p>'+
     '<p>'+h('purchaseCertificateScope',{count:result.evaluatedBasketCount})+'</p>'+
-    '<ul>'+failed.map(entry=>'<li><strong>'+escapeHtml(entry.basket.candidateIds.length?
+    (failed.length?'<ul>'+failed.map(entry=>'<li><strong>'+escapeHtml(entry.basket.candidateIds.length?
       entry.basket.candidateIds.map(id=>evaluated.candidateLabels[id]??id).join(' + '):t('purchaseBuyNothing'))+
     '</strong> · '+escapeHtml(money(entry.basket.costMinor,entry.basket.currency))+
-    ' · '+escapeHtml(entry.failedRequirements.map(req=>scenario.requirements.find(r=>r.id===req.requirementId)?.label??req.requirementId).join(', '))+'</li>').join('')+'</ul>'+
+    '<span class="mkt-unsatisfied">'+h('purchaseFails')+' '+
+      escapeHtml(entry.failedRequirements.map(req=>scenario.requirements.find(r=>r.id===req.requirementId)?.label??req.requirementId).join(', '))+
+    '</span></li>').join('')+'</ul>':
+    result.status==='solved'&&!basket.length?'<p class="mkt-no-cheaper">'+h('mktJudgeNoCheaper')+'</p>':'')+
     link('/app/#check',h('mktJudgeGoApp'))+'</aside></div>';
 }
 function guidedDemo():string{
@@ -275,13 +287,14 @@ function guidedDemo():string{
     '<h1>'+h('mktJudgeDemoTitle')+'</h1><p>'+h('mktJudgeDemoSubtitle')+'</p></div>'+
     link('/judges/',h('mktJudgesNav'))+'</header>'+
     (step==='wardrobe'?wardrobeStep():step==='preview'?previewStep():verdictStep())+
+    judgeDisclosures()+
     '<div class="mkt-guide-actions">'+(prev?'<button type="button" data-guide-step="'+prev+
       '" class="mkt-outline-button">'+h('mktJudgeBack')+'</button>':'<span></span>')+
       (next?'<button type="button" class="mkt-button mkt-button-dark" data-guide-step="'+next+'">'+
       h('mktJudgeNext',{title:t(next==='preview'?'mktJudgeStep2':'mktJudgeStep3')})+'</button>':
       link('/app/#check',h('mktJudgeGoApp'),'mkt-button mkt-button-dark'))+'</div>'+
     '<p class="mkt-guided-note">'+h('mktJudgeLiveSeparate')+' '+
-    link(CURRENT_LIVE_CLIENT,h('mktJudgeLiveLink'))+'</p>'+
+    link(API,h('mktJudgeSeeApi'))+'</p>'+
     '<p class="mkt-guided-note">'+h('mktJudgesVideoPending')+'</p>'+
     '</main>'+footer()+'</div>';
 }

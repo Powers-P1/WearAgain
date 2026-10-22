@@ -228,8 +228,16 @@
 .mkt-guide-actions{display:flex;justify-content:space-between;gap:17px;margin:35px clamp(20px,5vw,80px) 18px;
   border-top:1px solid var(--mkt-line);padding-top:20px;}
 .mkt-guide-actions>button,.mkt-guide-actions>a{min-height:48px;}
-.mkt-guided-note{margin:14px clamp(20px,5vw,80px);font-size:11px;color:var(--muted);}
+.mkt-guided main > .mkt-guided-note{margin:14px clamp(20px,5vw,80px);font-size:11px;color:var(--muted);}
 .mkt-guided-note>a{text-decoration:underline;}
+.mkt-judge-disclosures{border-block:1px solid var(--mkt-line);padding:24px 0;margin:38px clamp(20px,5vw,80px);}
+.mkt-judge-disclosures-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2.5vw,36px);}
+.mkt-site .mkt-judge-disclosures h2{font-size:clamp(23px,2vw,30px);line-height:1.1;margin:0 0 12px;}
+.mkt-site .mkt-judge-disclosures p{font-size:12px;line-height:1.6;color:var(--muted);margin:0;}
+.mkt-site .mkt-judge-disclosures .mkt-judge-limit-source{margin-top:12px;}
+.mkt-judge-limit-source a{text-decoration:underline;}
+.mkt-judge-context .mkt-unsatisfied{display:block;color:var(--muted);margin-top:5px;}
+.mkt-judge-context .mkt-no-cheaper{margin-top:16px;}
 .mkt-verdict-tabs{display:flex;gap:10px;margin-bottom:25px;}
 .mkt-verdict-tabs button{border:1px solid var(--mkt-line);background:transparent;min-height:44px;padding:10px 13px;font-size:12px;}
 .mkt-verdict-tabs button[aria-pressed=true]{background:var(--mkt-ink);color:var(--mkt-bg);}
@@ -332,7 +340,9 @@
  .mkt-judge-preview-grid img{height:295px;}
  .mkt-guide-actions{margin:20px;align-items:stretch;}
  .mkt-guide-actions>button,.mkt-guide-actions>a{padding:10px;font-size:11px;}
- .mkt-guided-note{margin:15px 20px;}
+ .mkt-guided main > .mkt-guided-note{margin:15px 20px;}
+ .mkt-judge-disclosures{margin:26px 20px;padding:20px 0;}
+ .mkt-judge-disclosures-grid{grid-template-columns:1fr;gap:20px;}
  .mkt-verdict-amount{display:block;}
  .mkt-verdict-amount strong,.mkt-verdict-amount span{display:block;}
 }

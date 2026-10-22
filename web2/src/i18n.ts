@@ -7,6 +7,14 @@ export const DEFAULT_LOCALE = 'en' as const;
 export type Locale = 'en' | 'pl';
 
 export const en = {
+  mktJudgeDisclosureSection: 'Implementation status and limits',
+  mktJudgeImplementedHeading: 'Implemented now',
+  mktJudgeImplementedBody: 'Six genuine saved single-garment YouCam cloth-v4 previews on an approved synthetic model; owned-item checks, a deterministic minimum-basket solver and its certificate. A budgeted Worker API exists separately, but this hosted replay submits no fresh tasks.',
+  mktJudgeConceptHeading: 'Concept / not yet',
+  mktJudgeConceptBody: 'Layered full-outfit rendering, size fitting, personal-model uploads, retailer checkout and cross-device sync are not implemented here. A walkthrough video is not supplied. No conversion, returns or impact improvements have been measured.',
+  mktJudgeLimitsHeading: 'Limits of this demo',
+  mktJudgeLimitsBody: 'Style preview, not size fit. Each successful YouCam image costs 2 units from a fixed server-side budget; the provider retains uploaded and generated images for 24 hours per the documented integration. This hosted replay uses saved recordings, not live YouCam calls. The repository is private and requires reviewer access.',
+  mktJudgeNoCheaper: 'No cheaper basket exists; buying nothing is the cheapest.',
 
   // PR-E: consumer, retailer and judge routes. All product-visible text stays in i18n.
   mktJudgesStart: 'Judges · Start here ↗',
@@ -163,8 +171,7 @@ export const en = {
   mktJudgeCurrencyNote: 'Synthetic fixture prices, not shop offers.',
   mktJudgeVerdictZero: 'Buying nothing satisfies the recorded example needs.',
   mktJudgeVerdictNotDuplicate: 'An excluded candidate is not automatically equivalent to something owned.',
-  mktJudgeLiveSeparate: 'Fresh rendering is a separate explicit live-client workflow, not performed by this guided replay.',
-  mktJudgeLiveLink: 'Open the existing live-capable client ↗',
+  mktJudgeLiveSeparate: 'Fresh rendering is not part of this hosted replay. The separate Worker API and its contract are documented in the private repository.'
   mktPwaInstall: 'Install the web demo',
   mktPwaHint: 'Optional browser install shell. It does not make live rendering or device data sync work offline.',
   mktPwaNotAvailable: 'Use your browser menu to add this page to your home screen if supported.',
