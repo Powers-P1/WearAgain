@@ -11,7 +11,7 @@
     "created_at": 1792700192408,
     "settled_at": 1792700212521
   },
-  "note": "Original live UI submission completed and charged2. Evidence listener crashed on CORS preflight body. Read-only recovery restores the same completed task/session to verify Worker image decoding and the production gallery; no additional render request.",
+  "note": "Original live UI submission completed and charged2. Evidence listener failed reading an image-endpoint response body after success; its filter also included CORS preflights. Read-only recovery restores the same completed task/session to verify Worker image decoding and the production gallery; no additional render request.",
   "record": {
     "mode": "live",
     "renderKey": "78ae8a091d817a45c1bf769872e82bee8498cd03898ee79cf538ab7d6eefec35",
