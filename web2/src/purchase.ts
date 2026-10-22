@@ -31,7 +31,7 @@ const labels: Record<string, TranslationKey> = {
   work: 'purchaseWorkTop',
   weekend: 'purchaseWeekendTop',
   evening: 'purchaseEveningTop',
-  shirt: 'purchaseWorkTop',
+  shirt: 'purchaseExampleShirt',
   'cheap-a': 'purchaseAster',
   'cheap-b': 'purchaseMila',
   'all-round': 'purchaseNova',

@@ -83,6 +83,13 @@ test('uncertain outcomes are never automatically resubmitted, including after re
  assert.equal(interrupted[0].status,'unknown');assert.equal(interrupted[0].error,'session_ended');
  q.dispose();restored.dispose();
 });
+test('confirmed avatar preflight failure is an error without automatic retry; generic503 stays unknown',async()=>{
+ for(const [code,status] of [['avatar_image_unavailable','error'],['upstream_unavailable','unknown']]){
+  let calls=0;const api=client();api.submit=async()=>{calls++;throw Object.assign(new Error(code),{code,status:503});};
+  const q=new queue.PreviewQueue(memory(),()=>{},api,photos);q.enqueue('preflight');await q.enable();
+  await until(()=>q.jobs[0].status===status);await q.enable();assert.equal(calls,1);q.dispose();
+ }
+});
 test('pause or removal during local photo preparation prevents a new provider submission',async()=>{
  for(const action of ['pause','remove']){
   let finish,calls=0;const api=client();api.submit=async()=>{calls++;return record;};

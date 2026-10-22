@@ -142,7 +142,11 @@ export class PreviewQueue {
       this.#update(job.itemId,{status:'ready',photoId,error:null});
     } catch(error) {
       const code=apiFailure(error)?error.code:'connection_error';
-      const uncertain=submitted&&!(apiFailure(error)&&error.status>=400&&error.status<500);
+      // The Worker returns these 503s before reserving units or contacting
+      // YouCam. A generic 503 or a lost response still has an unknown outcome.
+      const beforeReservation=apiFailure(error)&&error.status===503&&
+        ['avatar_image_unavailable','avatar_image_invalid','invalid_live_configuration'].includes(code);
+      const uncertain=submitted&&!(apiFailure(error)&&error.status>=400&&error.status<500)&&!beforeReservation;
       if(code==='limit_exceeded'||code==='invalid_session')this.#enabled=false;
       this.#update(job.itemId,{status:uncertain?'unknown':'error',error:code});
     }

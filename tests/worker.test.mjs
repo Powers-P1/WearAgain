@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createWorker } from '../worker/src/app.js';
 import { createUnitLedgerClass } from '../worker/src/unit-ledger.js';
-import { fetchAvatar } from '../worker/src/assets.js';
+import { AVATARS, fetchAvatar } from '../worker/src/assets.js';
 import { digest } from '../worker/src/http.js';
 import { createSqlStorage } from './helpers/sql-storage.mjs';
 import { testPng } from './helpers/image.mjs';
@@ -335,4 +335,13 @@ test('approved avatar loader checks pinned blob content and never forwards crede
   };
   assert.deepEqual((await fetchAvatar(avatar, network)).bytes, bytes);
   await assert.rejects(fetchAvatar({ ...avatar, baseRevision: '0'.repeat(40) }, network), error => error.code === 'avatar_image_unavailable');
+});
+test('approved avatars use public hash-addressed originals without depending on private GitHub access', async()=>{
+  for(const avatar of AVATARS){
+    assert.equal(avatar.url,`https://wearagain.pages.dev/demo/avatars/${avatar.baseRevision}-${avatar.file}`);
+    const original=await readFile(new URL('../fixtures/base_models/'+avatar.file,import.meta.url));
+    const loaded=await fetchAvatar(avatar,async()=>new Response(original));
+    assert.deepEqual(Buffer.from(loaded.bytes),original);
+    await assert.rejects(fetchAvatar(avatar,async()=>new Response(original.subarray(1))),e=>e.code==='avatar_image_unavailable');
+  }
 });

@@ -83,6 +83,16 @@ await cp(join(root, 'docs/mockups/landing-v1.png'),join(dest,'assets/reference-s
 await cp(join(root, 'docs/mockups/landing-retailers-v1.webp'),join(dest,'assets/reference-retailers.webp'));
 
 await cp(join(root, 'fixtures/youcam/demo-manifest.json'), join(dest, 'demo/manifest.json'));
+// Publish only the approved synthetic-adult bases, byte for byte. Do not put
+// originals in the PWA precache; the Worker checks the existing Git blob hash.
+const {AVATARS} = await import('../worker/src/assets.js');
+await mkdir(join(dest,'demo/avatars'),{recursive:true});
+for (const avatar of AVATARS) {
+  const bytes=await readFile(join(root,'fixtures/base_models',avatar.file));
+  const blobHash=createHash('sha1').update(`blob ${bytes.length}\0`).update(bytes).digest('hex');
+  if(blobHash!==avatar.baseRevision)throw new Error('Approved avatar hash mismatch: '+avatar.id);
+  await writeFile(join(dest,'demo/avatars',avatar.baseRevision+'-'+avatar.file),bytes);
+}
 // A real screen recording and captions, deliberately outside the PWA precache.
 await cp(join(root,'web2/public/video'),join(dest,'video'),{recursive:true});
 
