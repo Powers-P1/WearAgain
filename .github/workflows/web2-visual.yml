@@ -54,6 +54,7 @@ jobs:
               'judges-demo-verdict|/judges/demo/?step=verdict' \
               'consumer-wardrobe|/app/#wardrobe' \
               'consumer-purchase|/app/#check' \
+              'consumer-zero|/app/?scenario=zero#check' \
               'consumer-overview|/app/#overview' \
               'consumer-stylist|/app/#stylist'; do
                 IFS='|' read -r name route <<<"$pair"

@@ -127,3 +127,18 @@ test('purchase checker does not treat a nonchosen candidate as a proven duplicat
   // All required ratings and prices come from the existing synthetic fixture.
   assert.equal(first.scenario.ratings.filter(r=>r.status==='would_wear').length,6);
 });
+
+
+test('buy-nothing URL selects the original deterministic zero-purchase fixture',()=>{
+  assert.equal(purchase.purchaseDemoFromSearch('?scenario=zero'),'zero');
+  assert.equal(purchase.purchaseDemoFromSearch('?scenario=minimum'),'minimum');
+  assert.equal(purchase.purchaseDemoFromSearch('?scenario=invalid'),'minimum');
+  assert.equal(purchase.purchaseDemoFromSearch('?scenario=ZERO'),'minimum');
+  assert.equal(purchase.purchaseDemoFromSearch(''),'minimum');
+  const selected=purchase.initialPurchase(purchase.purchaseDemoFromSearch('?scenario=zero'));
+  assert.equal(selected.demo,'zero');
+  const result=purchase.computeDecision(selected);
+  assert.equal(result.status,'solved');
+  assert.equal(result.basket.costMinor,0);
+  assert.deepEqual(result.basket.candidateIds,[]);
+});

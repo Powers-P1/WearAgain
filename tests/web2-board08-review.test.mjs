@@ -118,8 +118,36 @@ test('overview month picker is functional and desktop attention actions remain e
   assert.match(before,/data-overview-review="bag"|data-overview-review="dress"/);
   assert.equal(overview.handleOverviewMonthChange({id:'overview-month',value:'2025-04'}),true);
   const after=overview.overviewPage(state,wear,decisions);
-  assert.match(after,/id="overview-month" type="month" value="2025-04"/);
+  assert.match(after,/<select id="overview-month" aria-label="Choose month for logged wardrobe wears">/);
+  assert.match(after,/<option value="2025-04" selected>April 2025<\/option>/);
+  assert.doesNotMatch(after,/type="month"/);
   assert.equal(overview.handleOverviewMonthChange({id:'random',value:'2025-05'}),false);
   assert.equal(overview.handleOverviewMonthChange({id:'overview-month',value:'not-a-month'}),true);
   assert.match(overview.overviewPage(state,wear,decisions),/value="2025-04"/);
+});
+
+
+test('overview month names are explicitly English regardless of native date widget locale',()=>{
+  const d={version:1,wears:[{date:'2022-04-12',lookId:'look_1',lookTitle:'Example',itemIds:['blazer']}]};
+  const options=overview.overviewMonthOptions(d,new Date(2026,9,22));
+  assert.deepEqual(options[0],{value:'2026-10',label:'October 2026'});
+  assert.ok(options.some(x=>x.value==='2025-04'&&x.label==='April 2025'));
+  assert.ok(options.some(x=>x.value==='2022-04'&&x.label==='April 2022'));
+  assert.ok(options.every(x=>/^[A-Z][a-z]+ \d{4}$/.test(x.label)));
+  assert.equal(new Set(options.map(x=>x.value)).size,options.length);
+  const html=overview.overviewPage(wardrobe.initialState(),d,daily.emptyDecisions());
+  assert.match(html,/>Month<\/span>/);
+  assert.match(html,/>April 2022<\/option>/);
+});
+test('desktop board-08 supporting text and product card captions remain 12px readable',async()=>{
+  const css=await readFile(new URL('../web2/src/purchase.css',import.meta.url),'utf8');
+  for(const [name,regex] of [
+    ['model caption',/\.purchase-model-caption\{font-size:12px/],
+    ['image footnote',/\.purchase-model-honesty\{font-size:12px/],
+    ['product captions',/\.purchase-desktop-products figcaption\{[\s\S]*?font-size:12px/],
+    ['secondary captions',/\.purchase-desktop-products figcaption small\{font-size:12px/],
+    ['shop provenance',/\.purchase-desktop-layout \.purchase-candidate-info small\{[\s\S]*?font-size:12px/],
+    ['footer',/\.purchase-desktop-foot\{font-size:12px/],
+  ]) assert.match(css,regex,name+' must remain 12px');
+  assert.match(css,/\.purchase-desktop-reason\{[^}]*text-wrap:balance/);
 });
