@@ -1,3 +1,5 @@
+import { renderLanding } from './landing-v1.js';
+import './landing-v1.css';
 import { t, type TranslationKey } from './i18n.js';
 import { coreDecision, demoEvidence, demoStep, money, retailExample, sampleWardrobe,
   type DemoStep, type MarketingRoute } from './marketing-model.js';
@@ -299,7 +301,7 @@ function guidedDemo():string{
     '</main>'+footer()+'</div>';
 }
 export function marketingPage(route:MarketingRoute):string {
-  if(route==='/')return landing();
+  if(route==='/')return renderLanding('shoppers').replaceAll('/retailers','/retail/');
   if(route==='/retail')return retailLanding();
   if(route==='/retail/demo')return retailerProduct();
   if(route==='/judges')return judgesLanding();
