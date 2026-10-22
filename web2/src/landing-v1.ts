@@ -35,7 +35,7 @@ function mark(name: "hanger" | "heart" | "calendar" | "person" | "image" | "docu
 }
 
 function header(kind: LandingKind): string {
-  return `<header class="landing-header"><a class="landing-brand" href="/" aria-label="WearAgain home">WearAgain</a><nav class="landing-audiences" aria-label="Audience"><a href="/" ${kind === "shoppers" ? 'aria-current="page"' : ""}>For shoppers</a><a href="/retail/" ${kind === "retailers" ? 'aria-current="page"' : ""}>For retailers</a></nav><a class="button landing-header-cta" href="${kind === "shoppers" ? "/app" : "#pilot-contact"}">${kind === "shoppers" ? "Try the demo" : "Plan a retail pilot"}${kind === "retailers" ? mark("arrow") : ""}</a></header>`;
+  return `<header class="landing-header"><a class="landing-brand" href="/" aria-label="WearAgain home">WearAgain</a><nav class="landing-audiences" aria-label="Audience"><a href="/" ${kind === "shoppers" ? 'aria-current="page"' : ""}>For shoppers</a><a href="/retail/" ${kind === "retailers" ? 'aria-current="page"' : ""}>For retailers</a><a class="landing-quiet-judge" href="/judges/">For judges</a></nav><a class="button landing-header-cta" href="${kind === "shoppers" ? "/app" : "#pilot-contact"}">${kind === "shoppers" ? "Try the demo" : "Plan a retail pilot"}${kind === "retailers" ? mark("arrow") : ""}</a></header>`;
 }
 
 function footer(kind: LandingKind): string {
