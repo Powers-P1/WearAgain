@@ -3,6 +3,7 @@
 .purchase-intro h1{font-size:clamp(42px,4.3vw,64px);line-height:1.02}
 .purchase-intro p{margin-top:9px;color:var(--muted);font-size:16px}
 .purchase-import-actions{display:flex;gap:16px;align-items:center;flex:none}
+.purchase-import-actions .text-link{min-height:44px;min-width:44px}
 .purchase-layout{display:grid;grid-template-columns:minmax(170px,.7fr) minmax(310px,1.3fr) minmax(250px,1fr);gap:28px;padding-top:28px;align-items:start}
 .purchase-layout>section{min-width:0}
 .purchase-layout h2{font-size:30px;line-height:1.1}
@@ -26,14 +27,14 @@
 .purchase-image-empty small{font-size:12px;color:var(--muted)}
 .purchase-preview-pair figcaption{font-size:13px;margin-top:8px;line-height:1.4}
 .purchase-top-picker{display:flex;gap:7px;overflow:auto;margin:16px 0;scrollbar-width:thin}
-.purchase-top-picker button{border:1px solid var(--line);background:none;padding:8px 11px;min-height:40px;font-size:12px;white-space:nowrap}
+.purchase-top-picker button{border:1px solid var(--line);background:none;padding:8px 11px;min-height:44px;font-size:12px;white-space:nowrap}
 .purchase-top-picker button[aria-pressed=true]{background:var(--olive-soft);border-color:var(--olive)}
 .purchase-rating h3{font-family:var(--sans);font-size:14px;font-weight:500;margin:18px 0 12px}
 .purchase-rating-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .purchase-rating-buttons button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:8px;border:1px solid var(--olive);background:none;font-size:13px}
 .purchase-rating-buttons button[aria-pressed=true]{background:var(--olive);color:var(--ivory)}
 .purchase-rating-buttons button:disabled{opacity:.45}
-.purchase-unsure{min-height:40px;border:0;background:none;color:var(--muted);text-decoration:underline;display:block;margin:3px auto;font-size:12px}
+.purchase-unsure{min-height:44px;border:0;background:none;color:var(--muted);text-decoration:underline;display:block;margin:3px auto;font-size:12px}
 .purchase-fit-note{color:var(--muted);font-size:12px;line-height:1.5;text-align:center}
 .purchase-verdict{border-left:1px solid var(--line);padding-left:26px}
 .purchase-verdict h2{font-size:clamp(36px,3.4vw,52px);line-height:1;letter-spacing:-.02em}
@@ -44,7 +45,7 @@
 .purchase-basket>p{font-size:13px;color:var(--muted);margin-top:5px}
 .purchase-actions{display:flex;flex-direction:column;gap:8px;margin:22px 0 16px}
 .purchase-actions .text-link{justify-content:center;display:flex;align-items:center;gap:8px;min-height:44px}
-.purchase-save-later{border:0;background:none;min-height:40px;text-decoration:underline;text-underline-offset:4px;font-size:13px}
+.purchase-save-later{border:0;background:none;min-height:44px;text-decoration:underline;text-underline-offset:4px;font-size:13px}
 .purchase-choice-notice{font-size:13px;color:#476344;margin:12px 0}
 .purchase-certificate,.purchase-compare{border-top:1px solid var(--line);padding:12px 0;font-size:13px}
 .purchase-certificate summary,.purchase-compare summary,.purchase-demo-settings summary{cursor:pointer;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px;list-style:none}
@@ -67,15 +68,24 @@
 .purchase-demo-settings p{margin:10px 0;max-width:75ch}
 .purchase-demo-settings button{border:1px solid var(--line);background:none;padding:10px 14px;min-height:44px;margin:4px 8px 4px 0;font-size:12px}
 .purchase-demo-settings button[aria-pressed=true]{border-color:var(--olive);background:var(--olive-soft);color:var(--olive)}
+.purchase-example-banner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 20px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--muted)}
+.purchase-demo-modes{display:flex;flex-wrap:wrap;gap:8px}
+.purchase-demo-modes button{min-height:44px;min-width:44px;border:1px solid var(--line);background:none;padding:8px 12px;font-size:13px}
+.purchase-demo-modes button[aria-pressed=true]{background:var(--olive-soft);border-color:var(--olive);color:var(--olive)}
+.purchase-zero-example p{line-height:1.6;margin-top:16px;color:var(--muted);font-size:14px}
+.purchase-zero-example ul{padding-left:20px;font-size:15px;line-height:1.6;margin-top:18px}
+.purchase-zero-example li+li{margin-top:10px}
 @media(min-width:801px) and (max-width:1100px){.purchase-layout{grid-template-columns:160px 1fr;gap:24px}.purchase-verdict{grid-column:2;border-left:0;padding:24px 0 0;border-top:1px solid var(--line)}.purchase-import-actions{flex-direction:column;gap:4px}.purchase-image-wrap{max-height:360px}}
 @media(max-width:800px){
+ .purchase-zero-mode .purchase-verdict{order:-1;padding-top:0;border-top:0}
+ .purchase-example-banner{padding:8px 0;gap:6px 12px;font-size:12px}
  .purchase-view{max-width:560px}
- .purchase-intro{display:block;padding-bottom:20px}
+ .purchase-intro{display:block;padding-bottom:14px}
  .purchase-intro h1{font-size:39px;line-height:1.05;max-width:330px}
  .purchase-intro p{font-size:14px;margin-top:8px}
- .purchase-import-actions{margin-top:18px;justify-content:space-between}
+ .purchase-import-actions{margin-top:14px;justify-content:space-between}
  .purchase-import-actions .button{min-height:44px}
- .purchase-layout{display:flex;flex-direction:column;gap:24px;padding-top:20px}
+ .purchase-layout{display:flex;flex-direction:column;gap:16px;padding-top:16px}
  .purchase-layout>section{width:100%}
  .purchase-layout h2{font-size:27px}
  .purchase-finds>h2{display:none}
@@ -91,12 +101,12 @@
  .purchase-section-head h2{font-size:26px}
  .purchase-section-head>span{font-size:11px}
  .purchase-preview-pair{gap:10px}
- .purchase-image-wrap{aspect-ratio:.66;max-height:300px}
+ .purchase-image-wrap{aspect-ratio:.82;max-height:230px}
  .purchase-photo-source{font-size:12px}
  .purchase-top-picker{margin:12px 0}
  .purchase-preview-pair figcaption{font-size:12px}
  .purchase-rating-buttons button{font-size:13px;min-height:48px}
- .purchase-rating h3{font-size:14px}
+ .purchase-rating h3{font-size:14px;margin-top:14px}
  .purchase-verdict{border-left:0;border-top:1px solid var(--line);padding:26px 0 0;margin-top:0}
  .purchase-verdict h2{font-size:40px}
  .purchase-compare-pair img{max-height:240px;object-fit:contain}

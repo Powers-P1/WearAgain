@@ -167,7 +167,7 @@ function judgesLanding():string{
     ] as const).map(([title,desc,url])=>
       '<a href="'+url+'" class="mkt-index-row"><strong>'+h(title)+'</strong>'+
       '<span>'+h(desc)+'</span><b>↗</b></a>').join('')+
-    '<section class="mkt-walkthrough" id="walkthrough"><h2>'+h('mktJudgesVideo')+'</h2><p>'+h('mktJudgesVideoDescription')+'</p><video controls playsinline preload="metadata" poster="/assets/editorial-judges.webp" aria-label="'+h('mktJudgesVideo')+'"><source src="/video/wearagain-demo.webm" type="video/webm" /><track kind="captions" src="/video/wearagain-demo.en.vtt" srclang="en" label="English" default /></video><p>'+link('/video/transcript.txt',h('mktJudgesTranscript'))+'</p></section>'+
+    '<section class="mkt-walkthrough" id="walkthrough"><h2>'+h('mktJudgesVideo')+'</h2><p>'+h('mktJudgesVideoDescription')+'</p><video controls playsinline preload="metadata" aria-label="'+h('mktJudgesVideo')+'"><source src="/video/wearagain-demo.webm" type="video/webm" /><track kind="captions" src="/video/wearagain-demo.en.vtt" srclang="en" label="English" default /></video><p>'+link('/video/transcript.txt',h('mktJudgesTranscript'))+'</p></section>'+
     '<p>'+h('mktJudgesFootnote')+'</p></section></main>'+footer()+'</div>';
 }
 function stepper():string{

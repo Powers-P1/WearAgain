@@ -1,7 +1,8 @@
 import index from '../../fixtures/base_models/avatars.json' with { type: 'json' };
 import { HttpError, digest, readBounded } from './http.js';
 
-const BASE_COMMIT = '21a98e05d301f300103bf2206ff2310d5201c941';
+// Approved originals from commit 21a98e05d301f300103bf2206ff2310d5201c941.
+// Private GitHub raw URLs are unavailable to unauthenticated Worker fetches.
 const BLOB_SHAS = {
   "woman_neutral_01": "6e8fe750bda30b03cd688673a894dec5cc49e9f1",
   "man_neutral_01": "090b19ed2a881b262e2d55c45740b1dcd4a17e9c",
@@ -18,7 +19,7 @@ const BLOB_SHAS = {
 export const AVATARS = Object.freeze(index.avatars.filter(avatar => avatar.ageBand === 'adult').map(avatar => Object.freeze({
   id: avatar.id, file: avatar.file, sex: avatar.sex, ageBand: avatar.ageBand,
   role: avatar.role ?? 'primary', baseRevision: BLOB_SHAS[avatar.id],
-  url: `https://raw.githubusercontent.com/Powers-P1/WearAgain/${BASE_COMMIT}/fixtures/base_models/${avatar.file}`,
+  url: `https://wearagain.pages.dev/demo/avatars/${BLOB_SHAS[avatar.id]}-${avatar.file}`,
 })));
 
 export function resolveAvatar(id) {

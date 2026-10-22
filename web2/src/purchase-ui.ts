@@ -25,7 +25,7 @@ function candidates(): string {
   return '<section class="purchase-finds" aria-labelledby="purchase-finds-title"><h2 id="purchase-finds-title">' + esc(t('purchaseFinds')) + '</h2>' +
     '<div class="purchase-candidate-list">' + session.scenario.outerwear.filter(item => item.kind === 'candidate').map(item =>
       '<button type="button" class="purchase-candidate ' + (item.id === session.candidateId ? 'selected' : '') + '" data-purchase-candidate="' + esc(item.id) + '" aria-pressed="' + (item.id === session.candidateId) + '">' +
-      '<span class="purchase-candidate-thumb">' + savedImage('outerwear', item.id, item.label) + '</span><span><strong>' + esc(item.label) + '</strong><small>' +
+      (recordingFor('outerwear',item.id)?'<span class="purchase-candidate-thumb">' + savedImage('outerwear', item.id, item.label) + '</span>':'')+'<span><strong>' + esc(item.label) + '</strong><small>' +
       esc(t('purchaseCandidatePrice')) + ' · ' + esc(money(item.kind === 'candidate' ? item.priceMinor : 0)) + '</small></span></button>').join('') + '</div>' +
     '<button type="button" class="text-link purchase-add-item" data-nav="gallery">' + icon('camera') + esc(t('purchaseAddAnother')) + '</button></section>';
 }
@@ -33,6 +33,10 @@ function previews(): string {
   const top = session.scenario.tops.find(item => item.id === session.topId);
   const candidate = session.scenario.outerwear.find(item => item.id === session.candidateId);
   if (!top || !candidate) return '';
+  if (session.demo === 'zero') return '<section class="purchase-preview-column purchase-zero-example" aria-labelledby="purchase-zero-title">' +
+    '<h2 id="purchase-zero-title">' + esc(t('purchaseZeroPreviewTitle')) + '</h2><p>' + esc(t('purchaseZeroPreviewNote')) + '</p>' +
+    '<ul>' + session.scenario.tops.map(item=>'<li>'+esc(item.label)+'</li>').join('') +
+    session.scenario.outerwear.filter(item=>item.kind==='owned').map(item=>'<li>'+esc(item.label)+'</li>').join('') + '</ul></section>';
   const canRate = !!selectedPair(session) && !!recordingFor('top', top.id) && !!recordingFor('outerwear', candidate.id);
   const rating = selectedRating(session);
   return '<section class="purchase-preview-column" aria-labelledby="purchase-preview-title"><div class="purchase-section-head"><h2 id="purchase-preview-title">' +
@@ -80,19 +84,19 @@ function verdict(wardrobe: WardrobeState): string {
     (position !== 'recommended' ? '<button type="button" class="purchase-save-later" data-purchase-choice="save">' + esc(t('purchaseSaveLater')) + '</button>' : '') + '</div>' +
     (session.decisions[session.candidateId] ? '<p role="status" class="purchase-choice-notice">' + esc(t(session.decisions[session.candidateId] === 'skip' ? 'purchaseSkipConfirmed' : 'purchaseSaveConfirmed')) + '</p>' : '') +
     '<details class="purchase-certificate"><summary>' + esc(t('purchaseWhy')) + icon('arrow') + '</summary>' + certificateExplanation(result) + '</details>' +
-    '<details class="purchase-compare" ' + (comparing ? 'open' : '') + '><summary>' + esc(t('purchaseNoDuplicateTitle')) + '</summary><p>' + esc(t('purchaseNoDuplicateNote')) + '</p>' +
+    (session.demo==='minimum'?'<details class="purchase-compare" ' + (comparing ? 'open' : '') + '><summary>' + esc(t('purchaseNoDuplicateTitle')) + '</summary><p>' + esc(t('purchaseNoDuplicateNote')) + '</p>' +
     '<label>' + esc(t('purchaseChooseOwnPiece')) + '<select id="purchase-compare-item">' + wardrobe.items.map(item => '<option value="' + esc(item.id) + '" ' + (compared?.id === item.id ? 'selected' : '') + '>' + esc(item.name) + '</option>').join('') + '</select></label>' +
     (compared && candidate ? '<div class="purchase-compare-pair"><figure>' + savedImage('outerwear', candidate.id, candidate.label) + '<figcaption>' + esc(t('purchaseDesktopShop')) + '</figcaption></figure>' +
-      '<figure>' + itemPicture(compared) + '<figcaption>' + esc(t('purchaseDesktopOwn')) + '</figcaption></figure></div><button type="button" class="button button-outline full-width" data-purchase-equivalent="' + esc(compared.id) + '">' + esc(t('purchaseMarkEquivalent')) + '</button>' : '') + '</details></section>';
+      '<figure>' + itemPicture(compared) + '<figcaption>' + esc(t('purchaseDesktopOwn')) + '</figcaption></figure></div><button type="button" class="button button-outline full-width" data-purchase-equivalent="' + esc(compared.id) + '">' + esc(t('purchaseMarkEquivalent')) + '</button>' : '') + '</details>':'')+'</section>';
 }
 export function purchasePage(wardrobe: WardrobeState = initialState()): string {
-  return '<section class="page purchase-view" aria-labelledby="purchase-title"><header class="purchase-intro"><div><h1 id="purchase-title">' + esc(t('purchaseHeadline')) + '</h1><p>' + esc(t('purchaseSubheading')) + '</p></div>' +
+  return '<section class="page purchase-view '+(session.demo==='zero'?'purchase-zero-mode':'')+'" aria-labelledby="purchase-title"><header class="purchase-intro"><div><h1 id="purchase-title">' + esc(t('purchaseHeadline')) + '</h1><p>' + esc(t('purchaseSubheading')) + '</p></div>' +
     '<div class="purchase-import-actions"><button type="button" class="button button-primary" data-nav="gallery">' + icon('camera') + esc(t('purchaseAddPhoto')) + '</button>' +
     '<button type="button" class="text-link" data-nav="gallery">' + esc(t('purchasePasteLink')) + '</button></div></header>' +
+    '<div class="purchase-example-banner"><p>' + esc(t('purchaseExampleLabel')) + '</p><div class="purchase-demo-modes" role="group" aria-label="' + esc(t('purchaseChooseDemo')) + '">' +
+    (['minimum','zero'] as const).map(mode=>'<button type="button" data-purchase-demo="'+mode+'" aria-pressed="'+(mode===session.demo)+'">'+esc(t(mode==='minimum'?'purchaseMinimumDemo':'purchaseZeroDemo'))+'</button>').join('')+'</div></div>'+
     '<div class="purchase-layout">' + candidates() + previews() + verdict(wardrobe) + '</div>' +
     '<details class="purchase-demo-settings"><summary>' + esc(t('purchaseEvidenceDetails')) + '</summary><p>' + esc(t('purchaseDemoOnly')) + ' · ' + esc(t(session.ratingsOrigin === 'example' ? 'purchaseExampleRatings' : 'purchaseEditedRatings')) + '</p>' +
-    '<div class="purchase-demo-modes" role="group" aria-label="' + esc(t('purchaseChooseDemo')) + '">' + (['minimum', 'zero'] as const).map(mode =>
-      '<button type="button" data-purchase-demo="' + mode + '" aria-pressed="' + (mode === session.demo) + '">' + esc(t(mode === 'minimum' ? 'purchaseMinimumDemo' : 'purchaseZeroDemo')) + '</button>').join('') + '</div>' +
     '<button type="button" data-purchase-clear>' + esc(t('purchaseClearRatings')) + '</button><button type="button" data-purchase-replay>' + esc(t('purchaseReplayRatings')) + '</button><p>' +
     esc(t('purchaseNoStoreStock')) + '</p><p>' + esc(t('purchaseNoCheckout')) + '</p></details></section>';
 }
