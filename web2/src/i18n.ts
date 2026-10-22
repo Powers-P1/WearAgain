@@ -148,7 +148,7 @@ export const en = {
   purchaseExampleLabel: 'Example · sample wardrobe and preferences',
   purchaseExampleShirt: 'Example shirt',
   purchaseZeroPreviewTitle: 'What you already own in this example',
-  purchaseZeroPreviewNote: 'The example shirt and existing coat cover the stated work and rainy-day needs. This is a logic example with preset ratings, without matching saved previews.',
+  purchaseZeroPreviewNote: 'Owned pieces in a logic example with preset ratings. No matching saved previews are available. The verdict follows the current ratings.',
   purchaseNextPair: 'Next pairing',
   purchaseProgressLabel: 'Compare with your wardrobe',
   purchaseSelectedCandidate: 'The piece you are checking',
