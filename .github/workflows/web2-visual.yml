@@ -6,6 +6,7 @@ on:
       - 'web2/**'
       - 'scripts/build-web2.mjs'
       - 'tests/web2-*'
+      - 'tests/browser/web2-*.mjs'
       - '.github/workflows/web2-visual.yml'
   workflow_dispatch:
 
@@ -19,8 +20,8 @@ concurrency:
 jobs:
   snapshots:
     name: Chromium screenshots (mobile + desktop)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -32,15 +33,22 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run build:web2
       - name: Install pinned screenshot browser
-        run: npx --yes playwright@1.56.1 install --with-deps chromium
+        # The hosted Ubuntu 24.04 image already provides Chromium's runtime
+        # libraries. WearAgain ships its own WOFF2 fonts; install only the
+        # pinned browser, avoiding unrelated apt font/Xvfb upgrades.
+        run: npx --yes playwright@1.56.1 install chromium
       - name: Capture actual built screens
         shell: bash
         run: |
           python3 -m http.server 8788 --directory web2/dist >/tmp/wearagain-web2-http.log 2>&1 &
+          qa_server_pid=$!
+          trap 'kill "$qa_server_pid" 2>/dev/null || true' EXIT
           for attempt in $(seq 1 30); do
             if curl --fail --silent http://127.0.0.1:8788/ >/dev/null; then break; fi
             sleep 1
           done
+          npm run qa:web2
+          npm run qa:web2:states
           mkdir -p screenshots
           for viewport in '390 844' '1280 800'; do
             read -r width height <<<"$viewport"
@@ -56,7 +64,13 @@ jobs:
               'consumer-purchase|/app/#check' \
               'consumer-zero|/app/?scenario=zero#check' \
               'consumer-overview|/app/#overview' \
-              'consumer-stylist|/app/#stylist'; do
+              'consumer-stylist|/app/#stylist' \
+              'consumer-trip|/app/#trip' \
+              'consumer-surprise|/app/#surprise' \
+              'consumer-balance|/app/#balance' \
+              'consumer-gallery|/app/#gallery' \
+              'consumer-morning|/app/#morning' \
+              'consumer-saved|/app/#saved'; do
                 IFS='|' read -r name route <<<"$pair"
                 npx --yes playwright@1.56.1 screenshot \
                   --browser chromium --viewport-size "$width,$height" \
@@ -70,6 +84,13 @@ jobs:
       - name: Capture references and board comparisons (no image substitutions)
         shell: bash
         run: |
+          python3 -m http.server 8788 --directory web2/dist >/tmp/wearagain-web2-http.log 2>&1 &
+          qa_server_pid=$!
+          trap 'kill "$qa_server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8788/ >/dev/null; then break; fi
+            sleep 1
+          done
           npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "1280,800" --full-page --wait-for-timeout 1000 "https://wearagain.pages.dev/" screenshots/landing-live-v1-1280.png
           npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "390,844" --full-page --wait-for-timeout 1000 "https://wearagain.pages.dev/" screenshots/landing-live-v1-390.png
           cp docs/mockups/v2/WearAgain-05-Desktop-Szafa.png screenshots/board-05-reference.png
@@ -111,6 +132,9 @@ jobs:
         if: always()
         with:
           name: wearagain-web2-desktop-parity-review
-          path: screenshots/
+          path: |
+            screenshots/
+            test-results/web2/
+            test-results/web2-states/
           if-no-files-found: warn
           retention-days: 14

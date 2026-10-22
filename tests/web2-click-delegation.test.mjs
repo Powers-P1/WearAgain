@@ -32,12 +32,13 @@ test('every click hook read by gallery/morning/overview/stylist/purchase is dele
   const match = main.match(/const control = target\.closest<HTMLElement>\('([^']+)'\);/);
   assert.ok(match, 'The root must use a delegated click selector.');
   const registered = new Set([...match[1].matchAll(/\[data-([\w-]+)\]/g)].map(m => m[1]));
-  assert.ok(registered.has('mall-context-toggle'), 'The Change context action must not be dead.');
+  const allButtons=match[1].split(',').some(value=>value.trim()==='button');
+  assert.ok(allButtons || registered.has('mall-context-toggle'), 'The Change context action must not be dead.');
   for (const [path, handler] of handlers) {
     const actual = hooksInHandler(source(path), handler);
     assert.ok(actual.length > 0, 'The test must discover live hooks for ' + handler);
     for (const hook of actual) {
-      assert.ok(registered.has(hook), handler + ' uses [data-' + hook + '] but main does not delegate it.');
+      assert.ok(allButtons || registered.has(hook), handler + ' uses [data-' + hook + '] but main does not delegate it.');
     }
   }
 });

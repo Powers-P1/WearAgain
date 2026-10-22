@@ -5,6 +5,7 @@ import { build } from 'esbuild';
 
 let state;
 let i18n;
+let media;
 before(async () => {
   async function load(path) {
     const output = await build({
@@ -15,6 +16,22 @@ before(async () => {
   }
   state = await load('../web2/src/state.ts');
   i18n = await load('../web2/src/i18n.ts');
+  media = await load('../web2/src/ui.ts');
+});
+
+test('editorial look illustrations never stand in for personal or altered garments', () => {
+  const wardrobe=state.initialState(),ids=['blazer','recorded-work','trousers','loafers'];
+  assert.equal(media.illustrationFor(ids,wardrobe),'/assets/illustrations/classic.webp');
+  assert.equal(media.illustrationFor([...ids].reverse(),wardrobe),'/assets/illustrations/classic.webp');
+  assert.match(media.outfitVisual(ids,wardrobe),/Illustrative styling · demo model/);
+  for(const change of [{photoId:'own_photo'},{photo:'silk'},{name:'My different blazer'},{category:'accessories'},{detail:'Red linen'}]){
+    const changed={...wardrobe,items:wardrobe.items.map(item=>item.id==='blazer'?{...item,...change}:item)};
+    assert.equal(media.illustrationFor(ids,changed),null);
+    assert.doesNotMatch(media.outfitVisual(ids,changed),/assets\/illustrations/);
+  }
+  assert.equal(media.illustrationFor(ids.slice(1),wardrobe),null);
+  assert.equal(media.illustrationFor([...ids,'bag'],wardrobe),null);
+  assert.equal(media.illustrationFor(ids,{...wardrobe,items:wardrobe.items.filter(item=>item.id!=='trousers')}),null);
 });
 
 test('English is default, with a catalogue and fallback for future Polish locale', () => {

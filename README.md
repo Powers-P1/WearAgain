@@ -8,7 +8,7 @@ Built for the YouCam API Skin AI & eCommerce VTO Hackathon. The planned AI Styli
 
 PR1 provides the exhaustive minimum-basket solver and certificate. PR2 adds per-element image state, revision-bound pair ratings, conservative selection of the next useful pair, requirement provenance, explicit wardrobe scoring/UNKNOWN, and pure typed tool contracts. PR3 adds the YouCam client, Worker routes and a SQLite Durable Object ledger with reservations, idempotency, daily limits and background reconciliation. Tests and CI require no key or provider calls.
 
-`web/` now supplies shopper and retailer landings, the five-screen decision app, guided tour, avatar selection and a demo PWA. Build it with `npm run build:web` into `web/dist`, then use `npm run dev:web` for local preview. PR4b adds AI Stylist; PR5 is the release handoff. The current demo is an explicitly synthetic solver walkthrough because saved YouCam recordings have not yet been supplied. Live mode uses the existing Worker and its configured ledger limits. See [docs/FRONTEND.md](docs/FRONTEND.md), [docs/API.md](docs/API.md) and [docs/DEPLOY.md](docs/DEPLOY.md).
+`web/` preserves the previous frontend. The redesigned mobile app and desktop wardrobe centre are in [`web2/`](web2/README.md), built to `web2/dist`; the consumer landing intentionally keeps its previous design. Six immutable single-garment YouCam recordings and a captioned walkthrough are included. Gallery live previews use the existing Worker and configured ledger after explicit opt-in; occasion/morning styling uses verified demo recipes. See [current UI scope](docs/UX_V2_GAPS.md), [Worker API](docs/API.md) and [release handoff](docs/DEPLOY_SWITCH_WEB2.md).
 
 ## Run locally
 

@@ -3,20 +3,14 @@ import test from 'node:test';
 import {readFile} from 'node:fs/promises';
 const get=p=>readFile(new URL('../'+p,import.meta.url),'utf8');
 
-test('desktop board 08 keeps three explicitly separate columns and mobile original',async()=>{
+test('purchase reuses one responsive surface with three desktop regions',async()=>{
  const [ui,css]=await Promise.all([get('web2/src/purchase-ui.ts'),get('web2/src/purchase.css')]);
- assert.match(ui,/purchase-desktop-layout/);
- assert.match(ui,/candidateButtons\('mobile'\) \+ previewColumn\(\) \+ verdictColumn\(\)/);
- assert.match(ui,/candidateButtons\('desktop'\) \+ desktopPreview\(\) \+ desktopVerdict\(\)/);
- assert.match(ui,/purchase-model-stage/);
- assert.match(ui,/purchase-model-actions/);
- assert.match(ui,/purchase-desktop-products/);
- assert.match(ui,/purchase-desktop-meta/);
- assert.match(ui,/certificateExplanation\(result\)/);
- assert.match(css,/@media\(min-width:801px\)/);
- assert.match(css,/purchase-desktop-layout\{display:grid;\s*grid-template-columns:/);
- assert.match(css,/@media\(max-width:800px\)\{\.purchase-desktop-layout,\.purchase-desktop-meta\{display:none\}\}/);
+ assert.match(ui,/candidates\(\) \+ previews\(\) \+ verdict\(wardrobe\)/);
+ assert.match(css,/grid-template-columns:minmax\(170px/);
+ assert.match(css,/@media\(max-width:800px\)/);
+ assert.match(css,/\.purchase-layout\{display:flex;flex-direction:column/);
 });
+
 test('v1 landing source imagery, copy and static CSS crops are preserved without inline styles',async()=>{
  const [src,css,build,headers,marketing]=await Promise.all([
   get('web2/src/landing-v1.ts'),get('web2/src/landing-v1.css'),

@@ -1,5 +1,5 @@
 /*
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' blob: data:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; frame-src 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' blob: data:; connect-src 'self' blob: __API_ORIGIN__; media-src 'self' blob:; worker-src 'self'; manifest-src 'self'; frame-src 'none'; upgrade-insecure-requests
   Permissions-Policy: camera=(self), microphone=(self), geolocation=()
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin

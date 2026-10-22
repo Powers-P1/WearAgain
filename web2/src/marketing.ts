@@ -22,16 +22,14 @@ const modelImage=(path:string,alt:string,extraClass='')=>
   '<img class="'+extraClass+'" src="'+escapeHtml(path)+'" alt="'+escapeHtml(alt)+'" loading="lazy" />';
 const link=(href:string,label:string,cls='mkt-text-link')=>
   '<a class="'+cls+'" href="'+escapeHtml(href)+'">'+escapeHtml(label)+'</a>';
-const illustrated=(path:string,title:string,short=false)=>
-  '<figure class="mkt-photo'+(short?' mkt-photo-short':'')+'">'+
-  modelImage(path,title,'mkt-photo-img')+
-  '<figcaption>'+h('mktOneGarment')+'</figcaption></figure>';
 const wardrobePhoto=(name:string,alt:string)=>
   '<img src="/assets/items/'+escapeHtml(name)+'.webp" alt="'+escapeHtml(alt)+'" loading="lazy" />';
+const artwork=(path:string,alt:string)=>'<figure class="mkt-photo mkt-artwork">'+modelImage(path,alt,'mkt-photo-img')+'<figcaption>'+h('mktIllustration')+'</figcaption></figure>';
+const shopProduct=()=>({label:t('mktIllustrativeCoat'),priceMinor:32000,currency:'EUR',imagePath:'/assets/retail-product.webp',stylingPath:'/assets/retail-styling.webp'});
 function siteHeader(active:'home'|'retail'|'judges'):string{
   return '<header class="mkt-header"><a class="mkt-logo" href="/" aria-label="'+h('mktHomeNav')+'">WearAgain</a>'+
     '<nav class="mkt-site-nav" aria-label="'+h('mktMenu')+'">'+
-    link('/#how',h('mktHow'),'mkt-header-link')+
+    link('/#how-it-works',h('mktHow'),'mkt-header-link')+
     link('/retail/',h('mktRetail'),'mkt-header-link'+(active==='retail'?' is-active':''))+
     link('/judges/',h('mktJudgesStart'),'mkt-judge-link'+(active==='judges'?' is-active':''))+
     link('/app/',h('mktExplore'),'mkt-header-cta')+
@@ -44,39 +42,8 @@ function footer():string{
     link('/judges/',h('mktFooterDocs'))+'</nav></div>'+
     '<p>'+h('mktFooterPrivacyDescription')+'</p><small>'+h('mktFooterRights')+'</small></footer>';
 }
-export function unusedBoard13Landing():string{
-  const recorded=demoEvidence();
-  return '<div class="mkt-site mkt-consumer">'+siteHeader('home')+
-    '<main id="main-content" tabindex="-1">'+
-    '<section class="mkt-hero"><div class="mkt-hero-copy">'+
-    '<h1>'+h('mktYourWardrobe').replace('more you.','<em>more you.</em>')+'</h1>'+
-    '<p>'+h('mktHeroSubtitle')+'</p>'+
-    link('/app/',h('mktHeroCTA'),'mkt-button mkt-button-dark')+
-    '<small>'+h('mktHeroNote')+'</small></div>'+
-    '<div class="mkt-hero-art">'+illustrated(recorded.top.imagePath,h('mktEditorial'))+
-    '<div class="mkt-floating-card"><span>WearAgain</span><strong>'+h('overviewFromYourWardrobe')+'</strong>'+
-    '<div class="mkt-floating-items">'+wardrobePhoto('blazer','Navy blazer')+
-    wardrobePhoto('trousers','Wool trousers')+wardrobePhoto('loafers','Leather loafers')+'</div>'+
-    link('/app/#morning',h('mktMorningCTA'),'mkt-floating-cta')+'</div></div></section>'+
-    '<section class="mkt-story mkt-morning-story" id="how"><div class="mkt-triptych">'+
-    illustrated(recorded.top.imagePath,h('mktOneGarment'),true)+
-    illustrated('/demo/renders/top-weekend-woman-neutral-01.jpg',h('mktOneGarment'),true)+
-    illustrated('/demo/renders/top-evening-woman-neutral-01.jpg',h('mktOneGarment'),true)+'</div>'+
-    '<div class="mkt-story-copy"><h2>'+h('mktMorningHeading')+'</h2>'+
-    '<blockquote>'+h('mktMorningQuote')+'</blockquote><p>'+h('mktMorningBody')+'</p>'+
-    link('/app/#morning',h('mktMorningCTA'))+'</div></section>'+
-    '<section class="mkt-dark-story"><div><h2>'+h('mktMallHeading')+'</h2>'+
-    '<p>'+h('mktMallBody')+'</p>'+link('/app/#gallery',h('mktMallCTA'))+
-    '<small>'+h('mktMallFootnote')+'</small></div>'+
-    '<div class="mkt-dark-photo">'+illustrated('/demo/renders/outerwear-cheap-a-woman-neutral-01.jpg',h('mktOneGarment'))+
-    '<div class="mkt-small-finds">'+wardrobePhoto('coat','Sample coat')+
-    wardrobePhoto('blazer','Sample blazer')+wardrobePhoto('silk','Sample blouse')+'</div></div></section>'+
-    '<section class="mkt-last-story"><h2>'+h('mktCareHeading')+'</h2><div><p>'+h('mktCareBody')+'</p>'+
-    link('/app/#overview',h('mktCareCTA'))+'</div></section>'+
-    '<div class="mkt-privacy-line">'+h('mktCarePrivacy')+'</div></main>'+footer()+'</div>';
-}
 function retailLanding():string{
-  const candidate=retailExample();
+  const candidate=shopProduct();
   return '<div class="mkt-site mkt-retail">'+siteHeader('retail')+
     '<main id="main-content" tabindex="-1">'+
     '<section class="mkt-hero mkt-retail-hero"><div class="mkt-hero-copy">'+
@@ -86,13 +53,12 @@ function retailLanding():string{
     link('/retail/demo/',h('mktRetailPrimary'),'mkt-button mkt-button-dark')+
     link('/retail/#pilot',h('mktRetailSecondary'),'mkt-secondary-action')+
     '<small>'+h('mktRetailFictional')+'</small></div>'+
-    '<div class="mkt-hero-art">'+illustrated(candidate.imagePath,candidate.label)+
-    '<div class="mkt-floating-card"><strong>'+h('mktRetailDemoOpenPanel')+'</strong>'+
-    '<span>'+escapeHtml(candidate.label)+'</span>'+
-    link('/retail/demo/',h('mktRetailPrimary'),'mkt-floating-cta')+'</div></div></section>'+
-    '<section class="mkt-retail-context"><div class="mkt-retail-samples">'+
-    wardrobePhoto('cashmere','Cream sweater')+wardrobePhoto('trousers','Beige trousers')+
-    wardrobePhoto('loafers','Brown loafers')+'</div>'+
+    '<div class="mkt-hero-art">'+artwork('/assets/editorial-retail.webp',candidate.label)+
+    '<div class="mkt-floating-card mkt-floating-product">'+modelImage(candidate.imagePath,candidate.label)+'<div><strong>'+escapeHtml(candidate.label)+'</strong>'+
+    link('/retail/demo/',h('mktRetailDemoOpenPanel'),'mkt-floating-cta')+'</div></div></section>'+
+    '<section class="mkt-retail-context"><a href="/retail/demo/" class="mkt-retail-window"><span>DEMO ATELIER</span><div class="mkt-retail-window-grid">'+
+    modelImage(candidate.imagePath,candidate.label)+'<div><h3>'+escapeHtml(candidate.label)+'</h3><p>'+escapeHtml(money(candidate.priceMinor,candidate.currency))+'</p><strong>'+h('mktRetailDemoOpenPanel')+'</strong><div class="mkt-retail-window-items">'+
+    wardrobePhoto('cashmere','Cream sweater')+wardrobePhoto('trousers','Beige trousers')+wardrobePhoto('loafers','Brown loafers')+'</div><span class="mkt-floating-cta">'+h('mktRetailPrimary')+'</span></div></div></a>'+
     '<div><h2>'+h('mktRetailSectionHeading')+'</h2>'+
     '<ul><li>'+h('mktRetailLine1')+'</li><li>'+h('mktRetailLine2')+'</li>'+
     '<li>'+h('mktRetailLine3')+'</li></ul><p>'+h('mktRetailContextNote')+'</p>'+
@@ -109,8 +75,8 @@ function retailLanding():string{
     '<p>'+h('mktRetailFooterText')+'</p></section></main>'+footer()+'</div>';
 }
 function retailerProduct():string{
-  const candidate=retailExample();
-  const owned=sampleWardrobe().filter(item=>['recorded-work','trousers','loafers'].includes(item.id));
+  const candidate=shopProduct();
+  const owned=sampleWardrobe().filter(item=>['cashmere','trousers','loafers'].includes(item.id));
   const selectedSizes=['XS','S','M','L','XL'].map(size=>
     '<button type="button" data-retail-size="'+size+'" class="'+(retailSize===size?'selected':'')+
     '" aria-pressed="'+(retailSize===size)+'">'+size+'</button>').join('');
@@ -125,19 +91,19 @@ function retailerProduct():string{
     '<section class="mkt-product-details"><p class="mkt-eyebrow">'+h('mktRetailFictional')+'</p>'+
     '<h1>'+escapeHtml(candidate.label)+'</h1><strong class="mkt-product-price">'+escapeHtml(money(candidate.priceMinor,candidate.currency))+'</strong>'+
     '<p class="mkt-small-muted">'+h('mktRetailDemoPrice')+'</p>'+
+    '<button type="button" class="mkt-outline-button mkt-product-wardrobe-action" data-retail-panel-toggle data-retail-panel-open aria-expanded="'+openRetailPanel+'">'+h('mktRetailDemoOpenPanel')+' →</button>'+
     '<div class="mkt-product-rule"></div><p>'+h('mktRetailDemoColour')+'</p>'+
     '<div class="mkt-colour-swatch" aria-hidden="true"></div><h2>'+h('mktRetailDemoSize')+'</h2>'+
     '<div class="mkt-size-options" role="group" aria-label="'+h('mktRetailDemoSize')+'">'+selectedSizes+'</div>'+
     '<p class="mkt-small-muted">'+h('mktRetailDemoSizeGuide')+'</p>'+
     '<button type="button" class="mkt-button mkt-button-disabled" disabled title="'+h('mktRetailDemoCart')+'">'+h('mktRetailDemoCart')+'</button>'+
-    '<div class="mkt-product-rule"></div><button type="button" class="mkt-outline-button" data-retail-panel-toggle aria-expanded="'+openRetailPanel+'">'+
-    h('mktRetailDemoOpenPanel')+' →</button>'+
+    '<div class="mkt-product-rule"></div>'+
     '<p class="mkt-small-muted">'+h('mktRetailDemoNotIntegrated')+'</p></section>'+
     (openRetailPanel?'<aside class="mkt-retail-panel"><div class="mkt-panel-heading"><span>WearAgain</span>'+
       '<button type="button" data-retail-panel-toggle aria-label="'+h('mktRetailDemoClosePanel')+'">×</button></div>'+
       '<h2>'+h('mktRetailDemoPanelTitle')+'</h2><p>'+h('mktRetailDemoPanelSubtitle')+'</p>'+
-      '<figure class="mkt-panel-hero">'+modelImage(candidate.imagePath,h('mktOneGarment'))+
-      '<figcaption>'+h('mktOneGarment')+'</figcaption></figure>'+
+      '<figure class="mkt-panel-hero">'+modelImage(candidate.stylingPath,h('mktIllustration'))+
+      '<figcaption>'+h('mktIllustration')+'</figcaption></figure>'+
       '<p class="mkt-small-muted">'+h('mktRetailDemoImageNote')+'</p>'+
       '<h3>'+h('mktRetailDemoOwnItems')+'</h3><div class="mkt-panel-items">'+owned.map(item=>
         '<figure>'+modelImage(item.photo?'/assets/items/'+item.photo+'.webp':
@@ -161,7 +127,6 @@ function judgeDisclosures():string{
     '</div></section>';
 }
 function judgesLanding():string{
-  const evidence=demoEvidence();
   const segments=[
     ['01','mktJudgesMoment1','mktJudgesMoment1Note','/app/#wardrobe','cashmere'],
     ['02','mktJudgesMoment2','mktJudgesMoment2Note','/judges/demo/','coat'],
@@ -174,11 +139,12 @@ function judgesLanding():string{
     '<h1>'+h('mktJudgesHero1')+'<em>'+h('mktJudgesHero2')+'</em></h1>'+
     '<p>'+h('mktJudgesHeroBody')+'</p><p class="mkt-judges-role">'+h('mktJudgesHeroRoles')+'</p>'+
     link('/judges/demo/',h('mktJudgesPrimary'),'mkt-button mkt-button-dark')+
+    link('#walkthrough',h('mktJudgesWatch'),'mkt-secondary-action')+
     '<div class="mkt-evidence-links">'+link(CODE,h('mktJudgesCode'))+
     link(SETUP,h('mktJudgesTests'))+'</div>'+
     '<small>'+h('mktJudgesSample')+'</small></div>'+
-    '<div class="mkt-hero-art">'+illustrated(evidence.candidate.imagePath,h('mktOneGarment'))+
-    '<div class="mkt-judges-mini-wardrobe">'+wardrobePhoto('cashmere','Cashmere sweater')+
+    '<div class="mkt-hero-art">'+artwork('/assets/editorial-judges.webp',h('mktIllustration'))+
+    '<div class="mkt-judges-mini-wardrobe">'+wardrobePhoto('coat','Camel coat')+wardrobePhoto('cashmere','Cashmere sweater')+
     wardrobePhoto('trousers','Wool trousers')+wardrobePhoto('loafers','Leather loafers')+'</div></div></section>'+
     '<section class="mkt-moments"><h2>'+h('mktJudgesMoments')+'</h2><div>'+segments.map(([n,title,desc,url,img])=>
       '<a href="'+url+'" class="mkt-moment"><span>'+n+' / '+h(title)+'</span>'+
@@ -191,7 +157,7 @@ function judgesLanding():string{
     '<p><strong>WearAgain</strong> · '+h('mktJudgesWearAgainRole')+'</p></div>'+
     '<small>'+h('mktJudgesNotComposited')+'</small>'+
     link(API,h('mktJudgeSeeApi'))+'</section>'+
-    judgeDisclosures()+
+    '<details class="mkt-landing-limits"><summary>'+h('mktJudgeDisclosureSection')+'</summary>'+judgeDisclosures()+'</details>'+
     '<section class="mkt-review-index"><h2>'+h('mktJudgesEvidenceHeading')+'</h2>'+
     ([
       ['mktJudgesEvidenceTech','mktJudgesEvidenceTechBody',API],
@@ -201,11 +167,11 @@ function judgesLanding():string{
     ] as const).map(([title,desc,url])=>
       '<a href="'+url+'" class="mkt-index-row"><strong>'+h(title)+'</strong>'+
       '<span>'+h(desc)+'</span><b>↗</b></a>').join('')+
-    '<div class="mkt-video-status"><strong>'+h('mktJudgesVideo')+'</strong><p>'+h('mktJudgesVideoPending')+'</p></div>'+
+    '<section class="mkt-walkthrough" id="walkthrough"><h2>'+h('mktJudgesVideo')+'</h2><p>'+h('mktJudgesVideoDescription')+'</p><video controls playsinline preload="metadata" poster="/assets/editorial-judges.webp" aria-label="'+h('mktJudgesVideo')+'"><source src="/video/wearagain-demo.webm" type="video/webm" /><track kind="captions" src="/video/wearagain-demo.en.vtt" srclang="en" label="English" default /></video><p>'+link('/video/transcript.txt',h('mktJudgesTranscript'))+'</p></section>'+
     '<p>'+h('mktJudgesFootnote')+'</p></section></main>'+footer()+'</div>';
 }
 function stepper():string{
-  return '<nav class="mkt-judge-steps" aria-label="'+h('mktJudgeProgress',{index:3})+'">'+
+  return '<nav class="mkt-judge-steps" aria-label="'+h('mktJudgeProgress',{index:1+(['wardrobe','preview','verdict'] as const).indexOf(step)})+'">'+
     ([['wardrobe','mktJudgeStep1'],['preview','mktJudgeStep2'],['verdict','mktJudgeStep3']] as const)
       .map(([id,label],i)=>'<button type="button" data-guide-step="'+id+'" aria-current="'+(step===id?'step':'false')+'">'+
         '<span>'+String(i+1).padStart(2,'0')+'</span>'+h(label)+'</button>').join('')+'</nav>';
@@ -225,13 +191,13 @@ function wardrobeStep():string{
 function previewStep():string{
   const evidence=demoEvidence(),product=retailExample();
   return '<div class="mkt-judge-workflow-grid"><section class="mkt-judge-preview-grid">'+
-    '<figure><span class="mkt-eyebrow">'+h('mktJudgeCandidateLabel')+'</span>'+
+    '<figure><span class="mkt-eyebrow">'+h('mktRecordedShopPiece')+'</span>'+
     modelImage(product.imagePath,product.label)+
     '<figcaption>'+escapeHtml(product.label)+'</figcaption></figure>'+
-    '<figure><span class="mkt-eyebrow">'+h('mktJudgeSavedTitle')+'</span>'+
+    '<figure><span class="mkt-eyebrow">'+h('mktRecordedOwnedPiece')+'</span>'+
     modelImage(evidence.top.imagePath,h('mktJudgeSavedBody'))+
     '<figcaption>'+h('mktJudgeOwnLabel')+' · '+h('purchaseWorkTop')+'</figcaption></figure>'+
-    '</section><aside class="mkt-judge-context"><h3>'+h('mktJudgeTechnicalTitle')+'</h3>'+
+    '</section><aside class="mkt-judge-context"><h3>'+h('mktGuideSimpleTitle')+'</h3><p>'+h('mktGuideSimpleBody')+'</p><details class="mkt-api-evidence"><summary>'+h('mktEvidenceDetails')+'</summary>'+
     '<dl><div><dt>'+h('mktJudgeInputReference')+'</dt><dd>'+
     escapeHtml(evidence.candidateElement.kind+':'+evidence.candidateElement.id)+'</dd></div>'+
     '<div><dt>'+h('mktJudgeAvatarReference')+'</dt><dd>'+
@@ -240,7 +206,7 @@ function previewStep():string{
     '<dd>'+h('mktJudgeSavedTitle')+'</dd></div></dl>'+
     '<p>'+h('mktJudgeSavedBody')+'</p><p>'+h('mktJudgeRecordedOn',{date:evidence.candidate.recordedAt.slice(0,10)})+'</p>'+
     '<p class="mkt-small-muted">'+h('mktJudgeStep2Body')+'</p>'+
-    link(API,h('mktJudgeSeeApi'))+'</aside></div>';
+    link(API,h('mktJudgeSeeApi'))+'</details></aside></div>';
 }
 function verdictStep():string{
   const evaluated=coreDecision(mode),result=evaluated.result;
@@ -282,22 +248,21 @@ function guidedDemo():string{
   const next=pageIndex<3?(['wardrobe','preview','verdict'] as const)[pageIndex]:null;
   const prev=pageIndex>1?(['wardrobe','preview','verdict'] as const)[pageIndex-2]:null;
   return '<div class="mkt-site mkt-guided">'+siteHeader('judges')+
-    '<main id="main-content" tabindex="-1"><div class="mkt-guide-top">'+
-    '<span>'+h('mktJudgeNoAccount')+'</span><nav>'+link(CODE,h('mktJudgesCode'))+
-    link(SETUP,h('mktJudgesTests'))+'</nav></div>'+stepper()+
+    '<main id="main-content" tabindex="-1">'+stepper()+
     '<header class="mkt-guide-heading"><div><p class="mkt-eyebrow">'+h('mktJudgeProgress',{index:pageIndex})+'</p>'+
     '<h1>'+h('mktJudgeDemoTitle')+'</h1><p>'+h('mktJudgeDemoSubtitle')+'</p></div>'+
     link('/judges/',h('mktJudgesNav'))+'</header>'+
     (step==='wardrobe'?wardrobeStep():step==='preview'?previewStep():verdictStep())+
-    judgeDisclosures()+
     '<div class="mkt-guide-actions">'+(prev?'<button type="button" data-guide-step="'+prev+
       '" class="mkt-outline-button">'+h('mktJudgeBack')+'</button>':'<span></span>')+
       (next?'<button type="button" class="mkt-button mkt-button-dark" data-guide-step="'+next+'">'+
       h('mktJudgeNext',{title:t(next==='preview'?'mktJudgeStep2':'mktJudgeStep3')})+'</button>':
       link('/app/#check',h('mktJudgeGoApp'),'mkt-button mkt-button-dark'))+'</div>'+
+    '<div class="mkt-guide-top"><span>'+h('mktJudgeNoAccount')+'</span><nav>'+link(CODE,h('mktJudgesCode'))+link(SETUP,h('mktJudgesTests'))+'</nav></div>'+
+    '<details class="mkt-guide-limits"><summary>'+h('mktJudgeDisclosureSection')+'</summary>'+judgeDisclosures()+'</details>'+
     '<p class="mkt-guided-note">'+h('mktJudgeLiveSeparate')+' '+
     link(API,h('mktJudgeSeeApi'))+'</p>'+
-    '<p class="mkt-guided-note">'+h('mktJudgesVideoPending')+'</p>'+
+    '<p class="mkt-guided-note">'+link('/judges/#walkthrough',h('mktJudgesWatch'))+'</p>'+
     '</main>'+footer()+'</div>';
 }
 export function marketingPage(route:MarketingRoute):string {
@@ -319,12 +284,21 @@ export function marketingTitle(route:MarketingRoute):string {
 }
 export function handleMarketingClick(target:HTMLElement,rerender:()=>void):boolean{
   if(target.dataset.guideStep){
-    step=demoStep(target.dataset.guideStep);rerender();return true;
+    step=demoStep(target.dataset.guideStep);
+    if(typeof window!=='undefined')window.history.replaceState(null,'','?step='+step);
+    rerender();
+    if(typeof window!=='undefined')window.scrollTo({top:0,behavior:'instant'});
+    const title=typeof document==='undefined'?null:document.querySelector<HTMLElement>('.mkt-guide-heading h1');if(title){title.setAttribute('tabindex','-1');title.focus({preventScroll:true});}
+    return true;
   }
   if(target.dataset.judgeMode){
     if(target.dataset.judgeMode==='minimum'||target.dataset.judgeMode==='zero'){
       mode=target.dataset.judgeMode;rerender();return true;
     }
+  }
+  if(target.hasAttribute('data-retail-panel-open')){
+    openRetailPanel=true;rerender();
+    const panel=document.querySelector<HTMLElement>('.mkt-retail-panel');if(panel){panel.scrollIntoView({behavior:'instant',block:'start'});panel.setAttribute('tabindex','-1');panel.focus({preventScroll:true});}return true;
   }
   if(target.hasAttribute('data-retail-panel-toggle')){openRetailPanel=!openRetailPanel;rerender();return true;}
   if(target.dataset.retailSize&&['XS','S','M','L','XL'].includes(target.dataset.retailSize)){

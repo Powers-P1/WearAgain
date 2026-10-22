@@ -1,6 +1,6 @@
 # Mockups v2 (21 Oct 2026): the visual and UX reference for the front-end rebuild
 
-Decision (Damian, 21 Oct): the current web app is replaced by a new front end built from scratch that reproduces these boards faithfully ("to be reproduced exactly; small errors in the boards are possible, but this is how it must look"). Mobile is the primary product; desktop is the wardrobe control centre; the landing is board 13. The core (solver, certificate), the Worker API, the recordings manifest and the avatars stay.
+Decision (Damian, 21 Oct; clarified 22 Oct): the app follows these boards, with mobile as the primary product and desktop as the wardrobe control centre. **The consumer landing keeps the previous v1 version by explicit owner decision; board 13 is superseded.** The core solver, certificate, Worker accounting, recordings manifest and approved avatars remain the integration contract. Current implementation decisions and honest exceptions are in `docs/UX_V2_GAPS.md`.
 
 Files: `WearAgain-NN-*.png` (1536x1024 boards; mobile boards show three 390-wide phone screens each), `WearAgain-prompty-v2.txt` (the exact copy and layout of every screen, in Polish; use the UI texts verbatim), `WearAgain-zalozenia-UX-v2.txt` (ten UX decisions; binding), `WearAgain-prompty.txt` (earlier prompts, context only).
 
