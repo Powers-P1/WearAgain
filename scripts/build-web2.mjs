@@ -64,6 +64,9 @@ const output = await build({
   bundle: true, minify: true, metafile: true,
   outdir: join(dest, 'assets'), entryNames: 'web2-[hash]',
   format: 'esm', platform: 'browser', target: ['es2022'],
+  // Absolute URLs resolve from the Pages origin; the licensed WOFF2 files
+  // are copied into /fonts/ above, not bundled as JS dependencies.
+  external: ['/fonts/*'],
   logLevel: 'warning',
 });
 const emitted = Object.keys(output.metafile.outputs).map(path => '/' + path.replaceAll('\\', '/').split('web2/dist/').at(-1));
