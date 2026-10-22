@@ -1,0 +1,92 @@
+{
+  "startedAt": "2026-10-22T20:20:10.318Z",
+  "front": "https://wearagain.pages.dev/app/#gallery",
+  "api": "https://wearagain-api.oli-struska.workers.dev",
+  "originalRenderPosts": 1,
+  "recoveryRenderPosts": 0,
+  "originalRecord": {
+    "render_key": "78ae8a091d817a45c1bf769872e82bee8498cd03898ee79cf538ab7d6eefec35",
+    "status": "succeeded",
+    "units": 2,
+    "created_at": 1792700192408,
+    "settled_at": 1792700212521
+  },
+  "note": "Original live UI submission completed and charged2. Evidence listener crashed on CORS preflight body. Read-only recovery restores the same completed task/session to verify Worker image decoding and the production gallery; no additional render request.",
+  "record": {
+    "mode": "live",
+    "renderKey": "78ae8a091d817a45c1bf769872e82bee8498cd03898ee79cf538ab7d6eefec35",
+    "status": "succeeded",
+    "accounting": "charged",
+    "reservedUnits": 0,
+    "chargedUnits": 2,
+    "reason": null,
+    "requiresReconciliation": false,
+    "assetId": "youcam:78ae8a091d817a45c1bf769872e82bee8498cd03898ee79cf538ab7d6eefec35",
+    "imageUrl": "/api/renders/78ae8a091d817a45c1bf769872e82bee8498cd03898ee79cf538ab7d6eefec35/image",
+    "statusUrl": "/api/renders/78ae8a091d817a45c1bf769872e82bee8498cd03898ee79cf538ab7d6eefec35",
+    "imageRequiresDownload": true,
+    "budget": {
+      "utcDay": "2026-10-22",
+      "unitsPerRender": 2,
+      "total": {
+        "limitUnits": 440,
+        "spentUnits": 6,
+        "reservedUnits": 4,
+        "remainingUnits": 430
+      },
+      "daily": {
+        "limitUnits": 240,
+        "spentUnits": 2,
+        "reservedUnits": 4,
+        "remainingUnits": 234
+      },
+      "sessionDaily": {
+        "limitUnits": 40,
+        "spentUnits": 2,
+        "reservedUnits": 0,
+        "remainingUnits": 38
+      }
+    }
+  },
+  "decoded": {
+    "width": 1024,
+    "height": 1536
+  },
+  "itemId": "photo_mvjzjdry_wj441ywv",
+  "image": {
+    "http": 200,
+    "type": "image/jpeg",
+    "bytes": 276145,
+    "sha256": "f7489afb73a068fd0aebacebc71d006e14f209dd8b289380a1b5b79d41316d2b"
+  },
+  "ledger": {
+    "utcDay": "2026-10-22",
+    "unitsPerRender": 2,
+    "total": {
+      "limitUnits": 440,
+      "spentUnits": 6,
+      "reservedUnits": 4,
+      "remainingUnits": 430
+    },
+    "daily": {
+      "limitUnits": 240,
+      "spentUnits": 2,
+      "reservedUnits": 4,
+      "remainingUnits": 234
+    },
+    "sessionDaily": {
+      "limitUnits": 40,
+      "spentUnits": 2,
+      "reservedUnits": 0,
+      "remainingUnits": 38
+    }
+  },
+  "productionGallery": {
+    "width": 1024,
+    "height": 1536,
+    "blob": true
+  },
+  "finishedAt": "2026-10-22T20:20:12.91Z",
+  "workerVersion": "69a3d986-989b-4825-913e-898484110ab4",
+  "frontDeployment": "3ed2e330-2eea-41b5-ae96-541c5c89a5c2"
+}
