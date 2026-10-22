@@ -380,7 +380,7 @@ root.addEventListener('input', event => {
 });
 root.addEventListener('change', event => {
   const target=event.target;
-  if(target instanceof HTMLInputElement && handleOverviewMonthChange(target)){render();return;}
+  if(target instanceof HTMLSelectElement && handleOverviewMonthChange(target)){render();return;}
   if(target instanceof HTMLInputElement && handleGalleryFile(target,{storage,rerender:render,notice:value=>{message=value;},focus:focusAfterRender}))return;
 });
 root.addEventListener('submit', event => {

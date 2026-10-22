@@ -144,7 +144,7 @@
   .purchase-desktop-layout .purchase-section-head{margin:0 0 12px}
   .purchase-desktop-layout .purchase-section-head h2,
   .purchase-model-topbar h2{font-family:var(--serif);font-weight:400;font-size:29px;line-height:1.03}
-  .purchase-desktop-layout .purchase-section-head p{font-size:11px;line-height:1.4;margin-top:7px}
+  .purchase-desktop-layout .purchase-section-head p{font-size:12px;line-height:1.4;margin-top:7px}
   .purchase-desktop-layout .purchase-candidate-list{display:flex;flex-direction:column;gap:0}
   .purchase-desktop-layout .purchase-candidate{
     display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;
@@ -158,13 +158,13 @@
     background:var(--stone);clip-path:none;overflow:hidden}
   .purchase-desktop-layout .purchase-neutral-name{
     display:flex;justify-content:center;align-items:center;text-align:center;
-    padding:4px;color:var(--olive);font-size:10px;line-height:1.25;
+    padding:4px;color:var(--olive);font-size:12px;line-height:1.25;
     border:1px solid var(--line)}
   .purchase-desktop-layout .purchase-candidate-info{min-width:0}
   .purchase-desktop-layout .purchase-candidate-info strong{
     display:block;font-size:13px;line-height:1.25;font-weight:600;margin:0 0 6px}
   .purchase-desktop-layout .purchase-candidate-info small{
-    display:block;color:var(--muted);font-size:11px;line-height:1.28;
+    display:block;color:var(--muted);font-size:12px;line-height:1.28;
     white-space:normal;overflow-wrap:break-word;margin:0}
   .purchase-desktop-layout .purchase-candidate-pager{display:none}
   .purchase-add-item{border:0;border-top:1px solid var(--line);background:transparent;
@@ -184,8 +184,8 @@
   .purchase-model-stage img{display:block;width:100%;height:100%;
     object-fit:cover;object-position:50% 23%}
   .purchase-model-stamp{position:absolute;bottom:9px;left:9px;padding:4px 6px;
-    background:#faf8f2e8;color:var(--olive);font-size:10px;line-height:1.3}
-  .purchase-model-caption{font-size:11px;color:var(--muted);text-align:left;margin:7px 0 10px}
+    background:#faf8f2e8;color:var(--olive);font-size:12px;line-height:1.3}
+  .purchase-model-caption{font-size:12px;color:var(--muted);text-align:left;margin:7px 0 10px}
   .purchase-model-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .purchase-model-actions button{display:flex;align-items:center;justify-content:center;gap:8px;
     min-width:0;min-height:43px;background:transparent;
@@ -193,13 +193,13 @@
   .purchase-model-actions button:first-child{background:var(--olive);color:var(--ivory)}
   .purchase-model-actions button[aria-pressed=true]{outline:2px solid #79836c;outline-offset:1px}
   .purchase-model-actions button:disabled{opacity:.5;cursor:not-allowed}
-  .purchase-model-honesty{font-size:11px;line-height:1.4;color:var(--muted);
+  .purchase-model-honesty{font-size:12px;line-height:1.4;color:var(--muted);
     text-align:center;margin-top:9px}
 
   .purchase-desktop-verdict h2{font-size:clamp(38px,3.65vw,55px);
     line-height:.96;letter-spacing:-.02em;margin:0;max-width:100%}
   .purchase-desktop-verdict h2 span{display:block}
-  .purchase-desktop-reason{font-size:12px;line-height:1.4;margin:11px 0 16px}
+  .purchase-desktop-reason{font-size:13px;line-height:1.4;margin:11px 0 16px;max-width:38ch;text-wrap:balance}
   .purchase-desktop-products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .purchase-desktop-products figure{margin:0;min-width:0}
   .purchase-desktop-product-image{width:100%;aspect-ratio:4 / 5;
@@ -210,32 +210,32 @@
     align-items:center;justify-content:center;padding:14px;text-align:center;
     font-size:13px;line-height:1.3;color:var(--muted);border:1px solid var(--line)}
   .purchase-desktop-products figcaption{display:flex;flex-direction:column;gap:3px;
-    padding-top:8px;font-size:11px;line-height:1.22}
+    padding-top:8px;font-size:12px;line-height:1.22}
   .purchase-desktop-products figcaption strong{font-size:12px;font-weight:600}
-  .purchase-desktop-products figcaption span{font-size:11px}
-  .purchase-desktop-products figcaption small{font-size:10px;color:var(--muted)}
+  .purchase-desktop-products figcaption span{font-size:12px}
+  .purchase-desktop-products figcaption small{font-size:12px;color:var(--muted)}
   .purchase-desktop-why{border-top:1px solid var(--line);margin-top:12px;padding:11px 0 8px}
   .purchase-desktop-why h3{font-family:var(--serif);font-size:26px;font-weight:400;margin:0 0 5px}
-  .purchase-desktop-why>p{font-size:11px;line-height:1.38;margin:4px 0}
+  .purchase-desktop-why>p{font-size:12px;line-height:1.38;margin:4px 0}
   .purchase-desktop-why .purchase-certificate{
     margin:4px 0 0;padding:2px 0;border:0}
   .purchase-desktop-why .purchase-certificate summary{
     display:inline-flex;min-height:25px;align-items:center;
-    text-decoration:underline;font-size:11px;font-weight:400}
-  .purchase-desktop-why .purchase-certificate>p{font-size:11px;margin:6px 0}
+    text-decoration:underline;font-size:12px;font-weight:400}
+  .purchase-desktop-why .purchase-certificate>p{font-size:12px;margin:6px 0}
   .purchase-desktop-why .purchase-why-note{color:var(--muted)}
   .purchase-desktop-verdict>.button{min-height:43px;font-size:12px}
   .purchase-desktop-save{display:block;border:0;background:transparent;
     text-decoration:underline;min-height:35px;font-size:12px;margin:5px auto}
-  .purchase-desktop-choice{font-size:11px;color:#476344;margin:5px 0}
-  .purchase-desktop-foot{font-size:10px;line-height:1.3;color:var(--muted);
+  .purchase-desktop-choice{font-size:12px;color:#476344;margin:5px 0}
+  .purchase-desktop-foot{font-size:12px;line-height:1.3;color:var(--muted);
     margin:8px 0 0;text-align:center}
 
   .purchase-desktop-meta{display:block;border-top:1px solid var(--line);
     padding:9px 0 16px;margin-top:10px;text-align:right}
   .purchase-desktop-meta details>summary{display:inline-flex;align-items:center;
-    cursor:pointer;min-height:27px;font-size:11px;color:var(--muted)}
-  .purchase-desktop-meta details>p,.purchase-desktop-meta details>button{font-size:11px}
+    cursor:pointer;min-height:27px;font-size:12px;color:var(--muted)}
+  .purchase-desktop-meta details>p,.purchase-desktop-meta details>button{font-size:12px}
   .purchase-desktop-meta .purchase-demo-modes{justify-content:flex-end;margin:7px 0}
   .purchase-desktop-meta button{padding:5px 7px;border:0;background:transparent;
     text-decoration:underline}
@@ -245,9 +245,9 @@
   .purchase-desktop-layout .purchase-candidate{grid-template-columns:47px minmax(0,1fr);gap:6px}
   .purchase-desktop-layout .purchase-candidate-photo{width:47px;height:65px}
   .purchase-desktop-layout .purchase-candidate-info strong{font-size:12px}
-  .purchase-desktop-layout .purchase-candidate-info small{font-size:11px}
+  .purchase-desktop-layout .purchase-candidate-info small{font-size:12px}
   .purchase-desktop-product-image{aspect-ratio:4/5}
-  .purchase-desktop-products figcaption small{font-size:9px}
+  .purchase-desktop-products figcaption small{font-size:12px}
   .purchase-model-topbar h2{font-size:24px}
   .purchase-model-controls button{min-width:30px}
   .purchase-desktop-verdict h2{font-size:36px}

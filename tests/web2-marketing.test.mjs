@@ -186,3 +186,13 @@ test('owner-selected v1 landing keeps original headline, narrative and a quiet j
   assert.match(html,/href="\/app\//);
   assert.doesNotMatch(html,/style="/);
 });
+
+
+test('legacy v1 landing uses truthful jury CTA and routes directly to zero-purchase example',async()=>{
+  const html=marketing.marketingPage('/');
+  assert.match(html,/href="\/judges\/">Review the evidence/);
+  assert.doesNotMatch(html,/View on GitHub/);
+  assert.match(html,/href="\/app\/\?scenario=zero#check">Explore the buy-nothing example/);
+  const source=await read('../web2/src/purchase-ui.ts');
+  assert.match(source,/purchaseDemoFromSearch\(typeof window === 'undefined' \? '' : window\.location\.search\)/);
+});
