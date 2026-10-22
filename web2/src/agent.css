@@ -15,6 +15,9 @@
 .agent-controls input[type=checkbox] { width:20px;height:20px;vertical-align:middle;margin:0 10px 0 0; }
 .agent-progress { padding:16px; background:#e8ece2; font-size:15px; line-height:1.6; }
 .agent-status { font-size:15px; line-height:1.6; }
+.agent-notes { margin:8px 0 16px; }
+.agent-notes summary,.agent-requirements summary { min-height:48px;cursor:pointer;display:flex;align-items:center;font-size:15px; }
+.agent-notes p,.agent-notes li { font-size:15px;line-height:1.6; }
 .agent-feedback { margin:28px 0; border-top:1px solid #ded9cf; padding-top:20px; }
 .agent-requirements label { display:block; margin:14px 0 8px; }
 .agent-requirements input,.agent-requirements textarea { display:block; width:100%; min-height:48px; padding:12px; font:inherit; border:1px solid #b7b9ab; background:transparent; }

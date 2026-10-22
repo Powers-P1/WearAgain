@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-22T23:37:20.374Z",
+  "completedAt": "2026-10-22T23:37:49.293Z",
+  "frontendSource": "ea588ea",
+  "frontendUrl": "https://v2-preview.wearagain.pages.dev",
+  "workerVersion": "0.4.0-agent-personalization",
+  "model": "claude-sonnet-5-5",
+  "sessions": [
+    {
+      "id": "545d9f36-9dfe-47f1-ad34-f768e89a720c",
+      "status": "completed",
+      "usage": {
+        "inputTokens": 15034,
+        "outputTokens": 1143,
+        "modelCalls": 3,
+        "toolCalls": 7
+      },
+      "tools": [
+        "get_profile",
+        "get_wardrobe",
+        "search_memory",
+        "get_history",
+        "lookup_city",
+        "inspect_clothing_photo",
+        "submit_answer"
+      ],
+      "verifiedMutationKinds": []
+    },
+    {
+      "id": "8e5baf97-f3c3-4010-99b8-24756f173749",
+      "status": "completed",
+      "usage": {
+        "inputTokens": 17549,
+        "outputTokens": 1510,
+        "modelCalls": 3,
+        "toolCalls": 8
+      },
+      "tools": [
+        "get_profile",
+        "get_wardrobe",
+        "search_memory",
+        "get_history",
+        "lookup_city",
+        "remember_preference",
+        "save_outfit",
+        "submit_answer"
+      ],
+      "verifiedMutationKinds": [
+        "memory",
+        "outfit"
+      ]
+    }
+  ],
+  "totals": {
+    "inputTokens": 32583,
+    "outputTokens": 2653,
+    "modelCalls": 6,
+    "toolCalls": 15
+  },
+  "estimatedLlmUsd": 0.091696,
+  "estimatePolicy": "Project estimate: USD2/million input and USD10/million output; not a provider invoice.",
+  "newYouCamTasks": 0,
+  "youCamCredits": 0,
+  "sessionSpentUnits": 0,
+  "sessionReservedUnits": 0,
+  "observedGlobalSpentUnits": 6,
+  "observedGlobalReservedUnits": 4,
+  "checks": [
+    "New empty QA profile and five custom garment records",
+    "Preference persisted after reload and read by live model",
+    "Actual uploaded garment photo inspected by model tool",
+    "Reload resumed the same paid request",
+    "Feedback revised to navy top",
+    "New explicit silver preference saved",
+    "Verified revised outfit saved and still present after reload",
+    "Unavailable wool garment excluded",
+    "No browser errors; no render POST"
+  ],
+  "limitations": [
+    "Synthetic QA garment reference, not a consumer study",
+    "City lookup unavailable during these sessions; no weather fabricated",
+    "Follow-up lacked current photo consent; subsequent code preserves prior inspection provenance",
+    "Physical OS installation not exercised"
+  ]
+}

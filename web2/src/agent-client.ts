@@ -75,11 +75,11 @@ function applyMutations(result:AgentResult,input:AgentInput){
   else if(mutation.kind==='outfit'){const look=verifyAgentLook(data,current.items.map(i=>({...i,photoId:i.photoId??null})));const saved=saveChosen(loadSaved(store),{...look,heroImagePath:null},{occasion:input.message,date:input.date,style:current.style},current);if(!persistSaved(saved,store))throw Error('Could not save the selected outfit');}
   else if(mutation.kind==='shopping'){
    if(!Array.isArray(data)||data.length>12)throw Error('Invalid shopping list');const catalogue=personalCatalogue(readPersonal(store));
-   const entries=data.map((raw:unknown)=>{if(!record(raw)||typeof raw.id!=='string')throw Error('Invalid product');const product=catalogue.products.find(p=>p.id===raw.id);if(!product)throw Error('The catalogue changed during the conversation');return {id:'need_'+product.id,label:product.label};});saveLocal(NEEDS_KEY,{version:1,entries},store);
+   const entries=data.map((raw:unknown)=>{if(!record(raw)||typeof raw.id!=='string')throw Error('Invalid product');const product=catalogue.products.find(p=>p.id===raw.id);if(!product)throw Error('The catalogue changed during the conversation');return {id:'need_'+product.id,label:product.label};});if(!saveLocal(NEEDS_KEY,{version:1,entries},store))throw Error('The shopping list could not be stored on this device');
   }else if(mutation.kind==='plan'){
    if(!record(data)||!Array.isArray(data.events)||typeof data.destination!=='string'||typeof data.from!=='string'||typeof data.until!=='string')throw Error('Invalid plan');const existing=readTrip(store);
    const events=data.events.map((raw:unknown,index)=>{if(!record(raw)||typeof raw.label!=='string'||typeof raw.date!=='string')throw Error('Invalid trip event');const look=verifyAgentLook(raw.look,current.items.map(i=>({...i,photoId:i.photoId??null})));return {id:'agent_event_'+index,date:raw.date,label:raw.label,outfit:{id:'agent_trip_'+index,title:look.title,occasion:raw.label,date:raw.date,itemIds:look.itemIds},companionItemIds:[]};});
-   saveLocal(TRIP_KEY,{...existing,destination:data.destination,from:data.from,until:data.until,events,packed:[]},store);
+   if(!saveLocal(TRIP_KEY,{...existing,destination:data.destination,from:data.from,until:data.until,events,packed:[]},store))throw Error('The trip plan could not be stored on this device');
   }else throw Error('Unsupported agent save action');
   applied.push(mutation.id);store.setItem(APPLIED_KEY,JSON.stringify(applied.slice(-120)));
  }

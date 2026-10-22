@@ -19,14 +19,14 @@ export class AgentService{
   if(path==='/agent'&&request.method==='POST'){
    const raw=await readBounded(request.body,250000);let body,snapshot;
    try{body=JSON.parse(new TextDecoder().decode(raw));if(!body||!Object.hasOwn(this.procedures,body.procedure)||typeof body.message!=='string'||!body.message.trim()||body.message.length>2000)throw Error();snapshot=this.parseSnapshot(body.snapshot);}catch{throw new HttpError(400,'invalid_agent_request');}
-   const requestId=opaque(body.requestId);let previous=null;
-   if(body.previousSessionId){const prior=this.store.get(owner,opaque(body.previousSessionId),this.now());if(prior.profile_id!==snapshot.profile.id||prior.state!=='completed')throw new HttpError(409,'agent_previous_unavailable');previous=JSON.parse(prior.result)?.answer??null;}
+   const requestId=opaque(body.requestId);let previous=null,previousEvidence=[];
+   if(body.previousSessionId){const prior=this.store.get(owner,opaque(body.previousSessionId),this.now());if(prior.profile_id!==snapshot.profile.id||prior.state!=='completed')throw new HttpError(409,'agent_previous_unavailable');const result=JSON.parse(prior.result);previous=result?.answer??null;previousEvidence=result?.evidence??[];}
    const hash=await digest(raw);this.store.cleanup(this.now());
    const reservation=this.store.start({owner,requestId,requestHash:hash,profileId:snapshot.profile.id,now:this.now()});
    await this.unit.schedule();
    if(reservation.created){
     const id=reservation.row.id;
-    const task=this.runner({snapshot,message:body.message,procedure:body.procedure,previous,apiKey:this.unit.env.ANTHROPIC_API_KEY,fetch:this.transport,now:this.now,
+    const task=this.runner({snapshot,message:body.message,procedure:body.procedure,previous,previousEvidence,apiKey:this.unit.env.ANTHROPIC_API_KEY,fetch:this.transport,now:this.now,
      emit:event=>this.store.event(owner,id,event,this.now()),photo:photoId=>Promise.resolve(this.store.asset(owner,photoId,this.now())),
      render:async(item,avatarId,kind)=>{
       const claim=this.store.claimRender(owner,id,item.id,this.now());if(!claim.created)return claim.result;
