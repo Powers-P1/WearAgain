@@ -252,8 +252,7 @@ function verdictStep():string{
     '<ul>'+failed.map(entry=>'<li><strong>'+escapeHtml(entry.basket.candidateIds.length?
       entry.basket.candidateIds.map(id=>evaluated.candidateLabels[id]??id).join(' + '):t('purchaseBuyNothing'))+
     '</strong> · '+escapeHtml(money(entry.basket.costMinor,entry.basket.currency))+
-    ' · '+escapeHtml(entry.failedRequirements.map(req=>evaluated.needs.find((_item,i)=>_item.length>0&&
-      req.requirementId===coreDecision(mode).result.status /* unreachable */)??req.requirementId).join(', '))+'</li>').join('')+'</ul>'+
+    ' · '+escapeHtml(entry.failedRequirements.map(req=>req.requirementId).join(', '))+'</li>').join('')+'</ul>'+
     link('/app/#check',h('mktJudgeGoApp'))+'</aside></div>';
 }
 function guidedDemo():string{

@@ -4,6 +4,9 @@ import {
   type Availability, type Category, type WardrobeItem, type WardrobeState,
 } from './state.js';
 import { DEFAULT_LOCALE, t, type TranslationKey } from './i18n.js';
+import { marketingRoute } from './marketing-model.js';
+import { marketingPage, marketingTitle, handleMarketingClick } from './marketing.js';
+import { setupPwa } from './pwa.js';
 import { purchasePage, handlePurchaseClick } from './purchase-ui.js';
 import { recordedPreviewForItem } from './stylist.js';
 import { loadDaily, loadDecisions, type DailyState, type DecisionsState } from './daily.js';
@@ -16,6 +19,8 @@ import './style.css';
 const root = document.querySelector<HTMLElement>('#app');
 if (!root) throw new Error('Missing app root.');
 document.documentElement.lang = DEFAULT_LOCALE;
+const publicRoute = marketingRoute(window.location.pathname);
+if (!publicRoute && /^\/app(?:\/|$)/.test(window.location.pathname)) setupPwa();
 
 type Screen = 'wardrobe' | 'profile' | 'stylist' | 'check' | 'saved' | 'gallery' | 'add' | 'item' | 'morning' | 'overview' | 'review';
 type NavId = 'wardrobe' | 'stylist' | 'check' | 'profile' | 'saved' | 'gallery' | 'morning' | 'overview';
@@ -225,6 +230,27 @@ function focusAfterRender(selector:string):void { requestedFocus=selector; }
 /** Preserve focus and expanded certificate, then restore a deterministic
  * heading when a previous control no longer exists or the route changes. */
 function render(): void {
+  if(publicRoute){
+    const focused=document.activeElement;
+    const attr=focused instanceof HTMLElement&&focused.dataset.guideStep?'[data-guide-step="'+focused.dataset.guideStep+'"]':
+      focused instanceof HTMLElement&&focused.dataset.judgeMode?'[data-judge-mode="'+focused.dataset.judgeMode+'"]':
+      focused instanceof HTMLElement&&focused.dataset.retailSize?'[data-retail-size="'+focused.dataset.retailSize+'"]':'';
+    root!.innerHTML=marketingPage(publicRoute);
+    document.title=marketingTitle(publicRoute);
+    if(hasRendered){
+      const target=attr?root!.querySelector<HTMLElement>(attr):null;
+      const candidate=target??root!.querySelector<HTMLElement>('main h1')??root!.querySelector<HTMLElement>('main');
+      if(candidate){
+        if(!candidate.matches('[tabindex],button,input,a[href]'))candidate.setAttribute('tabindex','-1');
+        candidate.focus({preventScroll:true});
+      }
+    } else if(window.location.hash.startsWith('#')){
+      const anchorId=window.location.hash.slice(1);
+      if(/^[a-zA-Z][\w-]{0,80}$/.test(anchorId))requestAnimationFrame(()=>document.getElementById(anchorId)?.scrollIntoView());
+    }
+    hasRendered=true;
+    return;
+  }
   const routeKey=window.location.hash;
   const same=previousRoute===routeKey;
   const focused=same&&root!.contains(document.activeElement)?document.activeElement as HTMLElement:null;
@@ -302,8 +328,12 @@ function render(): void {
 root.addEventListener('click', event => {
   const target = event.target;
   if (!(target instanceof Element)) return;
-  const control = target.closest<HTMLElement>('[data-nav], [data-cat], [data-item], [data-status], [data-expand], [data-stylist-reset], [data-occasion], [data-look-next], [data-look-prev], [data-save-look], [data-purchase-demo], [data-purchase-candidate], [data-purchase-top], [data-purchase-rating], [data-purchase-clear], [data-purchase-replay], [data-purchase-choice], [data-purchase-next], [data-purchase-prev], [data-mall-view], [data-mall-filter], [data-mall-step], [data-mall-decision], [data-mall-undo], [data-mall-remove], [data-mall-context-toggle], [data-morning-select], [data-morning-wear], [data-morning-reset], [data-morning-voice], [data-overview-review], [data-overview-decision], [data-overview-save]');
+  const control = target.closest<HTMLElement>('[data-nav], [data-cat], [data-item], [data-status], [data-expand], [data-stylist-reset], [data-occasion], [data-look-next], [data-look-prev], [data-save-look], [data-purchase-demo], [data-purchase-candidate], [data-purchase-top], [data-purchase-rating], [data-purchase-clear], [data-purchase-replay], [data-purchase-choice], [data-purchase-next], [data-purchase-prev], [data-mall-view], [data-mall-filter], [data-mall-step], [data-mall-decision], [data-mall-undo], [data-mall-remove], [data-mall-context-toggle], [data-morning-select], [data-morning-wear], [data-morning-reset], [data-morning-voice], [data-overview-review], [data-overview-decision], [data-overview-save], [data-retail-panel-toggle], [data-retail-size], [data-retail-save], [data-guide-step], [data-judge-mode]');
   if (!control) return;
+  if(publicRoute){
+    handleMarketingClick(control,render);
+    return;
+  }
   if (handleStylistClick(control, { wardrobe: data, storage, rerender: render, notice: value => { message = value; } })) return;
   if (handlePurchaseClick(control, { rerender: render, notice: value => { message = value; } })) return;
   if (handleGalleryClick(control, {storage,rerender:render,notice:value=>{message=value;},focus:focusAfterRender})) return;
@@ -361,5 +391,5 @@ root.addEventListener('submit', event => {
     } catch { message = t('itemSaveError'); render(); }
   }
 });
-window.addEventListener('hashchange', render);
+if(!publicRoute)window.addEventListener('hashchange', render);
 render();
