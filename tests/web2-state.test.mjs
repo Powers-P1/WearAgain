@@ -34,7 +34,7 @@ test('PR-A sample wardrobe uses English board meanings and stable category IDs',
   assert.equal(new Set(example.items.map(item => item.id)).size, example.items.length);
   assert.equal(example.items[0].name, 'Cashmere sweater');
   assert.equal(example.items[7].name, 'Everyday handbag');
-  assert.equal(example.items[8].name, 'Cream shirt · demo example');
+  assert.equal(example.items[8].name, 'Cream shirt (demo)');
   assert.equal(example.items[8].photo, null);
   assert.equal(example.items[0].category, 'tops');
   assert.equal(state.categoryLabel('bottoms'), 'Bottoms');

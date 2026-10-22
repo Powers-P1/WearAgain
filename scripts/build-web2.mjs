@@ -72,12 +72,22 @@ const style = emitted.find(path => path.endsWith('.css'));
 if (!script || !style) throw new Error('No compiled script or stylesheet for web2.');
 const markup = (await readFile(join(root, 'web2/index.html'), 'utf8'))
   .replace('__APP_SCRIPT__', script).replace('__APP_STYLE__', style);
-await writeFile(join(dest, 'index.html'), markup);
+await writeFile(join(dest, 'index.html'),
+  markup.replace('<title>Your wardrobe - WearAgain</title>','<title>WearAgain - Your wardrobe, more you</title>'));
 // Pages ships one static HTML shell on each route; the client resolves the exact
 // pathname. Root is now board 13 landing, the original demo is under /app/.
 for (const directory of ['app','retail','retail/demo','judges','judges/demo']) {
   await mkdir(join(dest,directory),{recursive:true});
-  await writeFile(join(dest,directory,'index.html'),markup);
+  const titles = {
+    app: 'Your wardrobe - WearAgain',
+    retail: 'For retailers - WearAgain',
+    'retail/demo': 'Demo Atelier - WearAgain',
+    judges: 'For judges - WearAgain',
+    'judges/demo': 'Guided demo - WearAgain',
+  };
+  await writeFile(join(dest,directory,'index.html'),
+    markup.replace('<title>Your wardrobe - WearAgain</title>',
+      '<title>'+titles[directory]+'</title>'));
 }
 await writeFile(join(dest,'_redirects'),
   '/app /app/ 301\n/retail /retail/ 301\n/retail/demo /retail/demo/ 301\n/judges /judges/ 301\n/judges/demo /judges/demo/ 301\n');

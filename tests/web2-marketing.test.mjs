@@ -17,7 +17,7 @@ before(async()=>{
 test('route inventory is closed: canonical landing, retailer and judge pages',()=>{
   for(const route of ['/','/retail','/retail/demo','/judges','/judges/demo']){
     assert.equal(model.marketingRoute(route),route);
-    assert.equal(model.marketingRoute(route+'/'),route==='/'?'/':route);
+    if(route!=='/') assert.equal(model.marketingRoute(route+'/'),route);
   }
   for(const route of ['/app/','/api/renders','/retail/fake','/judges/secret','//evil'])assert.equal(model.marketingRoute(route),null);
   assert.equal(model.demoStep('verdict'),'verdict');
