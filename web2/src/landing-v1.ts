@@ -1,7 +1,6 @@
 const CROPS: Record<string,string> = {"shoppersArt-296-674-100-112":"v1-crop-0","shoppersArt-404-674-99-112":"v1-crop-1","shoppersArt-42-675-216-126":"v1-crop-2","retailersArt-456-130-110-162":"v1-crop-3","shoppersArt-578-45-215-159":"v1-crop-4","shoppersArt-1-1105-393-181":"v1-crop-5","shoppersArt-590-1413-177-132":"v1-crop-6","retailersArt-580-1677-210-234":"v1-crop-7","retailersArt-29-713-153-131":"v1-crop-8","retailersArt-608-1339-184-162":"v1-crop-9","retailersArt-373-1661-417-252":"v1-crop-10"};
 type LandingKind = "shoppers" | "retailers";
 
-const repository = "https://github.com/Powers-P1/WearAgain";
 const shoppersArt = "/assets/reference-shoppers.png";
 const retailersArt = "/assets/reference-retailers.webp";
 
