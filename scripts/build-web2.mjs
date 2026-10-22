@@ -13,7 +13,10 @@ await mkdir(join(dest, 'fonts'), { recursive: true });
 await mkdir(join(dest, 'icons'), { recursive: true });
 // Local licensed webfonts are static public assets. No network CSS dependency.
 await cp(join(root, 'web2/public/fonts'), join(dest, 'fonts'), { recursive: true });
-await cp(join(root, 'web2/_headers'), join(dest, '_headers'));
+await cp(join(root, 'web2/_headers'), join(dest, '_headers');
+// Replace the former root-scope PWA with a one-time cleanup worker; keep
+// the optional new app PWA independently scoped under /app/sw.js.
+await cp(join(root, 'web2/public/sw.js'), join(dest, 'sw.js'));
 await cp(join(root, 'web2/manifest.webmanifest'), join(dest, 'manifest.webmanifest'));
 await cp(join(root, 'web/public/icons/icon.svg'), join(dest, 'icons/icon.svg'));
 for (const size of [192,512]) {

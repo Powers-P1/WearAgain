@@ -154,3 +154,14 @@ test('guided note gutters beat the site-wide paragraph margin reset',async()=>{
   assert.match(css,/\.mkt-guided main > \.mkt-guided-note\{margin:14px clamp\(20px,5vw,80px\)/);
   assert.match(css,/\.mkt-guided main > \.mkt-guided-note\{margin:15px 20px;/);
 });
+
+test('build copies a JS root-scope legacy worker and serves no-cache headers',async()=>{
+  const [script,headers,worker]=await Promise.all([
+    read('../scripts/build-web2.mjs'),read('../web2/_headers'),read('../web2/public/sw.js'),
+  ]);
+  assert.match(script,/cp\(join\(root, 'web2\/public\/sw\.js'\), join\(dest, 'sw\.js'\)\)/);
+  assert.match(headers,/\/sw\.js\s*\n\s*Cache-Control: no-cache/);
+  assert.match(worker,/wearagain-demo-/);
+  assert.match(worker,/registration\.unregister\(\)/);
+  assert.doesNotMatch(worker,/addEventListener\(['"]fetch['"]/);
+});
