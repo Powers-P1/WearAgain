@@ -33,8 +33,8 @@
 .stylist-arrows button { width: 30px; height: 30px; display: grid; place-items: center; background: transparent; border: 1px solid var(--line); }
 .stylist-arrows button:hover { background: var(--olive-soft); }
 .stylist-arrows .icon { width: 16px; height: 16px; }
-.stylist-photo { position: relative; background: var(--stone); aspect-ratio: 2 / 3; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.stylist-photo > img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; }
+.stylist-photo { position: relative; background: var(--stone); aspect-ratio: 1.02; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.stylist-photo > img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0%; }
 .stylist-photo-label, .stylist-photo-origin, .stylist-photo-fit { position: absolute; padding: 4px 7px; font-size: 10px; line-height: 1.4; background: rgba(248,246,241,.94); color: var(--olive); }
 .stylist-photo-label { top: 9px; left: 9px; }
 .stylist-photo-origin { top: 9px; right: 9px; }
@@ -59,6 +59,7 @@
 .stylist-next-link { display: flex; justify-content: center; margin: 10px auto 0; font-weight: 400; }
 .stylist-disclaimer { color: var(--muted); font-size: 11px; line-height: 1.5; margin-top: 9px; }
 .stylist-mobile-back { display: none; }
+.stylist-result-appbar { display:none; }
 .saved-view { max-width: 760px; }
 .saved-look-list { margin: 24px 0; }
 .saved-look-item { border-top: 1px solid var(--line); padding: 20px 0; }
@@ -92,11 +93,14 @@
   .stylist-view.show-brief .stylist-result { display: none; }
   .stylist-view.show-result .stylist-form { display: none; }
   .stylist-mobile-back { background: transparent; border: 0; align-items: center; padding: 6px 0; gap: 5px; font-size: 12px; }
-  .stylist-view.show-result .stylist-mobile-back { display: flex; }
+  .stylist-view.show-result .stylist-mobile-back { display:none; }
+  .stylist-view.show-result .stylist-result-appbar {display:flex;align-items:center;justify-content:space-between;margin:1px 0 16px;min-height:44px;border-bottom:1px solid var(--line);}
+  .stylist-result-appbar span {font-size:12px;font-weight:600;}
+  .stylist-result-appbar button {border:0;background:transparent;font-size:21px;width:42px;height:42px;}
   .stylist-mobile-back .icon { width: 15px; height: 15px; }
   .stylist-result { display: flex; flex-direction: column; gap: 0; }
   .stylist-progress { margin-top: 11px; }
-  .stylist-photo { aspect-ratio: 2 / 3; max-height: none; }
+  .stylist-photo { aspect-ratio: 1.02; max-height: none; }
   .stylist-caption { font-size: 32px; margin-top: 10px; }
   .stylist-details { padding: 15px 0 0; }
   .stylist-details h2 { font-size: 26px; }

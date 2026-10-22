@@ -113,6 +113,8 @@ function lookPreview(wardrobe: WardrobeState, selection: StylistResult): string 
 export function stylistPage(wardrobe: WardrobeState): string {
   const selection = validResult(wardrobe);
   return '<section class="page stylist-view ' + (generated ? 'show-result' : 'show-brief') + '" aria-labelledby="stylist-title">' +
+    (generated ? '<div class="stylist-result-appbar"><button type="button" data-stylist-reset aria-label="' + escapeHtml(t('stylistBackToBrief')) + '">←</button>'+
+    '<span>' + escapeHtml(t('stylistResultAppbar')) + '</span><button type="button" data-save-look aria-label="' + escapeHtml(t('stylistBookmarkLook')) + '">♧</button></div>' : '') +
     '<div class="stylist-intro"><div><h1 id="stylist-title">' + escapeHtml(t('stylistPageTitle')) + '</h1>' +
     '<p>' + escapeHtml(t('stylistHeaderSubtitle')) + '</p></div>' +
     '<button type="button" class="text-link stylist-saved-link" data-nav="saved">' + escapeHtml(t('stylistSavedLink')) + ' ' + svg('arrow') + '</button></div>' +
