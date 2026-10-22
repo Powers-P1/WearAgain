@@ -58,10 +58,13 @@ test('a nonchosen candidate offers Skip and the actual recommendation, never Kee
  click({purchaseDemo:'minimum'});
 });
 
-test('buy-nothing uses a named neutral tile and Keep my own without substituting an image',()=>{
+test('buy-nothing names the example owned pieces and Keep my own without substituting an image',()=>{
  click({purchaseDemo:'zero'});
  const html=ui.purchasePage();
- assert.match(html,/purchase-image-empty/);
+ assert.match(html,/purchase-zero-example/);
+ assert.match(html,/Example shirt/);
+ assert.match(html,/Existing coat · example/);
+ assert.doesNotMatch(html,/purchase-image-empty/);
  assert.doesNotMatch(html,/data-recorded-garment=/);
  assert.match(html,/Your wardrobe already covers it/);
  assert.match(html,/data-purchase-choice="skip"/);
