@@ -170,3 +170,14 @@
 .purchase-desktop-products img{height:98px}
 }
 @media(max-width:800px){.purchase-desktop-layout,.purchase-desktop-meta{display:none}}
+
+/* Screenshot-review refinements: no fake plus badge beside the coat artwork,
+   legible shop/floor provenance in board 08's narrow left discovery column. */
+@media(min-width:801px){
+ .purchase-desktop-layout .purchase-candidate{display:grid;grid-template-columns:55px minmax(0,1fr);gap:12px;align-items:center;padding:9px 4px}
+ .purchase-desktop-layout .purchase-candidate img{width:55px;height:79px;object-fit:contain;flex:none}
+ .purchase-desktop-layout .purchase-candidate-info strong{font-size:13px;line-height:1.25;margin-bottom:6px}
+ .purchase-desktop-layout .purchase-candidate-info small{font-size:10px;line-height:1.3;overflow-wrap:normal}
+ .purchase-desktop-layout .purchase-candidate-info small:last-child{display:none}
+ .purchase-desktop-layout .purchase-finds>.purchase-smallprint{font-size:10px}
+}

@@ -36,14 +36,11 @@ function candidateButtons(): string {
     '<div class="purchase-section-head"><h2 id="purchase-finds-title">' + esc(t('purchaseFinds')) + '</h2>' +
     '<p>' + esc(t('purchaseToday')) + '</p></div>' +
     '<div class="purchase-candidate-list">' + choices.map(item => {
-      const image = recordingFor('outerwear',item.id);
       return '<button type="button" class="purchase-candidate ' + (session.candidateId === item.id ? 'selected' : '') +
         '" data-purchase-candidate="' + esc(item.id) + '" aria-pressed="' + (session.candidateId === item.id) + '">' +
+        // This is a generic garment-only *illustration*, not a merchant
+        // photograph and never the synthetic-model YouCam recording.
         '<img src="/assets/items/coat.webp" alt="" loading="lazy" />' +
-        /* Saved YouCam recordings show the model, never a standalone shop product. */
-        (false ? '<span>' + esc(image?.id) + '</span>' : '') +
-        (false ? '<img src="' + esc(image?.imagePath) + '" alt="" />' :
-          '<span class="purchase-small-placeholder" aria-hidden="true">+</span>') +
         '<span class="purchase-candidate-info"><strong>' + esc(item.label) + '</strong>' +
         '<small>' + esc(t('purchaseShopUnknownSource')) + '</small><small>' + esc(t('purchaseSamplePrice')) + ' · ' + esc(formatMoney(item.priceMinor,session.scenario.currency)) +
         '</small></span></button>';

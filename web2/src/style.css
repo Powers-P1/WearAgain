@@ -274,3 +274,12 @@ h1:focus:not(:focus-visible),h2:focus:not(:focus-visible),main:focus:not(:focus-
 .v2-pwa-banner>p{margin:10px 0;color:#576355;font-size:12px;}
 .v2-pwa-banner>button:not(.v2-pwa-dismiss){min-height:44px;background:#30392f;color:#f8f6f1;border:0;padding:9px 15px;font-size:12px;}
 .v2-pwa-banner>.v2-pwa-dismiss{position:absolute;top:6px;right:6px;min-width:44px;min-height:44px;border:0;background:transparent;font-size:22px;}
+
+/* Board 05 desktop inventory: keep both rows visible earlier at 1280x800. */
+@media(min-width:801px){
+ .wardrobe-view .wardrobe-shortcuts{margin:8px 0 0}
+ .wardrobe-view .wardrobe-tools{margin-top:20px}
+ .wardrobe-view .category-tabs{margin-top:12px}
+ .wardrobe-view .wardrobe-grid{margin-top:17px;row-gap:21px}
+ .wardrobe-view .garment-photo{aspect-ratio:1.18}
+}
