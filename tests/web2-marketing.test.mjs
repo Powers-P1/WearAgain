@@ -59,7 +59,8 @@ test('public routes render English links with no invented task identifiers or re
   for(const route of model.MARKETING_ROUTES){
     const html=marketing.marketingPage(route);
     assert.ok(html.includes('<main id="main-content"'),route);
-    assert.match(html,/Judges · Start here/);
+    if(route==='/') assert.match(html,/For judges/);
+    else assert.match(html,/Judges · Start here/);
     assert.match(html,/href="\/app\/"/);
     assert.match(html,/href="\/retail\/"/);
     assert.match(html,/href="\/judges\/"/);
@@ -174,4 +175,14 @@ test('direct-upload Pages switch documentation is accurate and does not deploy',
   assert.match(docs,/web2\/dist\/sw\.js/);
   assert.doesNotMatch(docs,/change \*\*only the Pages production build output directory\*\*/);
   assert.match(docs,/no build output directory setting/i);
+});
+
+test('owner-selected v1 landing keeps original headline, narrative and a quiet jury link',()=>{
+  const html=marketing.marketingPage('/');
+  assert.match(html,/Buy what earns a place/);
+  assert.match(html,/Sometimes, the best basket is empty/);
+  assert.match(html,/landing-hero-pair/);
+  assert.match(html,/For judges/);
+  assert.match(html,/href="\/app\//);
+  assert.doesNotMatch(html,/style="/);
 });
