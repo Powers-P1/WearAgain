@@ -254,3 +254,30 @@
   .purchase-import-actions .button{min-width:130px}
 }
 @media(max-width:800px){.purchase-desktop-layout,.purchase-desktop-meta{display:none}}
+
+/* Only the exact recorded garment image is zoomed to show fabric and
+   construction rather than passing off the model's face as a shop photo. */
+@media(min-width:801px){
+  .purchase-desktop-layout .purchase-candidate{
+    grid-template-columns:62px minmax(0,1fr);
+  }
+  .purchase-desktop-layout .purchase-candidate-crop{
+    display:block;position:relative;width:62px;height:78px;
+    background:var(--stone);overflow:hidden;
+  }
+  .purchase-desktop-layout .purchase-candidate-crop>img{
+    display:block;width:100%;height:100%;
+    object-fit:cover;object-position:center 55%;
+    transform:scale(1.65);transform-origin:50% 60%;
+  }
+  .purchase-desktop-product-image>img{
+    transform:scale(1.48);transform-origin:50% 59%;
+    object-position:50% 54%;
+  }
+}
+@media(min-width:801px) and (max-width:1080px){
+  .purchase-desktop-layout .purchase-candidate{
+    grid-template-columns:47px minmax(0,1fr);
+  }
+  .purchase-desktop-layout .purchase-candidate-crop{width:47px;height:65px;}
+}

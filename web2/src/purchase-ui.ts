@@ -45,7 +45,8 @@ function candidateButtons(view: 'mobile' | 'desktop'): string {
     '<div class="purchase-candidate-list">' + choices.map(item => {
       const saved = recordingFor('outerwear',item.id);
       const photo = desktop
-        ? exactGarmentEvidence('outerwear',item.id,item.label,'purchase-candidate-photo')
+        ? '<span class="purchase-candidate-crop">' +
+            exactGarmentEvidence('outerwear',item.id,item.label,'purchase-candidate-photo')+'</span>'
         : saved
           ? '<img src="' + esc(saved.imagePath) + '" alt="" loading="lazy" />'
           : '<span class="purchase-small-placeholder" aria-hidden="true">+</span>';
@@ -246,7 +247,7 @@ function desktopVerdict():string {
       (candidate?productCard('outerwear',candidate.id,candidate.label,'purchaseDesktopShop'):'')+
       (owned?productCard('top',owned.id,owned.label,'purchaseDesktopOwn'):'')+
     '</div>'+
-    '<div class="purchase-desktop-why"><h3>'+esc(t('purchaseWhy'))+'</h3>'+
+    '<div class="purchase-desktop-why"><h3>'+esc(t('purchaseDesktopWhyHeading'))+'</h3>'+
       '<p>'+esc(t('purchaseCertificateScope',{count:result.evaluatedBasketCount}))+'</p>'+
       '<p>'+esc(cert?(cert.priceOptimality==='proven'?t('purchasePriceProven'):t('purchasePriceProvisional')):t('purchaseNeedRatings'))+'</p>'+
       '<details class="purchase-certificate"><summary>'+esc(t('purchaseDesktopReadCertificate'))+'</summary>'+

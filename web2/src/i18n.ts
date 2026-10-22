@@ -7,6 +7,7 @@ export const DEFAULT_LOCALE = 'en' as const;
 export type Locale = 'en' | 'pl';
 
 export const en = {
+  purchaseDesktopWhyHeading: 'Why?',
   overviewChooseMonth: 'Choose month for logged wardrobe wears',
   overviewPlanRepair: 'Plan repair',
   overviewBrowseItem: 'Review',
