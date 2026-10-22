@@ -7,6 +7,9 @@ export const DEFAULT_LOCALE = 'en' as const;
 export type Locale = 'en' | 'pl';
 
 export const en = {
+  overviewChooseMonth: 'Choose month for logged wardrobe wears',
+  overviewPlanRepair: 'Plan repair',
+  overviewBrowseItem: 'Review',
   purchaseDesktopSkipLineOne: 'You can skip',
   purchaseDesktopSkipLineTwo: 'this one.',
   purchaseDesktopNotRequiredReason: 'The cheapest basket for these recorded needs does not include this piece.',

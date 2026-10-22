@@ -11,7 +11,7 @@ import { purchasePage, handlePurchaseClick } from './purchase-ui.js';
 import { recordedPreviewForItem } from './stylist.js';
 import { loadDaily, loadDecisions, type DailyState, type DecisionsState } from './daily.js';
 import { morningPage, handleMorningInput, handleMorningClick, submitMorning } from './morning-ui.js';
-import { overviewPage, reviewItemPage, handleOverviewClick } from './overview-ui.js';
+import { overviewPage, reviewItemPage, handleOverviewClick, handleOverviewMonthChange } from './overview-ui.js';
 import { galleryPage, handleGalleryInput, handleGalleryClick, handleGallerySubmit, handleGalleryFile } from './gallery-ui.js';
 import { handleStylistClick, savedPage, stylistPage, submitStylist } from './stylist-ui.js';
 import './style.css';
@@ -380,6 +380,7 @@ root.addEventListener('input', event => {
 });
 root.addEventListener('change', event => {
   const target=event.target;
+  if(target instanceof HTMLInputElement && handleOverviewMonthChange(target)){render();return;}
   if(target instanceof HTMLInputElement && handleGalleryFile(target,{storage,rerender:render,notice:value=>{message=value;},focus:focusAfterRender}))return;
 });
 root.addEventListener('submit', event => {
