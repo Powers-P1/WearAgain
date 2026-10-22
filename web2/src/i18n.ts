@@ -68,6 +68,7 @@ export const en = {
   tripNav: 'Trip planner',
   tripTitle: 'Away, in good style.',
   tripSubtitle: 'A few good outfits. One less thing to think about.',
+  tripSampleNote: 'Starts with sample occasions. Edit them for your trip.',
   tripMyWardrobe: 'My wardrobe',
   tripOurWardrobes: 'Our wardrobes',
   tripDestination: 'Destination',

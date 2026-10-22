@@ -131,7 +131,12 @@ for (const directory of ['app','retail','retail/demo','judges','judges/demo']) {
       '<title>'+titles[directory]+'</title>'));
 }
 await writeFile(join(dest,'_redirects'),
-  '/app /app/ 301\n/retail /retail/ 301\n/retail/demo /retail/demo/ 301\n/judges /judges/ 301\n/judges/demo /judges/demo/ 301\n');
+  '/app /app/ 301\n/retail /retail/ 301\n/retail/demo /retail/demo/ 301\n/judges /judges/ 301\n/judges/demo /judges/demo/ 301\n/retailers /retail/ 301\n/retailers/ /retail/ 301\n');
+// A real top-level 404 disables Pages' implicit SPA fallback for unknown paths.
+await writeFile(join(dest,'404.html'),markup
+  .replace('<title>Your wardrobe - WearAgain</title>','<title>Page not found - WearAgain</title>')
+  .replace('<div id="app"></div>','<main class="page error-page" id="main-content"><a class="wordmark" href="/">WearAgain</a><h1>Let’s find your wardrobe.</h1><p>This page does not exist.</p><a class="button button-primary" href="/app/">Open your wardrobe</a></main>')
+  .replace(/<script type="module"[^>]*><\/script>/,''));
 
 // Only explicitly public, read-only assets enter the optional web app shell.
 // No private browser photo, localStorage, Worker responses or live URLs.

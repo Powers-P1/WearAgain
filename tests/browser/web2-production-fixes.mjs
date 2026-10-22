@@ -12,7 +12,7 @@ try{
   await page.route('**/*',r=>new URL(r.request().url()).origin===new URL(base).origin?r.continue():r.abort());
   await page.goto(base+'/app/#check');
   await page.locator('.purchase-example-banner').waitFor();
-  for(const selector of ['.purchase-top-picker button','.purchase-unsure','.purchase-save-later']){
+  for(const selector of ['.purchase-top-picker button','.purchase-unsure','.purchase-save-later','.purchase-import-actions .text-link']){
    const targets=await page.locator(selector).evaluateAll(es=>es.map(e=>e.getBoundingClientRect().height));
    assert.ok(targets.length&&targets.every(h=>h>=44),selector+' at '+width);
   }
@@ -32,5 +32,15 @@ try{
   for(const summary of await page.locator('.mall-item-name summary,.mall-live-controls summary').all())assert.ok(await summary.evaluate(e=>e.getBoundingClientRect().height)>=44);
   rows.push({width,touchTargets:'passed',buyNothing:'passed',exampleLabels:'passed'});await page.close();
  }
+ const context=await browser.newContext();
+ const missing=await context.request.get(base+'/does-not-exist');
+ assert.equal(missing.status(),404);assert.match(await missing.text(),/This page does not exist/);
+ for(const path of ['/retailers','/retailers/']){
+  const legacy=await context.request.get(base+path,{maxRedirects:0});assert.equal(legacy.status(),301);assert.equal(legacy.headers().location,'/retail/');
+ }
+ const page=await context.newPage();await page.goto(base+'/app/#trip');
+ assert.match(await page.locator('.trip-example-note').innerText(),/sample occasions/);
+ await page.goto(base+'/judges/');assert.equal(await page.locator('video').getAttribute('poster'),null);
+ await context.close();
  await writeFile(out+'/report.json',JSON.stringify(rows,null,2));console.log(JSON.stringify(rows));
 }finally{await browser.close();}

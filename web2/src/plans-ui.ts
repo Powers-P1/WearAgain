@@ -36,6 +36,7 @@ export function tripPage(wardrobe: WardrobeState, store: Store): string {
     (shared?'<section class="trip-person"><h2>'+esc(plan.companionName||'Travel companion')+'</h2>'+
       (companionEvent?outfitBoard(companionEvent.companionItemIds,plan.companion):'<div class="trip-person-empty">'+icon('hanger')+'<p>Bring your companion’s wardrobe along.</p><button class="text-link" type="button" data-trip-setup>'+esc(t('tripAddCompanion'))+' →</button></div>')+'</section>':'')+'</div>';
   return '<section class="page trip-view">' + heading(plan.destination + ', ' + t('tripTitle').toLowerCase().replace('away, ', ''), t('tripSubtitle')) +
+    '<p class="field-hint trip-example-note">'+esc(t('tripSampleNote'))+'</p>'+
     '<div class="trip-dates"><span>' + esc(dateLabel(plan.from)) + ' — ' + esc(dateLabel(plan.until)) + '</span><button type="button" class="text-link" data-trip-edit>' + esc(t('tripEdit')) + '</button></div>' +
     (editTrip ? '<form id="trip-edit-form" class="feature-form"><label>' + esc(t('tripDestination')) + '<input name="destination" required maxlength="100" value="' + esc(plan.destination) + '" /></label><div class="feature-form-row"><label>' +
       esc(t('tripStart')) + '<input name="from" type="date" required value="' + plan.from + '" /></label><label>' + esc(t('tripEnd')) + '<input name="until" type="date" required value="' + plan.until + '" /></label></div><button class="button button-primary" type="submit">' + esc(t('tripSave')) + '</button></form>' : '') +
