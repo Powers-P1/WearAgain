@@ -171,7 +171,7 @@ export const en = {
   mktJudgeCurrencyNote: 'Synthetic fixture prices, not shop offers.',
   mktJudgeVerdictZero: 'Buying nothing satisfies the recorded example needs.',
   mktJudgeVerdictNotDuplicate: 'An excluded candidate is not automatically equivalent to something owned.',
-  mktJudgeLiveSeparate: 'Fresh rendering is not part of this hosted replay. The separate Worker API and its contract are documented in the private repository.'
+  mktJudgeLiveSeparate: 'Fresh rendering is not part of this hosted replay. The separate Worker API and its contract are documented in the private repository.',
   mktPwaInstall: 'Install the web demo',
   mktPwaHint: 'Optional browser install shell. It does not make live rendering or device data sync work offline.',
   mktPwaNotAvailable: 'Use your browser menu to add this page to your home screen if supported.',
