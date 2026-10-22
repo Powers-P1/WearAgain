@@ -181,10 +181,11 @@ function desktopVerdict():string {
    '<div class="purchase-desktop-products">'+
      '<figure><span>'+esc(t('purchaseDesktopShop'))+'</span><img src="/assets/items/coat.webp" alt=""/><figcaption>'+esc(candidate?.label??'')+'</figcaption></figure>'+
      '<figure><span>'+esc(t('purchaseDesktopOwn'))+'</span><img src="/assets/items/cashmere.webp" alt=""/><figcaption>'+esc(owned?.label??'')+'</figcaption></figure></div>'+
-   '<details class="purchase-certificate"><summary>'+esc(t('purchaseWhy'))+'</summary>'+
+   '<div class="purchase-desktop-why"><h3>'+esc(t('purchaseWhy'))+'</h3>'+
       '<p>'+esc(t('purchaseCertificateScope',{count:result.evaluatedBasketCount}))+'</p>'+
       '<p>'+esc(cert?(cert.priceOptimality==='proven'?t('purchasePriceProven'):t('purchasePriceProvisional')):t('purchaseNeedRatings'))+'</p>'+
-      certificateExplanation(result)+'</details>'+
+      '<details class="purchase-certificate"><summary>'+esc(t('purchaseDesktopReadCertificate'))+'</summary>'+
+      certificateExplanation(result)+'</details></div>'+
    '<button class="button button-primary full-width" data-purchase-choice="skip">'+esc(t('purchaseKeepMine'))+'</button>'+
    '<button class="purchase-desktop-save" data-purchase-choice="save">'+esc(t('purchaseDesktopSave'))+'</button>'+
    '<p class="purchase-desktop-foot">'+esc(t('purchaseNoCheckout'))+'</p></section>';

@@ -181,3 +181,11 @@
  .purchase-desktop-layout .purchase-candidate-info small:last-child{display:none}
  .purchase-desktop-layout .purchase-finds>.purchase-smallprint{font-size:10px}
 }
+
+@media(min-width:801px){
+ .purchase-desktop-why{border-top:1px solid var(--line);margin-top:19px;padding:15px 0 12px}
+ .purchase-desktop-why h3{font-family:var(--serif);font-size:27px;font-weight:400;margin:0 0 7px}
+ .purchase-desktop-why>p{font-size:11px;line-height:1.48;margin:5px 0}
+ .purchase-desktop-why .purchase-certificate{border:0;margin:5px 0 0;padding:3px 0}
+ .purchase-desktop-why .purchase-certificate summary{font-size:11px;text-decoration:underline;font-weight:400}
+}

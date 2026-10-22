@@ -7,6 +7,7 @@ export const DEFAULT_LOCALE = 'en' as const;
 export type Locale = 'en' | 'pl';
 
 export const en = {
+  purchaseDesktopReadCertificate: 'View complete certificate',
   purchaseDesktopWear: 'I wear it',
   purchaseDesktopNotWear: 'I do not wear it',
   purchaseDesktopShop: 'From the shop',
