@@ -120,7 +120,10 @@ export function overviewFor(wardrobe: WardrobeState, daily: DailyState, decision
   const attention:AttentionItem[]=wardrobe.items.filter(item=>item.availability==='needs_repair'||item.availability==='needs_ironing')
     .map(item=>({id:item.id,kind:item.availability==='needs_repair'?'repair' as const:'ironing' as const}));
   // Only lack of a *recorded wear* is known. This is never evidence of lack of real use.
-  if (daily.wears.length) for(const item of wardrobe.items) {
+  // One logged morning is not a meaningful non-use history.
+  // Require at least seven independently logged dates before raising no-log
+  // prompts; the wording still never claims these pieces were unworn.
+  if (daily.wears.length>=7) for(const item of wardrobe.items) {
     if (!recentIds.has(item.id) && attention.length<6) attention.push({id:item.id,kind:'no_log'});
   }
   const decided=new Map(decisions.entries.map(entry=>[entry.itemId,entry.decision]));

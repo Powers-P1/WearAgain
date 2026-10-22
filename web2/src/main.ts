@@ -352,6 +352,22 @@ root.addEventListener('click', event => {
     message ||= t('statusChanged'); render();
   }
 });
+// Native-like keyboard traversal for button-based radio groups. Roving tabindex
+// avoids trapping tab focus while preserving existing verified click handlers.
+root.addEventListener('keydown',event=>{
+  const target=event.target;
+  if(!(target instanceof HTMLElement)||target.getAttribute('role')!=='radio')return;
+  if(!['ArrowRight','ArrowLeft','ArrowDown','ArrowUp','Home','End'].includes(event.key))return;
+  const group=target.closest('[role="radiogroup"]');
+  if(!group)return;
+  const choices=Array.from(group.querySelectorAll<HTMLElement>('[role="radio"]:not([disabled])'));
+  if(!choices.length)return;
+  const index=choices.indexOf(target);
+  const next=event.key==='Home'?0:event.key==='End'?choices.length-1:
+    (index+(event.key==='ArrowRight'||event.key==='ArrowDown'?1:choices.length-1))%choices.length;
+  event.preventDefault();
+  choices[next]?.click();
+});
 root.addEventListener('input', event => {
   const target = event.target;
   if(target instanceof HTMLTextAreaElement && handleMorningInput(target))return;

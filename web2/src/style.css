@@ -264,3 +264,5 @@ p { line-height: 1.55; }
  .mall-return-row button{padding:10px 7px;}
 }
 h1:focus:not(:focus-visible),h2:focus:not(:focus-visible),main:focus:not(:focus-visible){outline:none;}
+.mall-example-verdict{font-weight:600;color:var(--olive)!important;border-left:2px solid #6a7e60;padding-left:12px;margin:13px 0!important;}
+

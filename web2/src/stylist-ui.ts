@@ -27,7 +27,7 @@ function escapeHtml(value: unknown): string {
   return String(value ?? '').replace(/[&<>"']/g, character =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character] ?? character);
 }
-function svg(which: 'arrow' | 'left' | 'calendar' | 'hanger' | 'check' | 'lock'): string {
+function svg(which: 'arrow' | 'left' | 'calendar' | 'hanger' | 'check' | 'lock' | 'bookmark'): string {
   const paths = {
     arrow: '<path d="M4 12h16m-7-7 7 7-7 7"/>',
     left: '<path d="M20 12H4m7-7-7 7 7 7"/>',
@@ -35,6 +35,7 @@ function svg(which: 'arrow' | 'left' | 'calendar' | 'hanger' | 'check' | 'lock')
     hanger: '<path d="M9 5a3 3 0 0 1 6 0c0 2-3 2-3 4l9 7a2 2 0 0 1-1 3H4a2 2 0 0 1-1-3l9-7"/>',
     check: '<path d="M4 12.5 9.5 18 20 6"/>',
     lock: '<rect x="5" y="10" width="14" height="11" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+    bookmark: '<path d="M6 3h12v18l-6-4-6 4V3Z"/>',
   };
   return '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths[which] + '</svg>';
 }
@@ -99,7 +100,7 @@ function lookPreview(wardrobe: WardrobeState, selection: StylistResult): string 
     (selection.verified ? '<p class="stylist-verified">' + svg('check') + ' ' + escapeHtml(t('stylistVerified')) + '</p>' : '') +
     '</div>' +
     '<div class="stylist-details"><h2>' + escapeHtml(t('stylistAllOwned')) + '</h2>' +
-    '<p class="stylist-detail-count">' + escapeHtml(t('stylistPieces',{count:owned.length})) + '</p>' +
+    '<p class="stylist-detail-count">' + escapeHtml(t(owned.length===1?'stylistPiecesOne':'stylistPieces',{count:owned.length})) + '</p>' +
     '<div class="stylist-garments">' + owned.map(item =>
       '<div class="stylist-garment"><span class="stylist-item-photo">' + picture(item) + '</span>' +
       '<span>' + escapeHtml(item.name) + '</span></div>').join('') + '</div>' +
@@ -114,7 +115,7 @@ export function stylistPage(wardrobe: WardrobeState): string {
   const selection = validResult(wardrobe);
   return '<section class="page stylist-view ' + (generated ? 'show-result' : 'show-brief') + '" aria-labelledby="stylist-title">' +
     (generated ? '<div class="stylist-result-appbar"><button type="button" data-stylist-reset aria-label="' + escapeHtml(t('stylistBackToBrief')) + '">←</button>'+
-    '<span>' + escapeHtml(t('stylistResultAppbar')) + '</span><button type="button" data-save-look aria-label="' + escapeHtml(t('stylistBookmarkLook')) + '">♧</button></div>' : '') +
+    '<span>' + escapeHtml(t('stylistResultAppbar')) + '</span><button type="button" data-save-look aria-label="' + escapeHtml(t('stylistBookmarkLook')) + '">' + svg('bookmark') + '</button></div>' : '') +
     '<div class="stylist-intro"><div><h1 id="stylist-title">' + escapeHtml(t('stylistPageTitle')) + '</h1>' +
     '<p>' + escapeHtml(t('stylistHeaderSubtitle')) + '</p></div>' +
     '<button type="button" class="text-link stylist-saved-link" data-nav="saved">' + escapeHtml(t('stylistSavedLink')) + ' ' + svg('arrow') + '</button></div>' +
@@ -124,12 +125,12 @@ export function stylistPage(wardrobe: WardrobeState): string {
 export function savedPage(storage?: Pick<Storage, 'getItem'>): string {
   if (saved === null) saved = loadSaved(storage);
   return '<section class="page saved-view"><h1>' + escapeHtml(t('stylistOutfitList')) + '</h1>' +
-    '<p class="intro-subtitle">' + escapeHtml(t('stylistSavedCount',{count:saved.length})) + '</p>' +
+    '<p class="intro-subtitle">' + escapeHtml(t(saved.length===1?'stylistSavedCountOne':'stylistSavedCount',{count:saved.length})) + '</p>' +
     (saved.length ? '<div class="saved-look-list">' + saved.map(look =>
       '<article class="saved-look-item"><h2>' + escapeHtml(look.title) + '</h2><p>' +
       escapeHtml(look.occasion) + '</p>' +
       (look.date ? '<p>' + escapeHtml(t('stylistSavedWhen',{date:look.date})) + '</p>' : '') +
-      '<p>' + escapeHtml(t('stylistSavedItems',{count:look.itemIds.length})) + '</p></article>').join('') + '</div>' :
+      '<p>' + escapeHtml(t(look.itemIds.length===1?'stylistSavedItemsOne':'stylistSavedItems',{count:look.itemIds.length})) + '</p></article>').join('') + '</div>' :
       '<p class="no-results">' + escapeHtml(t('stylistNoSaved')) + '</p>') +
     '<button type="button" class="button button-outline" data-nav="stylist">' + escapeHtml(t('stylistPageTitle')) +
     ' ' + svg('arrow') + '</button></section>';

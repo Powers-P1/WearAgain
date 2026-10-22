@@ -88,7 +88,7 @@ export function morningPage(wardrobe:WardrobeState,daily:DailyState):string{
       '<p>'+esc(t('morningReadySubtitle'))+'</p></div>'+
       (looks.length?'<div class="morning-looks" role="radiogroup" aria-label="'+esc(t('morningChoose'))+'">'+
         looks.map(look=>'<button type="button" role="radio" aria-checked="'+(look.id===selected)+
-          '" class="morning-look '+(look.id===selected?'selected':'')+'" data-morning-select="'+esc(look.id)+'">'+
+          '" tabindex="'+(look.id===selected?'0':'-1')+'" class="morning-look '+(look.id===selected?'selected':'')+'" data-morning-select="'+esc(look.id)+'">'+
           '<span class="morning-look-photo">'+photoFor(look,wardrobe)+(look.heroImagePath?'<span class="morning-photo-badge">'+esc(t('morningOneGarmentBadge'))+'</span>':'')+'</span>'+
           '<span class="morning-look-desc"><strong>'+esc(look.title)+'</strong>'+
           '<small>'+esc(t('morningReadyBadge'))+'</small>'+

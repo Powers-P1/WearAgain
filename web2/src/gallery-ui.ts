@@ -6,6 +6,7 @@ import {
 import { deletePhoto, readPhoto, storePhoto, supportedPhoto, MAX_PHOTO_BYTES } from './photo-store.js';
 import { localISODate } from './daily.js';
 import { t } from './i18n.js';
+import { candidatePosition, initialPurchase, selectCandidate } from './purchase.js';
 import './gallery.css';
 
 type StorageLike=Pick<Storage,'getItem'|'setItem'>|undefined;
@@ -86,7 +87,7 @@ function camera():string{
     (saving.size?'<p class="mall-pending" role="status">'+esc(t('mallSaving',{count:saving.size}))+'</p>':'')+
     '</section>'+
     '<section class="mall-queue-panel"><div class="mall-queue-head"><h2>'+esc(t('mallToday'))+'</h2>'+
-      '<span>'+esc(t('mallItemCount',{count:counts.all}))+'</span></div>'+
+      '<span>'+esc(t(counts.all===1?'mallItemCountOne':'mallItemCount',{count:counts.all}))+'</span></div>'+
     '<p class="mall-queue-stats">'+esc(t('mallReadyCount',{ready:counts.ready,total:counts.all}))+'</p>'+
     '<div class="mall-queue-items">'+model().items.map(item=>'<article class="mall-queue-item">'+image(item,'mall-thumb')+
       '<div><strong>'+esc(item.title)+'</strong><p>'+esc(location(item))+'</p>'+
@@ -119,6 +120,15 @@ export function handleGalleryInput(input:HTMLInputElement):boolean {
 function readyList():readonly ShopItem[]{
   return model().items.filter(item=>!showReady||item.status==='saved_preview');
 }
+function exampleCoffeeVerdict(item:ShopItem):string|null{
+  if(item.source!=='recorded'||!item.id.startsWith('demo_'))return null;
+  const key=item.id.slice(5).replaceAll('_','-');
+  try{
+    const position=candidatePosition(selectCandidate(initialPurchase('minimum'),key));
+    return t(position==='recommended'?'mallExampleRecommended':
+      position==='not_required'?'mallExampleNotNeeded':'mallExampleUnknown');
+  }catch{return null;}
+}
 function coffee():string{
   const counts=shoppingCounts(model());
   const choices=readyList();
@@ -134,7 +144,8 @@ function coffee():string{
     '<div class="mall-review-details"><p class="mall-eyebrow">'+esc(t('mallProgress',{index:choices.indexOf(selected)+1,total:choices.length}))+'</p>'+
     '<p class="mall-location">'+esc(location(selected))+'</p><h3>'+esc(selected.title)+'</h3>'+
     '<p>'+esc(t(selected.status==='saved_preview'?'mallSavedPreviewExplanation':'mallPhotoOnlyDecision'))+'</p>'+
-    '<p class="mall-small">'+esc(t('styleFitDisclaimer'))+'</p>'+
+    (exampleCoffeeVerdict(selected)?'<p class="mall-example-verdict">'+esc(exampleCoffeeVerdict(selected))+'</p>':'')+
+    (selected.status==='saved_preview'?'<p class="mall-small">'+esc(t('styleFitDisclaimer'))+'</p>':'')+
     '<div class="mall-review-actions"><button type="button" class="button button-outline" data-mall-decision="skip" aria-pressed="'+(selected.decision==='skip')+'">'+esc(t('mallSkip'))+'</button>'+
     '<button type="button" class="button button-primary" data-mall-decision="return" aria-pressed="'+(selected.decision==='return')+'">'+esc(t('mallReturnForIt'))+'</button></div>'+
     '<p class="mall-small">'+esc(t('mallCanChangeMind'))+'</p>'+
