@@ -1,5 +1,6 @@
 import { morningLooks, morningHeadingKey, localISODate, storeDaily, wearToday, type DailyState } from './daily.js';
-import { proposeLooks, recordedPreviewForItem, type OccasionSuggestion } from './stylist.js';
+import { proposeLooks, type OccasionSuggestion } from './stylist.js';
+import { outfitBoard } from './ui.js';
 import type { WardrobeState } from './state.js';
 import { t } from './i18n.js';
 import './daily.css';
@@ -34,11 +35,7 @@ const svg=(name:'mic'|'check'|'arrow')=>{
   return '<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">'+path+'</svg>';
 };
 function photoFor(look:OccasionSuggestion,wardrobe:WardrobeState):string{
-  const recorded=look.itemIds.map(recordedPreviewForItem).find(path=>path!==null)??null;
-  if(recorded)return '<img src="'+esc(recorded)+'" loading="lazy" alt="'+esc(t('morningSinglePreview'))+'"/>';
-  const garment=wardrobe.items.find(item=>look.itemIds.includes(item.id)&&item.photo);
-  return garment?.photo?'<img src="/assets/items/'+esc(garment.photo)+'.webp" loading="lazy" alt="'+esc(garment.name)+'"/>':
-    '<span class="morning-no-preview">'+esc(t('stylistUnrendered'))+'</span>';
+  return outfitBoard(look.itemIds,wardrobe,true);
 }
 /** Keep the typed brief before rerenders caused by voice controls or async events. */
 export function handleMorningInput(target:HTMLTextAreaElement):boolean {
@@ -72,7 +69,7 @@ export function morningPage(wardrobe:WardrobeState,daily:DailyState):string{
       '<p class="morning-chips">'+esc(t('morningChips'))+'</p>'+
       '<button type="button" class="morning-dictate" data-morning-voice aria-pressed="'+listening+'">'+svg('mic')+
       ' '+esc(t(listening?'morningStopListening':'morningStartListening'))+'</button>'+
-      '<p class="morning-help">'+esc(t('morningVoiceDisclosure'))+'</p>'+
+      '<details class="morning-voice-help"><summary>'+esc(t('morningAboutDictation'))+'</summary><p class="morning-help">'+esc(t('morningVoiceDisclosure'))+'</p></details>'+
       '<button type="submit" class="button button-primary full-width">'+esc(t('morningPrepare'))+' '+svg('arrow')+'</button>'+
       '<p class="morning-help">'+esc(t('morningOfflineNote'))+'</p></form>':
     stage==='preparing'?
@@ -89,7 +86,7 @@ export function morningPage(wardrobe:WardrobeState,daily:DailyState):string{
       (looks.length?'<div class="morning-looks" role="radiogroup" aria-label="'+esc(t('morningChoose'))+'">'+
         looks.map(look=>'<button type="button" role="radio" aria-checked="'+(look.id===selected)+
           '" tabindex="'+(look.id===selected?'0':'-1')+'" class="morning-look '+(look.id===selected?'selected':'')+'" data-morning-select="'+esc(look.id)+'">'+
-          '<span class="morning-look-photo">'+photoFor(look,wardrobe)+(look.heroImagePath?'<span class="morning-photo-badge">'+esc(t('morningOneGarmentBadge'))+'</span>':'')+'</span>'+
+          '<span class="morning-look-photo">'+photoFor(look,wardrobe)+'</span>'+
           '<span class="morning-look-desc"><strong>'+esc(look.title)+'</strong>'+
           '<small>'+esc(t('morningReadyBadge'))+'</small>'+
           '<span>'+esc(lookNames(look,wardrobe))+'</span></span>'+
@@ -101,7 +98,7 @@ export function morningPage(wardrobe:WardrobeState,daily:DailyState):string{
       (logged?'<p class="morning-logged" role="status">'+svg('check')+' '+esc(t('morningTodayRecorded',{name:logged.lookTitle}))+'</p>':'')+
       '<button type="button" class="text-link morning-restart" data-morning-reset>'+
         esc(t('morningNewRequest'))+' →</button>'+
-      '<p class="morning-help">'+esc(t('morningSinglePreview'))+'</p></div>')+
+      '<p class="morning-help">'+esc(t('outfitBoardNote'))+'</p></div>')+
     '</section>';
 }
 export function handleMorningClick(button:HTMLElement,actions:Actions):boolean{

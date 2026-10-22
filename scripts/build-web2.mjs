@@ -7,13 +7,15 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dest = join(root, 'web2/dist');
+const apiOrigin = new URL(process.env.PUBLIC_API_ORIGIN || 'https://wearagain-api.oli-struska.workers.dev');
+if (apiOrigin.protocol !== 'https:' || apiOrigin.pathname !== '/' || apiOrigin.username || apiOrigin.password || apiOrigin.search || apiOrigin.hash) throw Error('PUBLIC_API_ORIGIN must be an HTTPS origin.');
 await rm(dest, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 await mkdir(join(dest, 'assets/items'), { recursive: true });
 await mkdir(join(dest, 'fonts'), { recursive: true });
 await mkdir(join(dest, 'icons'), { recursive: true });
 // Local licensed webfonts are static public assets. No network CSS dependency.
 await cp(join(root, 'web2/public/fonts'), join(dest, 'fonts'), { recursive: true });
-await cp(join(root, 'web2/_headers'), join(dest, '_headers'));
+await writeFile(join(dest,'_headers'),(await readFile(join(root,'web2/_headers'),'utf8')).replaceAll('__API_ORIGIN__',apiOrigin.origin));
 // Replace the former root-scope PWA with a one-time cleanup worker; keep
 // the optional new app PWA independently scoped under /app/sw.js.
 await cp(join(root, 'web2/public/sw.js'), join(dest, 'sw.js'));
@@ -54,8 +56,23 @@ await sharp(join(root, 'docs/mockups/v2/WearAgain-03-Personalizacja-i-wyjazd.png
   .resize({ width: 360 }).webp({ quality: 88 })
   .toFile(join(dest, 'assets/demo-portrait.webp'));
 
-// Outfit previews use only the real six single-garment recordings in the
-// immutable manifest. Never create hero images by cropping design boards.
+// Verbatim artwork extracts from the approved boards. Used as editorial
+// illustrations only: never catalogued as provider recordings or live results.
+const editorialArt = [
+  ['surprise-scarf', 'WearAgain-03-Personalizacja-i-wyjazd.png', 1035, 242, 415, 256],
+  ['editorial-retail', 'WearAgain-14-Retail-Landing.png', 645, 55, 378, 505],
+  ['editorial-judges', 'WearAgain-16-Judges-Landing.png', 456, 91, 426, 486],
+  ['retail-product', 'WearAgain-15-Retail-Produkt.png', 34, 116, 496, 628],
+  ['retail-styling', 'WearAgain-15-Retail-Produkt.png', 981, 228, 334, 518],
+];
+for (const [name, file, left, top, width, height] of editorialArt) {
+  await sharp(join(root, 'docs/mockups/v2', file)).extract({left, top, width, height})
+    .resize({width: 900, withoutEnlargement: true}).webp({quality: 88})
+    .toFile(join(dest, 'assets', name + '.webp'));
+}
+
+// Provider evidence uses only the six single-garment recordings in the
+// immutable manifest. Editorial art above is kept outside that catalogue.
 // Future flows reuse the original immutable recording paths and manifest.
 // Individual cloth-v4 outputs must never be described as complete outfit renders.
 await mkdir(join(dest, 'demo'), { recursive: true });
@@ -65,12 +82,15 @@ await cp(join(root, 'docs/mockups/landing-v1.png'),join(dest,'assets/reference-s
 await cp(join(root, 'docs/mockups/landing-retailers-v1.webp'),join(dest,'assets/reference-retailers.webp'));
 
 await cp(join(root, 'fixtures/youcam/demo-manifest.json'), join(dest, 'demo/manifest.json'));
+// A real screen recording and captions, deliberately outside the PWA precache.
+await cp(join(root,'web2/public/video'),join(dest,'video'),{recursive:true});
 
 const output = await build({
   entryPoints: [join(root, 'web2/src/main.ts')],
   bundle: true, minify: true, metafile: true,
   outdir: join(dest, 'assets'), entryNames: 'web2-[hash]',
   format: 'esm', platform: 'browser', target: ['es2022'],
+  define: {__PUBLIC_API_ORIGIN__: JSON.stringify(apiOrigin.origin), __PUBLIC_CONTACT_EMAIL__: JSON.stringify('')},
   // Absolute URLs resolve from the Pages origin; the licensed WOFF2 files
   // are copied into /fonts/ above, not bundled as JS dependencies.
   external: ['/fonts/*'],
@@ -85,7 +105,7 @@ const markup = (await readFile(join(root, 'web2/index.html'), 'utf8'))
 await writeFile(join(dest, 'index.html'),
   markup.replace('<title>Your wardrobe - WearAgain</title>','<title>WearAgain - Your wardrobe, more you</title>'));
 // Pages ships one static HTML shell on each route; the client resolves the exact
-// pathname. Root is now board 13 landing, the original demo is under /app/.
+// pathname. Root retains the owner-selected v1 landing; the app is under /app/.
 for (const directory of ['app','retail','retail/demo','judges','judges/demo']) {
   await mkdir(join(dest,directory),{recursive:true});
   const titles = {

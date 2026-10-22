@@ -6,10 +6,13 @@ import {
 import { DEFAULT_LOCALE, t, type TranslationKey } from './i18n.js';
 import { marketingRoute } from './marketing-model.js';
 import { marketingPage, marketingTitle, handleMarketingClick } from './marketing.js';
-import { setupPwa } from './pwa.js';
-import { purchasePage, handlePurchaseClick } from './purchase-ui.js';
-import { recordedPreviewForItem } from './stylist.js';
-import { loadDaily, loadDecisions, type DailyState, type DecisionsState } from './daily.js';
+import { setupPwa, canInstall, installWebApp } from './pwa.js';
+import { purchasePage, handlePurchaseClick, handlePurchaseChange } from './purchase-ui.js';
+import { loadDaily, loadDecisions, wearToday, storeDaily, localISODate, type DailyState, type DecisionsState } from './daily.js';
+import { tripPage, surprisePage, balancePage, handlePlansClick, handlePlansChange, handlePlansSubmit } from './plans-ui.js';
+import { itemPicture, configurePhotoMedia } from './ui.js';
+import { storePhoto, supportedPhoto } from './photo-store.js';
+import { stopCamera } from './camera.js';
 import { morningPage, handleMorningInput, handleMorningClick, submitMorning } from './morning-ui.js';
 import { overviewPage, reviewItemPage, handleOverviewClick, handleOverviewMonthChange } from './overview-ui.js';
 import { galleryPage, handleGalleryInput, handleGalleryClick, handleGallerySubmit, handleGalleryFile } from './gallery-ui.js';
@@ -22,9 +25,9 @@ document.documentElement.lang = DEFAULT_LOCALE;
 const publicRoute = marketingRoute(window.location.pathname);
 if (!publicRoute && /^\/app(?:\/|$)/.test(window.location.pathname)) setupPwa();
 
-type Screen = 'wardrobe' | 'profile' | 'stylist' | 'check' | 'saved' | 'gallery' | 'add' | 'item' | 'morning' | 'overview' | 'review';
-type NavId = 'wardrobe' | 'stylist' | 'check' | 'profile' | 'saved' | 'gallery' | 'morning' | 'overview';
-const navIds: readonly NavId[] = ['wardrobe', 'stylist', 'check', 'profile', 'saved', 'gallery', 'morning', 'overview'];
+type Screen = 'wardrobe' | 'profile' | 'stylist' | 'check' | 'saved' | 'gallery' | 'add' | 'item' | 'morning' | 'overview' | 'review' | 'trip' | 'surprise' | 'balance';
+type NavId = 'wardrobe' | 'stylist' | 'check' | 'profile' | 'saved' | 'gallery' | 'morning' | 'overview' | 'trip';
+const navIds: readonly NavId[] = ['wardrobe', 'stylist', 'check', 'profile', 'saved', 'gallery', 'morning', 'overview', 'trip'];
 let storage: Storage | undefined;
 try { storage = window.localStorage; } catch { /* Browsers may disable persistence. */ }
 let data: WardrobeState = loadState(storage);
@@ -34,9 +37,12 @@ let category: Category | 'all' = 'all';
 let search = '';
 let revealMore = false;
 let message = '';
+let addPhoto: File | null = null;
+let addPhotoUrl = '';
+let addDraft = { name: '', detail: '', category: 'tops', availability: 'ready' };
 
 const paths: Record<string, string> = {
-  hanger: '<path d="M9 5a3 3 0 0 1 6 0c0 2-3 2-3 4l9 7a2 2 0 0 1-8 0Z"/>',
+  hanger: '<path d="M9 5a3 3 0 0 1 6 0c0 2-3 2-3 4l9 7a2 2 0 0 1-1 3H4a2 2 0 0 1-1-3l9-7"/>',
   sparkles: '<path d="m12 2 2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6L12 2Z"/>',
   check: '<path d="M4 12.5 9.5 18 20 6"/>',
   search: '<circle cx="10.5" cy="10.5" r="7.2"/><path d="m16 16 5 5"/>',
@@ -62,7 +68,8 @@ function route(): { screen: Screen; itemId: string } {
   const value = decodeURIComponent(window.location.hash.slice(1));
   if (value.startsWith('item/')) return { screen: 'item', itemId: value.slice(5) };
   if (value.startsWith('review/')) return { screen: 'review', itemId: value.slice(7) };
-  if (['wardrobe', 'profile', 'stylist', 'check', 'saved', 'gallery', 'add', 'morning', 'overview'].includes(value))
+  if (value.startsWith('saved/')) return { screen: 'saved', itemId: value.slice(6) };
+  if (['wardrobe', 'profile', 'stylist', 'check', 'saved', 'gallery', 'add', 'morning', 'overview', 'trip', 'surprise', 'balance'].includes(value))
     return { screen: value as Screen, itemId: '' };
   return { screen: 'wardrobe', itemId: '' };
 }
@@ -78,11 +85,11 @@ function persist(next: WardrobeState): void {
 function navButton(id: NavId, desktop: boolean, active: NavId): string {
   const labels: Record<NavId, TranslationKey> = {
     wardrobe: 'wardrobe', stylist: 'stylist', check: desktop ? 'checkPurchase' : 'check', profile: 'profile',
-    saved: 'savedLooks', gallery: 'shoppingGallery', morning:'morningNav', overview:'overviewNav',
+    saved: 'savedLooks', gallery: 'shoppingGallery', morning:'morningNav', overview:'overviewNav', trip: 'tripNav',
   };
   const symbols: Record<NavId, string> = {
     wardrobe: 'hanger', stylist: 'sparkles', check: 'bag', profile: 'user',
-    saved: 'bookmark', gallery: 'bag', morning:'sparkles', overview:'hanger',
+    saved: 'bookmark', gallery: 'bag', morning:'sparkles', overview:'hanger', trip: 'bookmark',
   };
   return '<button class="navigation-item ' + (active === id ? 'is-current' : '') +
     '" data-nav="' + id + '" type="button" ' + (active === id ? 'aria-current="page"' : '') +
@@ -98,7 +105,7 @@ function sidebar(active: NavId): string {
     '<button class="wordmark wordmark-button sidebar-brand" type="button" data-nav="wardrobe">WearAgain</button>' +
     '<nav class="sidebar-top">' + (['wardrobe', 'stylist', 'check'] as NavId[]).map(id => navButton(id, true, active)).join('') +
     '<div class="sidebar-rule"></div>' +
-    (['saved', 'gallery', 'morning', 'overview'] as NavId[]).map(id => navButton(id, true, active)).join('') + '</nav>' +
+    (['saved', 'gallery', 'morning', 'trip', 'overview'] as NavId[]).map(id => navButton(id, true, active)).join('') + '</nav>' +
     '<button type="button" class="sidebar-profile" data-nav="profile">' +
     '<img src="/assets/demo-portrait.webp" alt="" /><span><strong>Anna</strong><small>' +
     msg('styleLink') + ' ' + icon('arrow') + '</small></span></button></aside>';
@@ -108,11 +115,7 @@ function bottomBar(active: NavId): string {
     (['wardrobe', 'stylist', 'check', 'profile'] as NavId[]).map(id => navButton(id, false, active)).join('') + '</nav>';
 }
 function itemImage(item: WardrobeItem): string {
-  const record = recordedPreviewForItem(item.id);
-  return item.photo
-    ? '<img src="/assets/items/' + safe(item.photo) + '.webp" alt="' + safe(item.name) + '" loading="lazy" />'
-    : record ? '<img src="' + safe(record) + '" alt="' + safe(item.name) + '" loading="lazy" />'
-    : '<div class="no-photo" aria-label="' + msg('noPhoto') + '">' + icon('hanger') + '<span>' + msg('noPhoto') + '</span></div>';
+  return itemPicture(item);
 }
 function itemCard(item: WardrobeItem): string {
   return '<button class="garment" type="button" data-item="' + safe(item.id) + '" aria-label="' +
@@ -129,6 +132,9 @@ function gridMarkup(): string {
   if (mobileHome) {
     const featured = ['cashmere', 'blazer', 'trousers', 'loafers'];
     items.sort((a,b) => {
+      // A freshly added personal piece must be visible immediately, including
+      // after reload, rather than hidden behind the four example garments.
+      if(a.id.startsWith('own_')||b.id.startsWith('own_'))return b.order-a.order;
       const ai = featured.indexOf(a.id), bi = featured.indexOf(b.id);
       return (ai < 0 ? 100 : ai) - (bi < 0 ? 100 : bi) || b.order - a.order;
     });
@@ -178,7 +184,9 @@ function profile(): string {
     '<p class="privacy-line">' + icon('lock') + ' ' + msg('photoPrivacy') + '</p>' +
     '<p class="field-hint">' + msg('photoFuture') + '</p>' +
     '<p class="field-hint">' + msg('styleFitDisclaimer') + '</p>' +
-    '<button type="submit" class="button button-primary full-width">' + msg('saveMyStyle') + '</button></form></section>';
+    '<button type="submit" class="button button-primary full-width">' + msg('saveMyStyle') + '</button></form>' +
+    '<div class="feature-links"><button data-nav="trip">' + msg('tripNav') + '</button><button data-nav="surprise">' + msg('surpriseNav') + '</button><button data-nav="saved">' + msg('savedLooks') + '</button></div>' +
+    (canInstall()?'<button type="button" class="text-link" data-pwa-install>'+msg('mktPwaInstall')+'</button>':'')+'</section>';
 }
 function itemDetail(itemId: string): string {
   const item = data.items.find(row => row.id === itemId);
@@ -200,14 +208,16 @@ function itemDetail(itemId: string): string {
 function addScreen(): string {
   return '<section class="page edit-view"><button type="button" class="back-link" data-nav="wardrobe">' + icon('left') +
     ' ' + msg('goBackWardrobe') + '</button><h1>' + msg('editItem') + '</h1><p class="intro-subtitle">' + msg('addGuidance') + '</p>' +
-    '<form id="add-form" class="edit-form"><label>' + msg('itemName') +
-    '<input name="name" required maxlength="80" placeholder="' + msg('itemNamePlaceholder') + '" autocomplete="off" /></label>' +
-    '<label>' + msg('colorMaterial') + '<input name="detail" maxlength="100" placeholder="' + msg('colorMaterialPlaceholder') + '" autocomplete="off" /></label>' +
+    '<form id="add-form" class="edit-form"><div class="wardrobe-photo-picker"><label for="wardrobe-photo">' + icon('camera') + msg('wardrobePhotoLabel') +
+    '<input id="wardrobe-photo" type="file" name="photo" accept="image/jpeg,image/png,image/webp" capture="environment" /></label><div class="add-photo-preview">' +
+    (addPhotoUrl ? '<img src="' + safe(addPhotoUrl) + '" alt="' + msg('wardrobePhotoSelected') + '" />' : '') + '</div><p class="field-hint">' + msg('wardrobePhotoHint') + '</p></div><label>' + msg('itemName') +
+    '<input name="name" required maxlength="80" value="' + safe(addDraft.name) + '" placeholder="' + msg('itemNamePlaceholder') + '" autocomplete="off" /></label>' +
+    '<label>' + msg('colorMaterial') + '<input name="detail" maxlength="100" value="' + safe(addDraft.detail) + '" placeholder="' + msg('colorMaterialPlaceholder') + '" autocomplete="off" /></label>' +
     '<label>' + msg('category') + '<select name="category">' +
-    CATEGORIES.map(key => '<option value="' + key + '">' + safe(categoryLabel(key)) + '</option>').join('') + '</select></label>' +
+    CATEGORIES.map(key => '<option value="' + key + '" ' + (addDraft.category === key ? 'selected' : '') + '>' + safe(categoryLabel(key)) + '</option>').join('') + '</select></label>' +
     '<label>' + msg('status') + '<select name="availability">' +
-    (Object.keys(AVAILABILITY) as Availability[]).map(key => '<option value="' + key + '">' + safe(availabilityLabel(key)) + '</option>').join('') +
-    '</select></label><p class="field-hint">' + msg('photosLater') + '</p>' +
+    (Object.keys(AVAILABILITY) as Availability[]).map(key => '<option value="' + key + '" ' + (addDraft.availability === key ? 'selected' : '') + '>' + safe(availabilityLabel(key)) + '</option>').join('') +
+    '</select></label>' +
     '<button class="button button-primary full-width" type="submit">' + msg('addToWardrobe') + '</button></form></section>';
 }
 function placeholder(screen: Screen): string {
@@ -230,6 +240,7 @@ function focusAfterRender(selector:string):void { requestedFocus=selector; }
 /** Preserve focus and expanded certificate, then restore a deterministic
  * heading when a previous control no longer exists or the route changes. */
 function render(): void {
+  configurePhotoMedia();
   if(publicRoute){
     const focused=document.activeElement;
     const attr=focused instanceof HTMLElement&&focused.dataset.guideStep?'[data-guide-step="'+focused.dataset.guideStep+'"]':
@@ -270,17 +281,22 @@ function render(): void {
   requestedFocus='';
   const whyOpen=same&&!!root!.querySelector('.purchase-certificate[open]');
   const current = route();
+  if(current.screen!=='gallery')stopCamera();
   const active: NavId = current.screen === 'item' || current.screen === 'add' ? 'wardrobe'
-    : current.screen==='review'?'overview'
+    : current.screen==='review'||current.screen==='balance'?'overview'
+    : current.screen==='surprise'?'profile'
     : navIds.includes(current.screen as NavId)?current.screen as NavId:'wardrobe';
   const page = current.screen === 'wardrobe' ? wardrobe()
     : current.screen === 'stylist' ? stylistPage(data)
-    : current.screen === 'check' ? purchasePage()
+    : current.screen === 'check' ? purchasePage(data)
+    : current.screen === 'trip' ? tripPage(data,storage)
+    : current.screen === 'surprise' ? surprisePage(storage)
+    : current.screen === 'balance' ? balancePage(data,daily,storage)
     : current.screen === 'morning' ? morningPage(data,daily)
     : current.screen === 'overview' ? overviewPage(data,daily,decisions)
     : current.screen === 'review' ? reviewItemPage(current.itemId,data,daily,decisions,storage)
     : current.screen === 'gallery' ? galleryPage(storage,render)
-    : current.screen === 'saved' ? savedPage(storage)
+    : current.screen === 'saved' ? savedPage(storage,data,current.itemId)
     : current.screen === 'profile' ? profile()
     : current.screen === 'item' ? itemDetail(current.itemId)
     : current.screen === 'add' ? addScreen() : placeholder(current.screen);
@@ -288,8 +304,8 @@ function render(): void {
     mobileBar() + (message ? '<p role="status" class="notice">' + safe(message) + '</p>' : '') +
     page + '</main>' + bottomBar(
       current.screen==='gallery'?'check':
-      current.screen==='morning'?'stylist':
-      current.screen==='overview'||current.screen==='review'?'wardrobe':active
+      current.screen==='morning'||current.screen==='trip'?'stylist':
+      current.screen==='overview'||current.screen==='review'||current.screen==='balance'?'wardrobe':active
     ) + '</div>';
   if(whyOpen){
     const details=root!.querySelector<HTMLDetailsElement>('.purchase-certificate');
@@ -328,20 +344,24 @@ function render(): void {
 root.addEventListener('click', event => {
   const target = event.target;
   if (!(target instanceof Element)) return;
-  const control = target.closest<HTMLElement>('[data-nav], [data-cat], [data-item], [data-status], [data-expand], [data-stylist-reset], [data-occasion], [data-look-next], [data-look-prev], [data-save-look], [data-purchase-demo], [data-purchase-candidate], [data-purchase-top], [data-purchase-rating], [data-purchase-clear], [data-purchase-replay], [data-purchase-choice], [data-purchase-next], [data-purchase-prev], [data-mall-view], [data-mall-filter], [data-mall-step], [data-mall-decision], [data-mall-undo], [data-mall-remove], [data-mall-context-toggle], [data-morning-select], [data-morning-wear], [data-morning-reset], [data-morning-voice], [data-overview-review], [data-overview-decision], [data-overview-save], [data-retail-panel-toggle], [data-retail-size], [data-retail-save], [data-guide-step], [data-judge-mode]');
+  const control = target.closest<HTMLElement>('button, [data-nav]');
   if (!control) return;
   if(publicRoute){
     handleMarketingClick(control,render);
     return;
   }
-  if (handleStylistClick(control, { wardrobe: data, storage, rerender: render, notice: value => { message = value; } })) return;
-  if (handlePurchaseClick(control, { rerender: render, notice: value => { message = value; } })) return;
+  if (handlePlansClick(control, {wardrobe:data,storage,rerender:render,notice:value=>{message=value;},navigate})) return;
+  if (handleStylistClick(control, { wardrobe: data, storage, rerender: render, notice: value => { message = value; }, navigate,
+    wear:look=>{try{daily=wearToday(daily,data,look,localISODate(new Date()));message=storeDaily(daily,storage)?t('morningSavedAsToday'):t('localStorageDenied');}catch(error){message=error instanceof Error?error.message:t('dailyInvalidLook');}}
+  })) return;
+  if (handlePurchaseClick(control, { wardrobe:data, rerender: render, notice: value => { message = value; } })) return;
   if (handleGalleryClick(control, {storage,rerender:render,notice:value=>{message=value;},focus:focusAfterRender})) return;
   if (handleMorningClick(control, {wardrobe:data,daily,storage,updateDaily:next=>{daily=next;},rerender:render,notice:value=>{message=value;}})) return;
   if (handleOverviewClick(control, {wardrobe:data,decisions,storage,
       updateDecisions:next=>{decisions=next;},updateWardrobe:next=>{persist(next);},
       navigate,rerender:render,notice:value=>{message=value;}})) return;
   if (control.hasAttribute('data-expand')) { revealMore = true; render(); return; }
+  if(control.hasAttribute('data-pwa-install')){void installWebApp().catch(()=>{message=t('mktPwaNotAvailable');}).finally(render);return;}
   if (control.dataset.nav) { navigate(control.dataset.nav); return; }
   if (control.dataset.cat && (control.dataset.cat === 'all' || CATEGORIES.includes(control.dataset.cat as Category))) {
     category = control.dataset.cat as Category | 'all'; render(); return;
@@ -371,6 +391,10 @@ root.addEventListener('keydown',event=>{
 });
 root.addEventListener('input', event => {
   const target = event.target;
+  if(target instanceof HTMLInputElement && target.closest('#add-form')){
+    const form=target.closest<HTMLFormElement>('form')!;const values=new FormData(form);
+    addDraft={name:String(values.get('name')??''),detail:String(values.get('detail')??''),category:String(values.get('category')??'tops'),availability:String(values.get('availability')??'ready')};
+  }
   if(target instanceof HTMLTextAreaElement && handleMorningInput(target))return;
   if(target instanceof HTMLInputElement && handleGalleryInput(target))return;
   if (!(target instanceof HTMLInputElement) || target.id !== 'wardrobe-search') return;
@@ -380,6 +404,14 @@ root.addEventListener('input', event => {
 });
 root.addEventListener('change', event => {
   const target=event.target;
+  if(target instanceof HTMLSelectElement && handlePurchaseChange(target)){render();return;}
+  if(target instanceof HTMLInputElement && handlePlansChange(target,{wardrobe:data,storage,rerender:render,notice:value=>{message=value;},navigate}))return;
+  if(target instanceof HTMLInputElement && target.id==='wardrobe-photo'){
+    const file=target.files?.[0];if(!file)return;
+    if(!supportedPhoto(file)){message=t('wardrobePhotoError');render();return;}
+    if(addPhotoUrl)URL.revokeObjectURL(addPhotoUrl);addPhoto=file;addPhotoUrl=URL.createObjectURL(file);
+    const preview=root.querySelector('.add-photo-preview');if(preview)preview.innerHTML='<img src="'+safe(addPhotoUrl)+'" alt="'+msg('wardrobePhotoSelected')+'" />';return;
+  }
   if(target instanceof HTMLSelectElement && handleOverviewMonthChange(target)){render();return;}
   if(target instanceof HTMLInputElement && handleGalleryFile(target,{storage,rerender:render,notice:value=>{message=value;},focus:focusAfterRender}))return;
 });
@@ -387,6 +419,7 @@ root.addEventListener('submit', event => {
   const form = event.target;
   if (!(form instanceof HTMLFormElement)) return;
   event.preventDefault();
+  if(handlePlansSubmit(form,{wardrobe:data,storage,rerender:render,notice:value=>{message=value;},navigate}))return;
   if (form.id === 'stylist-form') {
     submitStylist(form,{ wardrobe:data, storage, rerender:render, notice:value => { message = value; } });
   } else if (submitMorning(form,{wardrobe:data,daily,storage,updateDaily:next=>{daily=next;},rerender:render,notice:value=>{message=value;}})) {
@@ -400,14 +433,27 @@ root.addEventListener('submit', event => {
     const entries = new FormData(form);
     const id = 'own_' + Date.now().toString(36) + '_' + Math.floor(Math.random() * 100000).toString(36);
     try {
-      persist(addItem(data, {
+      const details = {
         id, name: String(entries.get('name') ?? ''), detail: String(entries.get('detail') ?? ''),
         category: String(entries.get('category')) as Category,
         availability: String(entries.get('availability')) as Availability,
-      }));
-      message ||= t('itemAdded'); navigate('wardrobe');
+      };
+      addItem(data,details); // Validate text before committing a device photo.
+      const photo=addPhoto;
+      const complete=()=>{
+        persist(addItem(data,{...details,...(photo?{photoId:id}:{})}));
+        if(addPhoto===photo){if(addPhotoUrl)URL.revokeObjectURL(addPhotoUrl);addPhoto=null;addPhotoUrl='';addDraft={name:'',detail:'',category:'tops',availability:'ready'};}
+        message ||= t('itemAdded');if(route().screen==='add')navigate('wardrobe');else render();
+      };
+      if(photo){const submit=form.querySelector<HTMLButtonElement>('[type=submit]');if(submit){submit.disabled=true;submit.textContent=t('wardrobeSaving');}
+        void storePhoto(id,photo).then(complete).catch(()=>{message=t('wardrobePhotoError');render();});
+      }else complete();
     } catch { message = t('itemSaveError'); render(); }
   }
 });
 if(!publicRoute)window.addEventListener('hashchange', render);
+if(!publicRoute)document.addEventListener('visibilitychange',()=>{
+  if(document.hidden)stopCamera();
+  else if(route().screen==='gallery')render();
+});
 render();

@@ -1,8 +1,11 @@
 import {
-  demoLooks, loadSaved, persistSaved, proposeLooks, recordedPreviewForItem, saveChosen, verifyLooks,
-  type SavedLook, type StylistBrief, type StylistResult,
+  demoLooks, loadSaved, persistSaved, proposeLooks, saveChosen, verifyLooks,
+  type SavedLook, type StylistBrief, type StylistResult, type OccasionSuggestion,
 } from './stylist.js';
-import type { WardrobeState, WardrobeItem } from './state.js';
+import { initialState, type WardrobeState, type WardrobeItem } from './state.js';
+import { outfitBoard, itemPicture } from './ui.js';
+import { stageTripLook } from './plans.js';
+import './outfit-media.css';
 import { t } from './i18n.js';
 import './stylist.css';
 
@@ -11,6 +14,8 @@ type UIActions = {
   readonly storage: Pick<Storage, 'setItem' | 'getItem'> | undefined;
   readonly rerender: () => void;
   readonly notice: (message: string) => void;
+  readonly navigate?: (path: string) => void;
+  readonly wear?: (look: OccasionSuggestion) => void;
 };
 let brief: StylistBrief = {
   occasion: t('stylistDemoOccasion'),
@@ -40,11 +45,7 @@ function svg(which: 'arrow' | 'left' | 'calendar' | 'hanger' | 'check' | 'lock' 
   return '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths[which] + '</svg>';
 }
 function picture(item: WardrobeItem): string {
-  const recording = recordedPreviewForItem(item.id);
-  if (recording) return '<img src="' + escapeHtml(recording) + '" alt="' + escapeHtml(item.name) + '" loading="lazy" />';
-  return item.photo
-    ? '<img src="/assets/items/' + escapeHtml(item.photo) + '.webp" alt="' + escapeHtml(item.name) + '" loading="lazy" />'
-    : '<span class="stylist-empty-thumbnail">' + svg('hanger') + '</span>';
+  return itemPicture(item);
 }
 function validResult(wardrobe: WardrobeState): StylistResult {
   if (result) {
@@ -66,7 +67,7 @@ function briefForm(wardrobe: WardrobeState): string {
     '<label class="visually-hidden" for="occasion-input">' + escapeHtml(t('stylistOccasion')) + '</label>' +
     '<textarea id="occasion-input" name="occasion" maxlength="500" required rows="5">' + escapeHtml(brief.occasion) + '</textarea>' +
     '<div class="occasion-suggestions"><button type="button" data-occasion="work">' + escapeHtml(t('stylistWork')) + ' ' + svg('arrow') + '</button>' +
-    '<button type="button" data-occasion="weekend">' + escapeHtml(t('stylistWeekend')) + ' ' + svg('arrow') + '</button></div>' +
+    '<button type="button" data-nav="trip">' + escapeHtml(t('stylistWeekend')) + ' ' + svg('arrow') + '</button></div>' +
     '<label class="stylist-date">' + svg('calendar') + '<span class="visually-hidden">' + escapeHtml(t('stylistDate')) + '</span>' +
     '<input type="date" name="date" value="' + escapeHtml(brief.date) + '" aria-label="' + escapeHtml(t('stylistDate')) + '" /></label>' +
     '<div class="stylist-style-row"><div><strong>' + escapeHtml(t('stylistStyleLabel')) + '</strong>' +
@@ -84,18 +85,12 @@ function lookPreview(wardrobe: WardrobeState, selection: StylistResult): string 
   const owned = look.itemIds
     .map(id => wardrobe.items.find(item => item.id === id))
     .filter((item): item is WardrobeItem => !!item);
-  const image = look.heroImagePath
-    ? '<img src="' + escapeHtml(look.heroImagePath) + '" alt="' + escapeHtml(t('stylistSavedRender')) + '" />'
-    : '<div class="stylist-no-render">' + svg('hanger') + '<span>' + escapeHtml(t('stylistUnrendered')) + '</span></div>';
+  const image = outfitBoard(look.itemIds, wardrobe);
   return '<section class="stylist-result"><div class="stylist-preview-column">' +
     '<div class="stylist-progress"><span>' + escapeHtml(t('stylistSuggestion',{index:selected+1,count:selection.looks.length})) + '</span>' +
     '<div class="stylist-arrows"><button type="button" data-look-prev aria-label="' + escapeHtml(t('stylistPrevious')) + '">' + svg('left') + '</button>' +
     '<button type="button" data-look-next aria-label="' + escapeHtml(t('stylistNext')) + '">' + svg('arrow') + '</button></div></div>' +
-    '<div class="stylist-photo">' + image +
-    (look.heroImagePath ? '<span class="stylist-photo-label">' + escapeHtml(t('stylistModelLabel')) + '</span>' +
-      '<span class="stylist-photo-origin">' + escapeHtml(t('stylistSavedRender')) + '</span>' +
-      '<span class="stylist-photo-fit">' + escapeHtml(t('styleFitDisclaimer')) + '</span>' : '') +
-    '</div>' +
+    '<div class="stylist-photo">' + image + '</div>' +
     '<h2 class="stylist-caption">' + escapeHtml(look.title) + '</h2>' +
     (selection.verified ? '<p class="stylist-verified">' + svg('check') + ' ' + escapeHtml(t('stylistVerified')) + '</p>' : '') +
     '</div>' +
@@ -106,9 +101,10 @@ function lookPreview(wardrobe: WardrobeState, selection: StylistResult): string 
       '<span>' + escapeHtml(item.name) + '</span></div>').join('') + '</div>' +
     '<p class="stylist-reason">' + escapeHtml(look.explanation) + '</p>' +
     '<button type="button" class="button button-primary full-width" data-save-look>' + escapeHtml(t('stylistSave')) + '</button>' +
-    '<button type="button" class="stylist-trip-link" disabled title="' + escapeHtml(t('stylistTripUnavailable')) + '">' + escapeHtml(t('stylistSaveTrip')) + '</button>' +
+    '<button type="button" class="stylist-trip-link" data-save-trip>' + escapeHtml(t('stylistSaveTrip')) + '</button>' +
     '<button type="button" class="text-link stylist-next-link" data-look-next>' + escapeHtml(t('stylistChangeLook')) + ' ' + svg('arrow') + '</button>' +
-    '<p class="stylist-disclaimer">' + escapeHtml(t('stylistImageNote')) + '</p>' +
+    '<p class="stylist-disclaimer">' + escapeHtml(t('outfitBoardNote')) + '</p>' +
+    (look.heroImagePath ? '<details class="stylist-preview-detail"><summary>' + escapeHtml(t('outfitRecordedDetail')) + '</summary><img src="' + escapeHtml(look.heroImagePath) + '" alt="' + escapeHtml(t('stylistSavedRender')) + '" /><p>' + escapeHtml(t('stylistImageNote')) + '</p></details>' : '') +
     '<p class="stylist-disclaimer">' + escapeHtml(t('stylistDemoNote')) + '</p></div></section>';
 }
 export function stylistPage(wardrobe: WardrobeState): string {
@@ -122,22 +118,48 @@ export function stylistPage(wardrobe: WardrobeState): string {
     '<button type="button" class="stylist-mobile-back" data-stylist-reset>' + svg('left') + ' ' + escapeHtml(t('stylistBackToBrief')) + '</button>' +
     '<div class="stylist-layout">' + briefForm(wardrobe) + lookPreview(wardrobe,selection) + '</div></section>';
 }
-export function savedPage(storage?: Pick<Storage, 'getItem'>): string {
+export function savedPage(storage?: Pick<Storage, 'getItem'>, wardrobe: WardrobeState = initialState(), detailId = ''): string {
   if (saved === null) saved = loadSaved(storage);
+  if (detailId) {
+    const look = saved.find(entry => entry.id === detailId);
+    if (!look) return '<section class="page"><h1>' + escapeHtml(t('savedMissing')) + '</h1><button class="text-link" data-nav="saved">' + escapeHtml(t('savedBack')) + '</button></section>';
+    const ready = look.itemIds.every(id => wardrobe.items.some(item => item.id === id && item.availability === 'ready'));
+    return '<section class="page saved-detail-view"><button class="back-link" data-nav="saved">' + svg('left') + escapeHtml(t('savedBack')) + '</button><h1>' + escapeHtml(look.title) + '</h1><p class="intro-subtitle">' + escapeHtml(look.occasion) + '</p>' +
+      '<div class="saved-detail-layout">' + outfitBoard(look.itemIds, wardrobe) + '<div><h2>' + escapeHtml(t('stylistAllOwned')) + '</h2>' +
+      look.itemIds.map(id => wardrobe.items.find(item => item.id === id)).filter((item): item is WardrobeItem => !!item).map(item => '<div class="stylist-garment"><span class="stylist-item-photo">' + picture(item) + '</span><span>' + escapeHtml(item.name) + '</span></div>').join('') +
+      (!ready ? '<p class="notice">' + escapeHtml(t('savedUnavailable')) + '</p>' : '') +
+      '<div class="saved-detail-actions"><button class="button button-primary" data-saved-wear="' + escapeHtml(look.id) + '" ' + (!ready ? 'disabled' : '') + '>' + escapeHtml(t('savedWear')) + '</button>' +
+      '<button class="button button-outline" data-saved-trip="' + escapeHtml(look.id) + '">' + escapeHtml(t('stylistSaveTrip')) + '</button></div></div></div></section>';
+  }
   return '<section class="page saved-view"><h1>' + escapeHtml(t('stylistOutfitList')) + '</h1>' +
     '<p class="intro-subtitle">' + escapeHtml(t(saved.length===1?'stylistSavedCountOne':'stylistSavedCount',{count:saved.length})) + '</p>' +
     (saved.length ? '<div class="saved-look-list">' + saved.map(look =>
-      '<article class="saved-look-item"><h2>' + escapeHtml(look.title) + '</h2><p>' +
+      '<article class="saved-look-item">' + outfitBoard(look.itemIds, wardrobe, true) + '<h2>' + escapeHtml(look.title) + '</h2><p>' +
       escapeHtml(look.occasion) + '</p>' +
       (look.date ? '<p>' + escapeHtml(t('stylistSavedWhen',{date:look.date})) + '</p>' : '') +
-      '<p>' + escapeHtml(t(look.itemIds.length===1?'stylistSavedItemsOne':'stylistSavedItems',{count:look.itemIds.length})) + '</p></article>').join('') + '</div>' :
+      '<p>' + escapeHtml(t(look.itemIds.length===1?'stylistSavedItemsOne':'stylistSavedItems',{count:look.itemIds.length})) + '</p><div class="saved-look-actions"><button class="button button-outline" data-saved-open="' + escapeHtml(look.id) + '">' + escapeHtml(t('savedOpen')) + '</button><button data-saved-remove="' + escapeHtml(look.id) + '">' + escapeHtml(t('savedRemove')) + '</button></div></article>').join('') + '</div>' :
       '<p class="no-results">' + escapeHtml(t('stylistNoSaved')) + '</p>') +
     '<button type="button" class="button button-outline" data-nav="stylist">' + escapeHtml(t('stylistPageTitle')) +
     ' ' + svg('arrow') + '</button></section>';
 }
 /** Return true if the click belongs to this workspace, without intercepting global navigation. */
 export function handleStylistClick(target: HTMLElement, actions: UIActions): boolean {
-  if (target.hasAttribute('data-stylist-reset')) {
+  if (target.dataset.savedOpen) {
+    actions.navigate?.('saved/' + target.dataset.savedOpen); return true;
+  } else if (target.dataset.savedRemove) {
+    saved = (saved ?? loadSaved(actions.storage)).filter(look => look.id !== target.dataset.savedRemove);
+    actions.notice(persistSaved(saved, actions.storage) ? t('savedRemoved') : t('stylistSaveFailed'));
+  } else if (target.dataset.savedWear || target.dataset.savedTrip) {
+    const entry = (saved ?? loadSaved(actions.storage)).find(look => look.id === (target.dataset.savedWear ?? target.dataset.savedTrip));
+    if (entry) {
+      const look = { ...entry, explanation: entry.occasion || entry.title, heroImagePath: null };
+      if (target.dataset.savedWear) actions.wear?.(look);
+      else { stageTripLook(look); actions.navigate?.('trip'); return true; }
+    }
+  } else if (target.hasAttribute('data-save-trip')) {
+    const look = validResult(actions.wardrobe).looks[selected];
+    if (look) { stageTripLook(look); actions.navigate?.('trip'); return true; }
+  } else if (target.hasAttribute('data-stylist-reset')) {
     generated = false;
   } else if (target.dataset.occasion) {
     brief = { ...brief, occasion: target.dataset.occasion === 'work' ? t('stylistWork') : t('stylistWeekend') };

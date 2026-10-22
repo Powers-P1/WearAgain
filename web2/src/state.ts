@@ -22,6 +22,7 @@ export interface WardrobeItem {
   readonly category: Category;
   readonly availability: Availability;
   readonly photo: string | null;
+  readonly photoId?: string | null;
   readonly order: number;
 }
 export interface WardrobeState {
@@ -94,12 +95,14 @@ export function parseStored(value: unknown): WardrobeState {
       || typeof raw.detail !== 'string' || raw.detail.length > 100
       || !isCategory(category) || !isAvailability(availability)
       || !(raw.photo === null || (typeof raw.photo === 'string' && EXAMPLES.some(item => item.photo === raw.photo)))
+      || !(raw.photoId === undefined || raw.photoId === null || (typeof raw.photoId === 'string' && /^[a-zA-Z0-9_-]{1,64}$/.test(raw.photoId)))
       || typeof raw.order !== 'number' || !Number.isFinite(raw.order)) return initialState();
     ids.add(raw.id);
     const example = EXAMPLES.find(item => item.id === raw.id && item.photo === raw.photo);
     items.push({
       id: raw.id, name: example?.name ?? raw.name, detail: example?.detail ?? raw.detail,
       category, availability, photo: raw.photo, order: raw.order,
+      ...(typeof raw.photoId === 'string' ? { photoId: raw.photoId } : {}),
     });
   }
   // Saved PR-A wardrobes have eight board-05 garments. Append missing
@@ -138,15 +141,17 @@ export function setAvailability(state: WardrobeState, itemId: string, availabili
     throw new Error(t('invalidItemStatus'));
   return { ...state, items: state.items.map(item => item.id === itemId ? { ...item, availability } : item) };
 }
-export function addItem(state: WardrobeState, data: { id: string; name: string; detail: string; category: Category; availability: Availability }): WardrobeState {
+export function addItem(state: WardrobeState, data: { id: string; name: string; detail: string; category: Category; availability: Availability; photoId?: string }): WardrobeState {
   const name = data.name.trim();
   if (!/^[a-zA-Z0-9_-]{1,64}$/.test(data.id) || state.items.some(item => item.id === data.id)
     || !name || name.length > 80 || data.detail.length > 100 || !isCategory(data.category)
-    || !isAvailability(data.availability) || state.items.length >= 200) throw new Error(t('invalidItem'));
+    || !isAvailability(data.availability) || state.items.length >= 200
+    || (data.photoId !== undefined && !/^[a-zA-Z0-9_-]{1,64}$/.test(data.photoId))) throw new Error(t('invalidItem'));
   const order = Math.max(0,...state.items.map(item => item.order)) + 1;
   return { ...state, items: [...state.items, {
     id: data.id, name, detail: data.detail.trim(), category: data.category,
     availability: data.availability, photo: null, order,
+    ...(data.photoId ? { photoId: data.photoId } : {}),
   }] };
 }
 export function setStyle(state: WardrobeState, value: string): WardrobeState {

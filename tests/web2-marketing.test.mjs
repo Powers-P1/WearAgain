@@ -70,7 +70,9 @@ test('public routes render English links with no invented task identifiers or re
   const judges=marketing.marketingPage('/judges');
   assert.match(judges,/Try it on/);
   assert.match(judges,/Know why/);
-  assert.match(judges,/Video not supplied yet/);
+  assert.match(judges,/<video controls playsinline/);
+  assert.match(judges,/src="\/video\/wearagain-demo.webm"/);
+  assert.match(judges,/kind="captions"/);
   assert.match(judges,/reviewer access required/);
   assert.match(marketing.marketingPage('/retail'),/Pilot measurement plan only/);
   assert.match(marketing.marketingPage('/retail/demo'),/Fictional retailer/);

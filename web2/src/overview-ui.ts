@@ -2,9 +2,9 @@ import {
   chooseDecision, localISODate, overviewFor, storeDecisions,
   type DailyState, type DecisionsState, type GarmentDecision,
 } from './daily.js';
-import { AVAILABILITY, availabilityLabel, categoryLabel, setAvailability, type WardrobeItem, type WardrobeState } from './state.js';
+import { AVAILABILITY, availabilityLabel, setAvailability, type WardrobeItem, type WardrobeState } from './state.js';
 import { morningLooks, type AttentionItem } from './daily.js';
-import { recordedPreviewForItem } from './stylist.js';
+import { itemPicture, outfitBoard } from './ui.js';
 import { loadSaved } from './stylist.js';
 import { t, type TranslationKey } from './i18n.js';
 import './daily.css';
@@ -20,10 +20,7 @@ type Actions={
 const esc=(v:unknown)=>String(v??'').replace(/[&<>"']/g,c=>
   ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]??c));
 const draw=(item:WardrobeItem):string=>{
-  const saved=recordedPreviewForItem(item.id);
-  return item.photo?'<img src="/assets/items/'+esc(item.photo)+'.webp" loading="lazy" alt="'+esc(item.name)+'"/>':
-    saved?'<img src="'+esc(saved)+'" loading="lazy" alt="'+esc(item.name)+'"/>':
-    '<span class="overview-no-photo">'+esc(t('noPhoto'))+'</span>';
+  return itemPicture(item);
 };
 let selectedOverviewMonth: string | null = null;
 function activeOverviewMonth(): string {
@@ -72,7 +69,6 @@ export function overviewPage(wardrobe:WardrobeState,daily:DailyState,decisions:D
   const month=activeOverviewMonth();
   const metrics=overviewFor(wardrobe,daily,decisions,month+'-01');
   const suggested=morningLooks(wardrobe)[0];
-  const imagePath=suggested?.heroImagePath??null;
   const profile=wardrobe.style||t('overviewNoProfile');
   const insight=metrics.loggedWearEntries>0?t('overviewLoggedNote'):t('overviewNoHistory');
   return '<section class="page overview-view" aria-labelledby="overview-title"><header class="overview-header">'+
@@ -99,19 +95,19 @@ export function overviewPage(wardrobe:WardrobeState,daily:DailyState,decisions:D
     }).join('')+'</div>':'<p class="overview-empty">'+esc(t('overviewNothingFlagged'))+'</p>')+
     '<section class="overview-gap"><h2>'+esc(t('overviewRealGaps'))+'</h2>'+
     '<p>'+esc(t('overviewMissingUnknown'))+'</p>'+
-    '<button class="text-link" type="button" data-nav="check">'+esc(t('overviewCheckBeforeBuying'))+' →</button>'+
+    '<button class="text-link" type="button" data-nav="balance">'+esc(t('balanceNav'))+' →</button>'+
     '<p class="overview-evidence">'+esc(t('overviewGapProof'))+'</p></section>'+
     (metrics.categoryOverlap.length?'<section class="overview-categories"><h3>'+esc(t('overviewCompareCategory'))+'</h3>'+
     '<p>'+esc(t('overviewOverlapOnly'))+'</p>'+
-    '<p>'+metrics.categoryOverlap.map(key=>esc(categoryLabel(key as WardrobeItem['category']))).join(' · ')+'</p></section>':'')+
+    '<div class="overview-category-thumbnails">'+wardrobe.items.filter(item=>item.category===metrics.categoryOverlap[0]).slice(0,3).map(item=>'<span>'+draw(item)+'</span>').join('')+'</div>'+
+    '<button class="text-link" type="button" data-nav="balance">'+esc(t('balanceCompare'))+' →</button></section>':'')+
     '</div><aside class="overview-today"><div class="overview-today-photo">'+
-    (imagePath?'<img src="'+esc(imagePath)+'" alt="'+esc(t('morningSinglePreview'))+'" loading="lazy"/>'+
-      '<span class="overview-photo-badge">'+esc(t('morningOneGarmentBadge'))+'</span>':
+    (suggested?outfitBoard(suggested.itemIds,wardrobe):
       '<div class="overview-no-photo">'+esc(t('stylistUnrendered'))+'</div>')+
     '</div><h2>'+esc(t('overviewFromYourWardrobe'))+'</h2>'+
     '<p>'+esc(suggested?suggested.itemIds.map(id=>wardrobe.items.find(x=>x.id===id)?.name??id).join(' · '):t('morningNoneReady'))+'</p>'+
     '<button type="button" class="button button-primary full-width" data-nav="morning">'+esc(t('overviewMorningCTA'))+'</button>'+
-    '<p class="overview-evidence">'+esc(t('morningSinglePreview'))+'</p>'+
+    '<p class="overview-evidence">'+esc(t('outfitBoardNote'))+'</p>'+
     '<button class="text-link" data-nav="profile" type="button">'+esc(t('overviewAdjustStyle'))+' →</button>'+
     '<p class="overview-profile">'+esc(profile)+'</p></aside></div>'+
     '<p class="overview-bottom-note">'+esc(t('overviewUserDecides'))+'</p></section>';

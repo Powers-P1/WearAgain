@@ -16,12 +16,14 @@
     "build:web": "node scripts/build-web.mjs",
     "dev:web": "node scripts/serve-web.mjs",
     "build:web2": "node scripts/build-web2.mjs",
-    "dev:web2": "npm run build:web2 && wrangler pages dev web2/dist"
+    "dev:web2": "npm run build:web2 && wrangler pages dev web2/dist",
+    "qa:web2": "node tests/browser/web2-smoke.mjs"
   },
   "devDependencies": {
-    "typescript": "5.9.3",
-    "wrangler": "^4.151.3",
     "esbuild": "0.28.2",
-    "sharp": "0.35.5"
+    "playwright": "1.56.1",
+    "sharp": "0.35.5",
+    "typescript": "5.9.3",
+    "wrangler": "^4.151.3"
   }
 }

@@ -1,6 +1,24 @@
 # Prepared web/ to web2/ Pages switch (NOT DEPLOYED)
 
-**Status:** PR-E prepares a release artifact and documents a later manual action. **No production deploy or Pages settings change occurs in this PR.** The Worker, Durable Object ledger, limits and secrets stay unchanged.
+**Status (22 Oct 2026):** code and release artifacts only. **Codex must not publish preview or production.** The team deploys using vault credentials on **Oliwia's Cloudflare account**. Damian's local Wrangler login is a different account; do not reauthenticate it or copy a token into the repository. Worker accounting, Durable Object identity/migrations, limits and secrets are unchanged; the config adds only the exact preview origin to the allowlist.
+
+## Preview handoff to the authorized team
+
+Build with `npm ci --ignore-scripts` and `npm run check`. The target artifact is
+`web2/dist`, preview branch `v2-preview`, project `wearagain`. It includes the
+previous consumer landing, redesigned app, retailer/jury routes and captioned
+walkthrough. The team uses its existing vault-backed deployment process.
+
+Gallery live requests additionally need the prepared `ALLOWED_ORIGINS` value
+from `worker/wrangler.toml` applied to the existing Oliwia Worker. Keep the
+ledger binding, migration history, secrets and unit limits intact. No backend
+deployment was run by Codex. Until the team applies that config, the current
+Worker may reject preview-origin requests. API origin is public build-time
+configuration, not a credential.
+
+After publishing, verify actual CSP, Permissions-Policy, video/captions, exact
+preview CORS and one authorized synthetic-garment live task. Local tests use
+mocked provider responses and do not spend YouCam units.
 
 ## Real Pages project configuration
 
@@ -47,6 +65,6 @@ Do not attempt to 'revert the Pages build output directory': none exists. Evalua
 
 - The v2 frontend self-hosts licensed DM Sans and Cormorant Garamond WOFF2 fonts. Static CSP uses `img-src blob:` for local photo thumbnails and `microphone=(self)` for explicit browser dictation.
 - The hosted `/judges/demo/` replays six genuine immutable *single-garment* YouCam recordings. **It does not submit fresh API tasks.** The separate Worker API contract is documented in `docs/API.md`; the guided UI does not point to a hardcoded old production live-client URL.
-- Real size fitting, multi-garment layering, personal photo sync, retailer checkout and measured pilot impact remain unimplemented in this demo. The hackathon walkthrough video has not been supplied.
+- Real size fitting, multi-garment layering, personal photo sync, retailer checkout and measured pilot impact remain unimplemented. A real captioned 93-second walkthrough is shipped in `/video/` and linked from the jury hero.
 - Repository links point to the **private** source repository and require reviewer access. No code is presented as publicly accessible.
 - `_headers` is enforced by Cloudflare Pages, not ordinary local file servers. Validate CSP and Permissions-Policy on HTTPS Pages preview before any authorized production switch.

@@ -7,6 +7,9 @@ import { deletePhoto, readPhoto, storePhoto, supportedPhoto, MAX_PHOTO_BYTES } f
 import { localISODate } from './daily.js';
 import { t } from './i18n.js';
 import { candidatePosition, initialPurchase, selectCandidate } from './purchase.js';
+import { PreviewQueue, type JobStatus } from './render-queue.js';
+import { devicePhotoUrl, icon } from './ui.js';
+import { cameraActive, startCamera, mountCamera, stopCamera, captureFrame } from './camera.js';
 import './gallery.css';
 
 type StorageLike=Pick<Storage,'getItem'|'setItem'>|undefined;
@@ -22,6 +25,10 @@ const saving=new Set<string>();
 let refresh:(()=>void)|null=null;
 let draft:CaptureDraft|null=null;
 let editingContext=false;
+let renderQueue:PreviewQueue|null=null;
+let reviewing=false;
+let liveFormOpen=false;
+let enabling=false;
 const esc=(value:unknown)=>String(value??'').replace(/[&<>"']/g,c=>
   ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]??c));
 const model=()=>session!;
@@ -34,20 +41,39 @@ function hydrated(item:ShopItem):void {
       urls.set(id,URL.createObjectURL(blob));
     }
     else urls.set(id,'');
-    refresh?.();
-  }).catch(()=>{urls.set(id,'');refresh?.();});
+    if(window.location.hash==='#gallery')refresh?.();
+  }).catch(()=>{urls.set(id,'');if(window.location.hash==='#gallery')refresh?.();});
 }
 function initialise(store:StorageLike,rerender?:()=>void):void {
   if(!session)session=loadShopping(store);
   if(!draft)draft=initialCaptureDraft(session);
   if(rerender)refresh=rerender;
+  if(!renderQueue){
+    renderQueue=new PreviewQueue(store,()=>{if(typeof window!=='undefined'&&window.location.hash==='#gallery')refresh?.();});
+    if(typeof window!=='undefined')window.addEventListener('pagehide',()=>{renderQueue?.dispose();renderQueue=null;},{once:true});
+  }
   for(const item of session.items)hydrated(item);
 }
-function image(item:ShopItem,cssClass:string):string{
+function image(item:ShopItem,cssClass:string,preview=false):string{
+  const job=renderQueue?.jobs.find(row=>row.itemId===item.id);
+  if(preview&&job?.status==='ready'&&job.photoId){const url=devicePhotoUrl(job.photoId);return url?'<img class="'+cssClass+'" src="'+esc(url)+'" alt="'+esc(item.title)+'" />':'<div class="'+cssClass+' mall-empty" data-device-photo="'+esc(job.photoId)+'" data-photo-alt="'+esc(item.title)+'" data-photo-class="'+esc(cssClass)+'">'+esc(t('mallLoadingPreview'))+'</div>';}
   const src=item.imagePath||(item.photoId?urls.get(item.photoId):null);
   return src?'<img class="'+cssClass+'" src="'+esc(src)+'" alt="'+esc(item.title)+'" loading="lazy" />':
     '<div class="'+cssClass+' mall-empty" role="img" aria-label="'+esc(item.source==='link'?t('mallLinkWithoutImage'):t('mallPhotoMissing'))+'">'+
     esc(item.source==='link'?t('mallLinkWithoutImage'):t('mallPhotoMissing'))+'</div>';
+}
+const queueStatus=(item:ShopItem):JobStatus|null=>renderQueue?.jobs.find(job=>job.itemId===item.id)?.status??null;
+const isReady=(item:ShopItem):boolean=>item.status==='saved_preview'||queueStatus(item)==='ready';
+const countsForView=()=>({...shoppingCounts(model()),ready:model().items.filter(isReady).length});
+function statusLabel(item:ShopItem):string{
+  const status=queueStatus(item);
+  if(status){const keys={queued:'mallJobQueued',submitting:'mallJobSubmitting',processing:'mallJobProcessing',ready:'mallJobReady',error:'mallJobError',unknown:'mallJobUnknown'} as const;return t(keys[status]);}
+  return t(item.status==='saved_preview'?'mallSavedPreview':item.status==='photo_only'?'mallOwnPhoto':'mallLinkOnly');
+}
+function liveControls():string{
+  return '<details class="mall-live-controls" '+(liveFormOpen?'open':'')+'><summary>'+esc(t('mallLiveTitle'))+'</summary>'+
+    (renderQueue?.enabled?'<p>'+esc(t('mallLiveEnabled'))+'</p><button type="button" class="button button-outline" data-mall-live-pause>'+esc(t('mallPausePreviews'))+'</button>':
+      '<form id="mall-live-form"><label class="mall-consent"><input type="checkbox" name="garmentOnly" required />'+esc(t('mallGarmentConsent'))+'</label><p>'+esc(t('mallLiveRetention'))+'</p><button type="submit" class="button button-outline" '+(enabling?'disabled':'')+'>'+esc(t(enabling?'mallLiveConnecting':'mallStartPreviews'))+'</button></form>')+'</details>';
 }
 function location(item:ShopItem):string {
   return (item.shop||t('mallShopUnknown'))+' · '+(item.floor||t('mallFloorUnknown'));
@@ -59,7 +85,7 @@ function tabbar():string{
       '" class="'+(current===id?'active':'')+'">'+esc(t(label))+'</button>').join('')+'</div>';
 }
 function camera():string{
-  const counts=shoppingCounts(model());
+  const counts=countsForView();
   const values=draft??initialCaptureDraft(model());
   const context=(values.shop||t('mallShopUnknown'))+' · '+(values.floor||t('mallFloorUnknown'));
   return '<div class="mall-capture-layout"><section class="mall-capture-panel">'+
@@ -75,15 +101,16 @@ function camera():string{
       '<input id="mall-floor" name="floor" maxlength="32" placeholder="'+esc(t('mallFloorExample'))+'" value="'+esc(values.floor)+'" /></div>'+
       '<button type="submit" data-mall-context-save class="button button-outline">'+esc(t('mallUpdateContext'))+'</button></form>'+
       '<p class="mall-small">'+esc(t('mallContextNotVerified'))+'</p>':'')+
-    '<label class="mall-capture-label" for="mall-camera">'+
+    (cameraActive()?'<div class="mall-camera-viewfinder"><video id="mall-viewfinder" autoplay muted playsinline aria-label="'+esc(t('mallCameraView'))+'"></video><span>'+esc(t('mallFrameHint'))+'</span></div><div class="mall-camera-toolbar"><button type="button" class="mall-file-fallback" data-mall-view="coffee">'+esc(t('mallCoffeeTab'))+'</button><button type="button" class="mall-shutter" data-mall-camera-shutter aria-label="'+esc(t('mallShutter'))+'"></button><button type="button" class="icon-button" data-mall-camera-stop aria-label="'+esc(t('mallCameraStop'))+'">'+icon('close')+'</button></div><label for="mall-camera" class="mall-file-fallback">'+esc(t('mallChooseFile'))+'</label><input id="mall-camera" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" />':
+    '<button type="button" class="mall-open-camera button button-primary full-width" data-mall-camera-start>'+icon('camera')+esc(t('mallOpenCamera'))+'</button><label class="mall-capture-label" for="mall-camera">'+
       '<span class="mall-camera-symbol" aria-hidden="true">＋</span>'+
       '<strong>'+esc(t('mallTakePhoto'))+'</strong>'+
       '<small>'+esc(t('mallTakePhotoHint'))+'</small>'+
       '<input id="mall-camera" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" />'+
-    '</label>'+
+    '</label>')+
     '<label for="mall-capture-title" class="mall-field-label">'+esc(t('mallOptionalItemName'))+'</label>'+
     '<input id="mall-capture-title" class="mall-text-input" maxlength="100" placeholder="'+esc(t('mallNewItemExample'))+'" value="'+esc(values.itemName)+'" />'+
-    '<p class="mall-small">'+esc(t('mallPhotoOnly'))+'</p>'+
+    liveControls()+
     (saving.size?'<p class="mall-pending" role="status">'+esc(t('mallSaving',{count:saving.size}))+'</p>':'')+
     '</section>'+
     '<section class="mall-queue-panel"><div class="mall-queue-head"><h2>'+esc(t('mallToday'))+'</h2>'+
@@ -91,7 +118,7 @@ function camera():string{
     '<p class="mall-queue-stats">'+esc(t('mallReadyCount',{ready:counts.ready,total:counts.all}))+'</p>'+
     '<div class="mall-queue-items">'+model().items.map(item=>'<article class="mall-queue-item">'+image(item,'mall-thumb')+
       '<div><strong>'+esc(item.title)+'</strong><p>'+esc(location(item))+'</p>'+
-      '<small>'+esc(t(item.status==='saved_preview'?'mallSavedPreview':item.status==='photo_only'?'mallOwnPhoto':'mallLinkOnly'))+'</small></div>'+
+      '<small class="mall-status-'+esc(queueStatus(item)??'photo')+'">'+esc(statusLabel(item))+'</small></div>'+
       (item.source!=='recorded'?'<button type="button" class="mall-remove" data-mall-remove="'+esc(item.id)+
         '" aria-label="'+esc(t('mallRemovePhoto'))+'">×</button>':'')+
       '</article>').join('')+'</div>'+
@@ -118,7 +145,7 @@ export function handleGalleryInput(input:HTMLInputElement):boolean {
 }
 
 function readyList():readonly ShopItem[]{
-  return model().items.filter(item=>!showReady||item.status==='saved_preview');
+  return model().items.filter(item=>!showReady||isReady(item));
 }
 function exampleCoffeeVerdict(item:ShopItem):string|null{
   if(item.source!=='recorded'||!item.id.startsWith('demo_'))return null;
@@ -130,22 +157,30 @@ function exampleCoffeeVerdict(item:ShopItem):string|null{
   }catch{return null;}
 }
 function coffee():string{
-  const counts=shoppingCounts(model());
+  const counts=countsForView();
   const choices=readyList();
   const selected=choices.find(item=>item.id===selectedId)??choices[0]??null;
   if(selected)selectedId=selected.id;
+  const ready=model().items.filter(isReady).length;
+  const pending=model().items.filter(item=>['queued','submitting','processing'].includes(queueStatus(item)??'')).length;
+  if(!reviewing)return '<section class="mall-coffee mall-coffee-list"><h2>'+esc(t('mallCoffeeQueueTitle'))+'</h2><p class="mall-lead">'+esc(t('mallQueueSummary',{ready,pending}))+'</p>'+
+    '<div class="mall-filter"><button type="button" data-mall-filter="all" aria-pressed="'+!showReady+'">'+esc(t('mallAll',{count:counts.all}))+'</button><button type="button" data-mall-filter="ready" aria-pressed="'+showReady+'">'+esc(t('mallReadyFilter',{count:ready}))+'</button></div>'+
+    '<div class="mall-coffee-queue">'+choices.map(item=>'<button type="button" data-mall-open="'+esc(item.id)+'">'+image(item,'mall-thumb')+'<span><strong>'+esc(item.title)+'</strong><small>'+esc(location(item))+'</small><span>'+esc(statusLabel(item))+'</span></span>'+icon('arrow')+'</button>').join('')+'</div>'+
+    '<button type="button" class="button button-primary full-width" data-mall-review-ready '+(!ready?'disabled':'')+'>'+esc(t('mallReviewReady'))+'</button><button type="button" class="text-link" data-mall-view="capture">'+esc(t('mallMorePhotos'))+icon('arrow')+'</button></section>';
   return '<section class="mall-coffee"><div class="mall-coffee-heading"><div><h2>'+esc(t('mallCoffeeHeadline'))+'</h2>'+
     '<p>'+esc(t('mallReadyCount',{ready:counts.ready,total:counts.all}))+'</p></div>'+
     '<div class="mall-filter" role="group"><button type="button" data-mall-filter="all" aria-pressed="'+(!showReady)+'">'+
     esc(t('mallAll',{count:counts.all}))+'</button><button type="button" data-mall-filter="ready" aria-pressed="'+showReady+'">'+
     esc(t('mallOnlyReady',{count:counts.ready}))+'</button></div></div>'+
-    (selected?'<div class="mall-review-body"><div class="mall-review-image">'+image(selected,'mall-model-image')+
+    (selected?'<div class="mall-review-body"><div class="mall-review-image">'+image(selected,'mall-model-image',true)+
     (selected.source==='recorded'?'<span class="mall-image-badge">'+esc(t('mallSavedPreview'))+'</span>':'')+'</div>'+
     '<div class="mall-review-details"><p class="mall-eyebrow">'+esc(t('mallProgress',{index:choices.indexOf(selected)+1,total:choices.length}))+'</p>'+
     '<p class="mall-location">'+esc(location(selected))+'</p><h3>'+esc(selected.title)+'</h3>'+
-    '<p>'+esc(t(selected.status==='saved_preview'?'mallSavedPreviewExplanation':'mallPhotoOnlyDecision'))+'</p>'+
+    '<p>'+esc(t(isReady(selected)?'mallPreviewReadyNote':'mallPhotoOnlyDecision'))+'</p>'+
+    (queueStatus(selected)&&queueStatus(selected)!=='ready'?'<p class="mall-job-state">'+esc(statusLabel(selected))+'</p>':'')+
+    (selected.source==='photo'&&!queueStatus(selected)?'<button class="text-link" type="button" data-mall-generate="'+esc(selected.id)+'">'+esc(t('mallGeneratePreview'))+'</button>':'')+
     (exampleCoffeeVerdict(selected)?'<p class="mall-example-verdict">'+esc(exampleCoffeeVerdict(selected))+'</p>':'')+
-    (selected.status==='saved_preview'?'<p class="mall-small">'+esc(t('styleFitDisclaimer'))+'</p>':'')+
+    (isReady(selected)?'<p class="mall-small">'+esc(t('styleFitDisclaimer'))+'</p>':'')+
     '<div class="mall-review-actions"><button type="button" class="button button-outline" data-mall-decision="skip" aria-pressed="'+(selected.decision==='skip')+'">'+esc(t('mallSkip'))+'</button>'+
     '<button type="button" class="button button-primary" data-mall-decision="return" aria-pressed="'+(selected.decision==='return')+'">'+esc(t('mallReturnForIt'))+'</button></div>'+
     '<p class="mall-small">'+esc(t('mallCanChangeMind'))+'</p>'+
@@ -154,7 +189,7 @@ function coffee():string{
     '<p class="mall-no-result">'+esc(t('mallNoReady'))+'</p>')+
     '<div class="mall-coffee-actions"><button type="button" class="text-link" data-mall-view="returns">'+
     esc(t('mallReturnList',{count:counts.returns}))+' →</button>'+
-    '<button type="button" class="text-link" data-mall-view="capture">'+esc(t('mallMorePhotos'))+' →</button></div></section>';
+    '<button type="button" class="text-link" data-mall-back>'+esc(t('mallBackToQueue'))+'</button></div></section>';
 }
 function returnList():string{
   const groups=groupedReturns(model());const count=shoppingCounts(model()).returns;
@@ -171,15 +206,26 @@ function returnList():string{
 }
 export function galleryPage(store?:StorageLike,rerender?:()=>void):string{
   initialise(store,rerender);
-  return '<section class="page mall-view" aria-labelledby="mall-title"><header class="mall-intro"><div>'+
-    '<p class="mall-eyebrow">'+esc(t('mallShoppingSession'))+'</p><h1 id="mall-title">'+esc(t('mallPageTitle'))+'</h1>'+
-    '<p>'+esc(t('mallHeadlineSub'))+'</p></div></header>'+tabbar()+
+  if(cameraActive())requestAnimationFrame(mountCamera);
+  const focused=current==='coffee'&&reviewing;
+  const item=model().items.find(row=>row.id===selectedId);
+  return '<section class="page mall-view '+(focused?'mall-reviewing':'')+' '+(cameraActive()?'mall-camera-active':'')+'" aria-labelledby="mall-title"><header class="mall-intro"><div>'+
+    (focused?'<button type="button" class="back-link" data-mall-back>'+icon('left')+esc(t('mallBackToQueue'))+'</button>':'<p class="mall-eyebrow">'+esc(t('mallShoppingSession'))+'</p>')+'<h1 id="mall-title">'+esc(focused&&item?item.title:t('mallPageTitle'))+'</h1>'+
+    '<p>'+esc(focused&&item?location(item):t('mallHeadlineSub'))+'</p></div></header>'+(focused?'':tabbar())+
     (current==='capture'?camera():current==='coffee'?coffee():returnList())+'</section>';
 }
 export function handleGalleryClick(control:HTMLElement,actions:Actions):boolean{
   initialise(actions.storage,actions.rerender);
   const d=control.dataset;
-  if(d.mallView&&['capture','coffee','returns'].includes(d.mallView))current=d.mallView as View;
+  if(control.hasAttribute('data-mall-camera-start')){editingContext=false;void startCamera().then(ok=>{if(!ok)actions.notice(t('mallCameraUnavailable'));actions.rerender();}).catch(()=>{actions.notice(t('mallCameraUnavailable'));actions.rerender();});return true;}
+  if(control.hasAttribute('data-mall-camera-shutter')){void captureFrame().then(file=>capturePhoto(file,actions)).catch(()=>{actions.notice(t('mallCameraUnavailable'));actions.rerender();});return true;}
+  if(control.hasAttribute('data-mall-camera-stop'))stopCamera();
+  else if(control.hasAttribute('data-mall-live-pause'))renderQueue?.pause();
+  else if(d.mallGenerate){renderQueue?.enqueue(d.mallGenerate);if(!renderQueue?.enabled){current='capture';liveFormOpen=true;}}
+  else if(d.mallOpen){selectedId=d.mallOpen;reviewing=true;current='coffee';}
+  else if(control.hasAttribute('data-mall-back'))reviewing=false;
+  else if(control.hasAttribute('data-mall-review-ready')){selectedId=model().items.find(isReady)?.id??null;reviewing=!!selectedId;showReady=true;}
+  else if(d.mallView&&['capture','coffee','returns'].includes(d.mallView)){current=d.mallView as View;if(current==='coffee')reviewing=false;if(current!=='capture')stopCamera();}
   else if(control.hasAttribute('data-mall-context-toggle'))editingContext=!editingContext;
   else if(d.mallFilter){showReady=d.mallFilter==='ready';selectedId=null;}
   else if(d.mallStep){
@@ -200,6 +246,7 @@ export function handleGalleryClick(control:HTMLElement,actions:Actions):boolean{
     if(item){
       if(!window.confirm(t('mallConfirmRemove',{item:item.title})))return true;
       session=removeShopItem(model(),item.id);
+      renderQueue?.remove(item.id);
       if(!saveShopping(session,actions.storage))actions.notice(t('localStorageDenied'));
       if(item.photoId){
         const url=urls.get(item.photoId);
@@ -214,7 +261,14 @@ export function handleGalleryClick(control:HTMLElement,actions:Actions):boolean{
 export function handleGallerySubmit(form:HTMLFormElement,actions:Actions):boolean{
   initialise(actions.storage,actions.rerender);
   const formData=new FormData(form);
-  if(form.id==='mall-shop-form'){
+  if(form.id==='mall-live-form'){
+    if(formData.get('garmentOnly')!=='on')return true;
+    enabling=true;liveFormOpen=true;actions.rerender();
+    void renderQueue!.enable().then(()=>{
+      for(const item of model().items)if(item.source==='photo'&&item.photoId)renderQueue!.enqueue(item.photoId);
+      actions.notice(t('mallLiveEnabled'));
+    }).catch(()=>actions.notice(t('mallLiveUnavailable'))).finally(()=>{enabling=false;actions.rerender();});return true;
+  }else if(form.id==='mall-shop-form'){
     try{
       session=setShop(model(),String(formData.get('shop')??''),String(formData.get('floor')??''));
       draft={...(draft??initialCaptureDraft(session)),shop:session.shop,floor:session.floor};
@@ -238,7 +292,10 @@ export function handleGalleryFile(input:HTMLInputElement,actions:Actions):boolea
   initialise(actions.storage,actions.rerender);
   const file=input.files?.[0];input.value='';
   if(!file)return true;
-  if(!supportedPhoto(file)){actions.notice(t('mallBadPhoto',{size:MAX_PHOTO_BYTES/1_000_000}));actions.rerender();return true;}
+  capturePhoto(file,actions);return true;
+}
+function capturePhoto(file:File,actions:Actions):void{
+  if(!supportedPhoto(file)){actions.notice(t('mallBadPhoto',{size:MAX_PHOTO_BYTES/1_000_000}));actions.rerender();return;}
   const id='photo_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,10);
   const title=(draft?.itemName??'').trim()||t('mallUnnamedPhoto',{count:model().items.length+1});
   // Snapshot the shop currently typed, even when the user did not press Save
@@ -250,7 +307,7 @@ export function handleGalleryFile(input:HTMLInputElement,actions:Actions):boolea
     session=setShop(model(),store,floor);
     context={shop:session.shop,floor:session.floor};
     if(!saveShopping(session,actions.storage))actions.notice(t('localStorageDenied'));
-  }catch(e){actions.notice(e instanceof Error?e.message:t('shopInvalidContext'));actions.rerender();return true;}
+  }catch(e){actions.notice(e instanceof Error?e.message:t('shopInvalidContext'));actions.rerender();return;}
   // The chosen label belongs to this captured file only, not later photos.
   // Context and unsent link drafts remain untouched.
   draft={...(draft??initialCaptureDraft(model())),itemName:''};
@@ -266,6 +323,7 @@ export function handleGalleryFile(input:HTMLInputElement,actions:Actions):boolea
     urls.set(id,url);requested.add(id);
     if(!saveShopping(session,actions.storage))actions.notice(t('localStorageDenied'));
     actions.notice(t('mallPhotoSaved'));
+    if(renderQueue?.enabled)renderQueue.enqueue(id);
   }).catch(()=>{
     actions.notice(t('mallPhotoFailed'));
     void deletePhoto(id).catch(()=>{});
@@ -274,5 +332,4 @@ export function handleGalleryFile(input:HTMLInputElement,actions:Actions):boolea
     if(current==='capture')actions.focus?.('#mall-camera');
     actions.rerender();
   });
-  return true;
 }

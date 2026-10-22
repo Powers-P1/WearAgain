@@ -37,10 +37,13 @@ jobs:
         shell: bash
         run: |
           python3 -m http.server 8788 --directory web2/dist >/tmp/wearagain-web2-http.log 2>&1 &
+          qa_server_pid=$!
+          trap 'kill "$qa_server_pid" 2>/dev/null || true' EXIT
           for attempt in $(seq 1 30); do
             if curl --fail --silent http://127.0.0.1:8788/ >/dev/null; then break; fi
             sleep 1
           done
+          npm run qa:web2
           mkdir -p screenshots
           for viewport in '390 844' '1280 800'; do
             read -r width height <<<"$viewport"
@@ -56,7 +59,13 @@ jobs:
               'consumer-purchase|/app/#check' \
               'consumer-zero|/app/?scenario=zero#check' \
               'consumer-overview|/app/#overview' \
-              'consumer-stylist|/app/#stylist'; do
+              'consumer-stylist|/app/#stylist' \
+              'consumer-trip|/app/#trip' \
+              'consumer-surprise|/app/#surprise' \
+              'consumer-balance|/app/#balance' \
+              'consumer-gallery|/app/#gallery' \
+              'consumer-morning|/app/#morning' \
+              'consumer-saved|/app/#saved'; do
                 IFS='|' read -r name route <<<"$pair"
                 npx --yes playwright@1.56.1 screenshot \
                   --browser chromium --viewport-size "$width,$height" \
@@ -70,6 +79,13 @@ jobs:
       - name: Capture references and board comparisons (no image substitutions)
         shell: bash
         run: |
+          python3 -m http.server 8788 --directory web2/dist >/tmp/wearagain-web2-http.log 2>&1 &
+          qa_server_pid=$!
+          trap 'kill "$qa_server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8788/ >/dev/null; then break; fi
+            sleep 1
+          done
           npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "1280,800" --full-page --wait-for-timeout 1000 "https://wearagain.pages.dev/" screenshots/landing-live-v1-1280.png
           npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "390,844" --full-page --wait-for-timeout 1000 "https://wearagain.pages.dev/" screenshots/landing-live-v1-390.png
           cp docs/mockups/v2/WearAgain-05-Desktop-Szafa.png screenshots/board-05-reference.png
@@ -111,6 +127,8 @@ jobs:
         if: always()
         with:
           name: wearagain-web2-desktop-parity-review
-          path: screenshots/
+          path: |
+            screenshots/
+            test-results/web2/
           if-no-files-found: warn
           retention-days: 14

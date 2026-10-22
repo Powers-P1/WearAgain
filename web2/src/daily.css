@@ -17,6 +17,14 @@
 .morning-dictate[aria-pressed=true] {background:var(--olive-soft);border-color:var(--olive);}
 
 .morning-help { font-size:11px; line-height:1.5; color:var(--muted); margin-top:12px; }
+.morning-voice-help{font-size:12px;color:var(--muted);margin:0 0 14px}
+.morning-voice-help summary{cursor:pointer;min-height:36px;display:flex;align-items:center}
+.overview-category-thumbnails{display:flex;gap:12px;margin:16px 0}
+.overview-category-thumbnails>span{display:block;width:100px;height:110px;overflow:hidden;background:var(--stone)}
+.overview-category-thumbnails img{width:100%;height:100%;object-fit:contain}
+.overview-today-photo:has(.outfit-board){aspect-ratio:auto;height:auto!important}
+.overview-today-photo>.outfit-board{height:auto;min-height:300px}
+.overview-today-photo .outfit-board img{object-fit:contain}
 .morning-wait { padding:25px 0; }
 .morning-wait h1 { max-width:700px; }
 .morning-wait>p { margin-top:18px; color:var(--muted); }

@@ -59,10 +59,10 @@ test('review #16: mobile camera has a real focusable tile before name, finds and
   assert.ok(camera.indexOf('mall-capture-label')<camera.indexOf('mall-capture-title'));
   assert.ok(camera.indexOf('mall-capture-title')<camera.indexOf('mall-queue-panel'));
   assert.ok(camera.indexOf('mall-queue-panel')<camera.indexOf('mall-link-panel'));
-  const tileStart=camera.indexOf("'<label class=\"mall-capture-label\"");
-  const tile=camera.slice(tileStart,camera.indexOf("'</label>'",tileStart));
-  assert.match(tile,/mall-camera/);
-  assert.match(tile,/type="file"/);
+  assert.match(camera,/id="mall-camera"/);
+  assert.match(camera,/type="file"/);
+  assert.match(camera,/data-mall-camera-start/);
+  assert.match(camera,/data-mall-camera-shutter/);
   assert.match(css,/\.mall-capture-label:focus-within\s*\{[^}]*outline:\s*3px/);
   assert.match(css,/\.mall-capture-label\{min-height:150px/);
 });
@@ -92,6 +92,6 @@ test('review #16: UI draft sync and fallback focus are wired for captures and ro
   assert.match(morning,/spoken=target\.value/);
   assert.match(morning,/t\(morningHeadingKey\(looks\.length\)/);
   assert.match(morning,/t\('morningTapToSave'\)/);
-  assert.match(morning,/morning-photo-badge/);
-  assert.match(overview,/overview-photo-badge/);
+  assert.match(morning,/outfitBoard\(look.itemIds,wardrobe,true\)/);
+  assert.match(overview,/outfitBoard\(suggested.itemIds,wardrobe\)/);
 });
