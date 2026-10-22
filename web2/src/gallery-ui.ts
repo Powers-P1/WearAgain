@@ -240,6 +240,9 @@ export function handleGalleryFile(input:HTMLInputElement,actions:Actions):boolea
     context={shop:session.shop,floor:session.floor};
     if(!saveShopping(session,actions.storage))actions.notice(t('localStorageDenied'));
   }catch(e){actions.notice(e instanceof Error?e.message:t('shopInvalidContext'));actions.rerender();return true;}
+  // The chosen label belongs to this captured file only, not later photos.
+  // Context and unsent link drafts remain untouched.
+  draft={...(draft??initialCaptureDraft(model())),itemName:''};
   saving.add(id);
   actions.focus?.('#mall-camera');
   actions.rerender(); // The next photo need not wait for a model preview.

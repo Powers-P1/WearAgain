@@ -269,14 +269,25 @@ function render(): void {
     const details=root!.querySelector<HTMLDetailsElement>('.purchase-certificate');
     if(details)details.open=true;
   }
-  const focusTarget=(targetSelector?root!.querySelector<HTMLElement>(targetSelector):null)
-    ??root!.querySelector<HTMLElement>('main .page h1')
-    ??root!.querySelector<HTMLElement>('main h1')
-    ??root!.querySelector<HTMLElement>('main');
+  // Mobile Stylist hides its h1. An existing but display:none heading
+  // cannot be focused - skip invisible targets instead of landing on BODY.
+  const mainElement=root!.querySelector<HTMLElement>('main');
+  const focusCandidates:HTMLElement[]=[
+    ...(targetSelector?[...root!.querySelectorAll<HTMLElement>(targetSelector)]:[]),
+    ...root!.querySelectorAll<HTMLElement>('main .page h1, main .page h2, main h1'),
+    ...(mainElement?[mainElement]:[]),
+  ];
+  const focusTarget=focusCandidates.find(el=>el.getClientRects().length>0 &&
+    window.getComputedStyle(el).visibility!=='hidden');
   if(focusTarget && (hasRendered||routeKey!=='')){
     if(!focusTarget.matches('button,input,textarea,select,a[href],[tabindex]'))
       focusTarget.setAttribute('tabindex','-1');
     focusTarget.focus({preventScroll:true});
+    // A detached or otherwise unfocusable target must not strand focus on BODY.
+    if(document.activeElement!==focusTarget && mainElement){
+      mainElement.setAttribute('tabindex','-1');
+      mainElement.focus({preventScroll:true});
+    }
   }
   hasRendered=true;
   previousRoute=routeKey;
@@ -291,7 +302,7 @@ function render(): void {
 root.addEventListener('click', event => {
   const target = event.target;
   if (!(target instanceof Element)) return;
-  const control = target.closest<HTMLElement>('[data-nav], [data-cat], [data-item], [data-status], [data-expand], [data-stylist-reset], [data-occasion], [data-look-next], [data-look-prev], [data-save-look], [data-purchase-demo], [data-purchase-candidate], [data-purchase-top], [data-purchase-rating], [data-purchase-clear], [data-purchase-replay], [data-purchase-choice], [data-purchase-next], [data-purchase-prev], [data-mall-view], [data-mall-filter], [data-mall-step], [data-mall-decision], [data-mall-undo], [data-mall-remove], [data-morning-select], [data-morning-wear], [data-morning-reset], [data-morning-voice], [data-overview-review], [data-overview-decision], [data-overview-save]');
+  const control = target.closest<HTMLElement>('[data-nav], [data-cat], [data-item], [data-status], [data-expand], [data-stylist-reset], [data-occasion], [data-look-next], [data-look-prev], [data-save-look], [data-purchase-demo], [data-purchase-candidate], [data-purchase-top], [data-purchase-rating], [data-purchase-clear], [data-purchase-replay], [data-purchase-choice], [data-purchase-next], [data-purchase-prev], [data-mall-view], [data-mall-filter], [data-mall-step], [data-mall-decision], [data-mall-undo], [data-mall-remove], [data-mall-context-toggle], [data-morning-select], [data-morning-wear], [data-morning-reset], [data-morning-voice], [data-overview-review], [data-overview-decision], [data-overview-save]');
   if (!control) return;
   if (handleStylistClick(control, { wardrobe: data, storage, rerender: render, notice: value => { message = value; } })) return;
   if (handlePurchaseClick(control, { rerender: render, notice: value => { message = value; } })) return;

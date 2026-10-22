@@ -123,8 +123,20 @@ export function handleMorningClick(button:HTMLElement,actions:Actions):boolean{
           if(input instanceof HTMLTextAreaElement)input.value=text;
         }
       };
-      speech.onerror=()=>{listening=false;actions.notice(t('morningVoiceFailed'));actions.rerender();};
-      speech.onend=()=>{listening=false;actions.rerender();};
+      // Browsers normally dispatch error -> end. Do not immediately erase the
+      // failure notice with a second render triggered by the end event.
+      let failed=false;
+      speech.onerror=()=>{
+        if(recognizer!==speech)return;
+        failed=true;listening=false;recognizer=null;
+        actions.notice(t('morningVoiceFailed'));
+        actions.rerender();
+      };
+      speech.onend=()=>{
+        if(recognizer!==speech)return;
+        recognizer=null;listening=false;
+        if(!failed)actions.rerender();
+      };
       speech.start();listening=true;actions.rerender();
     }catch{listening=false;actions.notice(t('morningVoiceFailed'));actions.rerender();}
     return true;

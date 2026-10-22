@@ -113,7 +113,7 @@ export const en = {
   mallNowAt: 'Now at:',
   mallChangeContext: 'Change',
   mallCloseContext: 'Close',
-  mallOptionalItemName: 'Item name (optional, after the photo)',
+  mallOptionalItemName: 'Name for the next photo (optional)',
   mallConfirmRemove: 'Remove “{item}” from this gallery and delete its locally stored photo? This cannot be undone.',
   mallTakePhotoHint: 'Camera when available · JPEG, PNG or WebP',
   mallPhotoOnly: 'Your photo stays on this device. It is not sent to YouCam and does not become an on-model render.',

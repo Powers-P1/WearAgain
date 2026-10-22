@@ -42,3 +42,10 @@ Boards **13-17**: consumer landing; `/retail`, `/retail/demo`, `/judges`, `/judg
 - Pre-save help uses future tense; zero/one/many ready looks have separate grammar; morning and overview single-garment images use DOM overlays `Demo model · one garment`.
 - File input is nested inside its visible capture label, with an explicit `:focus-within` 3px focus ring.
 - Own-photo/candidate delete has a minimum 44 × 44 px target and requires native confirmation before metadata and IndexedDB deletion. No background jobs, Worker changes, secrets or deploy switches.
+
+## PR-D final review corrections (22 Oct 2026)
+
+- Delegated main click selector now includes `[data-mall-context-toggle]`; the responsive shop/floor Change button can actually open and close its context form. `tests/web2-click-delegation.test.mjs` guards delegated attribute coverage for each existing click handler.
+- Focus fallback now filters out elements hidden by responsive CSS (notably the mobile Stylist h1) and reliably falls back to focusable `main`, preventing BODY focus after route and stage changes.
+- Capture now snapshots the optional item name for the *current* image and clears only that field on the next render; the on-screen label identifies it as the name for the next photo. Other unsent drafts remain intact.
+- A browser speech-recognition error is shown once; a subsequent recognition `end` event cannot immediately clear the notice. No speech activation or extra network call is introduced.
