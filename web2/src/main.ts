@@ -11,26 +11,33 @@ import { purchasePage, handlePurchaseClick, handlePurchaseChange } from './purch
 import { loadDaily, loadDecisions, wearToday, storeDaily, localISODate, type DailyState, type DecisionsState } from './daily.js';
 import { tripPage, surprisePage, balancePage, handlePlansClick, handlePlansChange, handlePlansSubmit } from './plans-ui.js';
 import { itemPicture, configurePhotoMedia } from './ui.js';
-import { storePhoto, supportedPhoto } from './photo-store.js';
+import { storePhoto, supportedPhoto,setPhotoNamespace } from './photo-store.js';
+import {activeProfile,profileStorage} from './profiles.js';
+import {accountMarkup,accountClick,accountSubmit,accountChange} from './account-ui.js';
+import {personalPurchasePage,personalClick,personalSubmit,personalChange} from './personal-purchase-ui.js';
+import './agent.css';
 import { stopCamera } from './camera.js';
 import { morningPage, handleMorningInput, handleMorningClick, submitMorning, stopMorningDictation } from './morning-ui.js';
 import { overviewPage, reviewItemPage, handleOverviewClick, handleOverviewMonthChange } from './overview-ui.js';
 import { galleryPage, handleGalleryInput, handleGalleryClick, handleGallerySubmit, handleGalleryFile } from './gallery-ui.js';
-import { handleStylistClick, savedPage, stylistPage, submitStylist } from './stylist-ui.js';
+import { handleStylistClick, savedPage, stylistPage, submitStylist,stylistChange,submitAgentFeedback } from './stylist-ui.js';
 import './style.css';
 
 const root = document.querySelector<HTMLElement>('#app');
 if (!root) throw new Error('Missing app root.');
 document.documentElement.lang = DEFAULT_LOCALE;
 const publicRoute = marketingRoute(window.location.pathname);
-if (!publicRoute && /^\/app(?:\/|$)/.test(window.location.pathname)) setupPwa();
+setupPwa();
 
-type Screen = 'wardrobe' | 'profile' | 'stylist' | 'check' | 'saved' | 'gallery' | 'add' | 'item' | 'morning' | 'overview' | 'review' | 'trip' | 'surprise' | 'balance';
+type Screen = 'wardrobe' | 'profile' | 'stylist' | 'check' | 'my-check' | 'saved' | 'gallery' | 'add' | 'item' | 'morning' | 'overview' | 'review' | 'trip' | 'surprise' | 'balance';
 type NavId = 'wardrobe' | 'stylist' | 'check' | 'profile' | 'saved' | 'gallery' | 'morning' | 'overview' | 'trip';
 const navIds: readonly NavId[] = ['wardrobe', 'stylist', 'check', 'profile', 'saved', 'gallery', 'morning', 'overview', 'trip'];
-let storage: Storage | undefined;
-try { storage = window.localStorage; } catch { /* Browsers may disable persistence. */ }
-let data: WardrobeState = loadState(storage);
+let baseStorage:Storage|undefined;
+try { baseStorage = window.localStorage; } catch { /* Browsers may disable persistence. */ }
+const deviceProfile=activeProfile(baseStorage);
+const storage=profileStorage(baseStorage,deviceProfile.id);
+setPhotoNamespace(deviceProfile.id);
+let data: WardrobeState = deviceProfile.id!=='default'&&!storage?.getItem('wearagain:web2:demo-wardrobe:v1')?{version:1,exampleMode:false,style:'',items:[]}:loadState(storage);
 let daily: DailyState = loadDaily(storage);
 let decisions: DecisionsState = loadDecisions(storage);
 let category: Category | 'all' = 'all';
@@ -69,7 +76,7 @@ function route(): { screen: Screen; itemId: string } {
   if (value.startsWith('item/')) return { screen: 'item', itemId: value.slice(5) };
   if (value.startsWith('review/')) return { screen: 'review', itemId: value.slice(7) };
   if (value.startsWith('saved/')) return { screen: 'saved', itemId: value.slice(6) };
-  if (['wardrobe', 'profile', 'stylist', 'check', 'saved', 'gallery', 'add', 'morning', 'overview', 'trip', 'surprise', 'balance'].includes(value))
+  if (['wardrobe', 'profile', 'stylist', 'check','my-check', 'saved', 'gallery', 'add', 'morning', 'overview', 'trip', 'surprise', 'balance'].includes(value))
     return { screen: value as Screen, itemId: '' };
   return { screen: 'wardrobe', itemId: '' };
 }
@@ -107,7 +114,7 @@ function sidebar(active: NavId): string {
     '<div class="sidebar-rule"></div>' +
     (['saved', 'gallery', 'morning', 'trip', 'overview'] as NavId[]).map(id => navButton(id, true, active)).join('') + '</nav>' +
     '<button type="button" class="sidebar-profile" data-nav="profile">' +
-    '<img src="/assets/demo-portrait.webp" alt="" /><span><strong>Anna</strong><small>' +
+    '<img src="/assets/demo-portrait.webp" alt="" /><span><strong>'+safe(deviceProfile.name)+'</strong><small>' +
     msg('styleLink') + ' ' + icon('arrow') + '</small></span></button></aside>';
 }
 function bottomBar(active: NavId): string {
@@ -166,7 +173,7 @@ function wardrobe(): string {
     '<button type="button" data-nav="stylist" class="text-link mobile-only">' + msg('styleFromWardrobe') + ' ' + icon('arrow') + '</button></footer>' +
     '<div class="wardrobe-shortcuts"><button type="button" class="text-link" data-nav="overview">' + msg('overviewNav') + ' →</button>' +
     '<button type="button" class="text-link" data-nav="morning">' + msg('morningNav') + ' →</button></div>' +
-    '<p class="demo-explainer">' + msg('sampleWardrobe') + '</p></section>';
+    '<p class="demo-explainer">' + (data.exampleMode===false?'Your wardrobe · saved on this device. Use Profile to transfer it to another device.':msg('sampleWardrobe')) + '</p></section>';
 }
 function profile(): string {
   return '<section class="page profile-view" aria-labelledby="profile-title">' +
@@ -185,6 +192,7 @@ function profile(): string {
     '<button type="submit" class="button button-primary full-width">' + msg('saveMyStyle') + '</button>'+
     '<details class="profile-photo-help"><summary>About your preview</summary><p class="field-hint">' + msg('photoFuture') + '</p><p class="field-hint">' + msg('styleFitDisclaimer') + '</p></details></form>' +
     '<div class="feature-links"><button data-nav="trip">' + msg('tripNav') + '</button><button data-nav="surprise">' + msg('surpriseNav') + '</button><button data-nav="saved">' + msg('savedLooks') + '</button></div>' +
+    accountMarkup(baseStorage,storage)+
     (canInstall()?'<button type="button" class="text-link" data-pwa-install>'+msg('mktPwaInstall')+'</button>':'')+'</section>';
 }
 function itemDetail(itemId: string): string {
@@ -259,6 +267,7 @@ function render(): void {
       if(/^[a-zA-Z][\w-]{0,80}$/.test(anchorId))requestAnimationFrame(()=>document.getElementById(anchorId)?.scrollIntoView());
     }
     hasRendered=true;
+    window.dispatchEvent(new Event('wearagain:rendered'));
     return;
   }
   const routeKey=window.location.hash;
@@ -285,11 +294,12 @@ function render(): void {
   if(current.screen!=='morning')stopMorningDictation();
   const active: NavId = current.screen === 'item' || current.screen === 'add' ? 'wardrobe'
     : current.screen==='review'||current.screen==='balance'?'overview'
-    : current.screen==='surprise'?'profile'
+    : current.screen==='surprise'?'profile':current.screen==='my-check'?'check'
     : navIds.includes(current.screen as NavId)?current.screen as NavId:'wardrobe';
   const page = current.screen === 'wardrobe' ? wardrobe()
-    : current.screen === 'stylist' ? stylistPage(data)
+    : current.screen === 'stylist' ? stylistPage(data,storage,render)
     : current.screen === 'check' ? purchasePage(data)
+    : current.screen === 'my-check' ? personalPurchasePage(data,storage)
     : current.screen === 'trip' ? tripPage(data,storage)
     : current.screen === 'surprise' ? surprisePage(storage)
     : current.screen === 'balance' ? balancePage(data,daily,storage)
@@ -340,12 +350,15 @@ function render(): void {
     current.screen==='gallery'?t('galleryPageTitle'):
     current.screen==='check'?t('checkPageTitle'):t('generalPageTitle');
   message='';
+  window.dispatchEvent(new Event('wearagain:rendered'));
 }
 root.addEventListener('click', event => {
   const target = event.target;
   if (!(target instanceof Element)) return;
   const control = target.closest<HTMLElement>('button, [data-nav]');
   if (!control) return;
+  if(!publicRoute&&accountClick(control,{base:baseStorage,store:storage,notice:value=>{message=value;},rerender:render}))return;
+  if(!publicRoute&&personalClick(control,{wardrobe:data,storage,notice:value=>{message=value;},rerender:render}))return;
   if(publicRoute){
     handleMarketingClick(control,render);
     return;
@@ -404,6 +417,9 @@ root.addEventListener('input', event => {
 });
 root.addEventListener('change', event => {
   const target=event.target;
+  if(target instanceof HTMLElement&&stylistChange(target,render))return;
+  if(target instanceof HTMLElement&&accountChange(target,{base:baseStorage,store:storage,notice:value=>{message=value;},rerender:render}))return;
+  if(target instanceof HTMLElement&&personalChange(target,{wardrobe:data,storage,notice:value=>{message=value;},rerender:render}))return;
   if(target instanceof HTMLSelectElement && target.id==='review-availability' && target.dataset.statusItem && Object.hasOwn(AVAILABILITY,target.value)){
     persist(setAvailability(data,target.dataset.statusItem,target.value as Availability));message ||= t('statusChanged');render();return;
   }
@@ -421,7 +437,10 @@ root.addEventListener('change', event => {
 root.addEventListener('submit', event => {
   const form = event.target;
   if (!(form instanceof HTMLFormElement)) return;
+  if(form.id==='agent-feedback-form'){event.preventDefault();submitAgentFeedback(form,{wardrobe:data,storage,rerender:render,notice:value=>{message=value;}});return;}
   event.preventDefault();
+  if(accountSubmit(form,{base:baseStorage,store:storage,notice:value=>{message=value;},rerender:render}))return;
+  if(personalSubmit(form,{wardrobe:data,storage,notice:value=>{message=value;},rerender:render}))return;
   if(handlePlansSubmit(form,{wardrobe:data,storage,rerender:render,notice:value=>{message=value;},navigate}))return;
   if (form.id === 'stylist-form') {
     submitStylist(form,{ wardrobe:data, storage, rerender:render, notice:value => { message = value; } });

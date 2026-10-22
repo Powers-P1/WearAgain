@@ -3,7 +3,12 @@ import {
   type SavedLook, type StylistBrief, type StylistResult, type OccasionSuggestion,
 } from './stylist.js';
 import { initialState, type WardrobeState, type WardrobeItem } from './state.js';
-import { outfitVisual, itemPicture } from './ui.js';
+import { outfitVisual, outfitBoard,itemPicture } from './ui.js';
+import {startLiveAgent,resumeLiveAgent,savedAgentRequest,agentPreviewImage} from './agent-client.js';
+import {activeProfile} from './profiles.js';
+import {remember} from './memory.js';
+import {PROCEDURES,record} from '../../src/agent/contract.js';
+import type {AgentResult,Procedure} from '../../src/agent/contract.js';
 import { stageTripLook } from './plans.js';
 import './outfit-media.css';
 import { t } from './i18n.js';
@@ -11,7 +16,7 @@ import './stylist.css';
 
 type UIActions = {
   readonly wardrobe: WardrobeState;
-  readonly storage: Pick<Storage, 'setItem' | 'getItem'> | undefined;
+  readonly storage: Storage | undefined;
   readonly rerender: () => void;
   readonly notice: (message: string) => void;
   readonly navigate?: (path: string) => void;
@@ -27,6 +32,19 @@ let selected = 0;
 let generated = false;
 let saved: SavedLook[] | null = null;
 let requestSequence = 0;
+let agentMode:'demo'|'live'|null=typeof window!=='undefined'&&new URLSearchParams(window.location.search).get('stylist')==='live'?'live':null,agentBusy=false,agentNotice='',agentSessionId='';
+let procedure:Procedure='occasion',locationText='',allowPhotos=false,allowRenders=false;
+let latestAgent:AgentResult|null=null,restored=false;
+const previewUrls=new Map<string,string>();
+function ownProfile(){let base:Storage|undefined;try{base=window.localStorage;}catch{}return activeProfile(base);}
+function agentInput(actions:UIActions,message:string,previous=false){return {profile:ownProfile(),wardrobe:actions.wardrobe,storage:actions.storage,message,procedure,location:locationText,date:brief.date,allowPhotos,allowRenders,...(previous&&agentSessionId?{previousSessionId:agentSessionId}:{}),onEvent:(event:{message:string})=>{agentNotice=event.message;if(window.location.hash==='#stylist')actions.rerender();}};}
+function acceptAgent(value:{sessionId:string;result:AgentResult},actions:UIActions){
+ latestAgent=value.result;agentSessionId=value.sessionId;
+ if(value.result.status!=='completed'||!value.result.answer){agentNotice='Live AI stopped before a complete proposal. Your existing saved data and ratings are unchanged.';return;}
+ result=verifyLooks(value.result.answer.looks,actions.wardrobe,'agent');generated=true;selected=0;agentMode='live';saved=null;
+ agentNotice=value.result.answer.reply;
+}
+export function stageStylistRequest(occasion:string):void{brief={...brief,occasion:occasion.slice(0,500)};agentMode='live';generated=false;}
 
 function escapeHtml(value: unknown): string {
   return String(value ?? '').replace(/[&<>"']/g, character =>
@@ -54,6 +72,7 @@ function validResult(wardrobe: WardrobeState): StylistResult {
       return result;
     } catch {
       generated = false;
+      if(result.source==='agent'){result=null;agentNotice='Your wardrobe changed. The previous AI look no longer passes availability checks. Ask for an updated proposal.';return {source:'agent',looks:[],verified:true};}
     }
   }
   result = demoLooks(wardrobe);
@@ -61,22 +80,23 @@ function validResult(wardrobe: WardrobeState): StylistResult {
   return result;
 }
 function briefForm(wardrobe: WardrobeState): string {
-  return '<form id="stylist-form" class="stylist-form">' +
+  return '<form id="stylist-form" class="stylist-form'+(agentMode==='live'?' stylist-live':'')+'">' +
     '<h2>' + escapeHtml(t('stylistOccasion')) + '</h2>' +
     '<p class="stylist-form-note">' + escapeHtml(t('stylistDescribe')) + '</p>' +
     '<label class="visually-hidden" for="occasion-input">' + escapeHtml(t('stylistOccasion')) + '</label>' +
-    '<textarea id="occasion-input" name="occasion" maxlength="500" required rows="5">' + escapeHtml(brief.occasion) + '</textarea>' +
+    '<textarea id="occasion-input" name="occasion" maxlength="500" required rows="5"'+(agentBusy?' disabled':'')+'>' + escapeHtml(brief.occasion) + '</textarea>' +
     '<div class="occasion-suggestions"><button type="button" data-occasion="work">' + escapeHtml(t('stylistWork')) + ' ' + svg('arrow') + '</button>' +
     '<button type="button" data-nav="trip">' + escapeHtml(t('stylistWeekend')) + ' ' + svg('arrow') + '</button></div>' +
-    '<label class="stylist-date">' + svg('calendar') + '<span class="visually-hidden">' + escapeHtml(t('stylistDate')) + '</span>' +
+    '<details class="stylist-context"><summary>Date and saved style</summary><label class="stylist-date">' + svg('calendar') + '<span class="visually-hidden">' + escapeHtml(t('stylistDate')) + '</span>' +
     '<input type="date" name="date" value="' + escapeHtml(brief.date) + '" aria-label="' + escapeHtml(t('stylistDate')) + '" /></label>' +
     '<div class="stylist-style-row"><div><strong>' + escapeHtml(t('stylistStyleLabel')) + '</strong>' +
     '<p>' + escapeHtml(wardrobe.style === t('defaultStyle') ? t('stylistStyleSummary') : wardrobe.style) + '</p></div>' +
     '<button type="button" data-nav="profile">' + escapeHtml(t('stylistChange')) + '</button></div>' +
-    '<p class="stylist-owned">' + svg('hanger') + ' ' + escapeHtml(t('stylistStartOwned')) + '</p>' +
-    '<button type="submit" class="button button-primary full-width">' + escapeHtml(t(generated ? 'stylistChangeSuggestions' : 'stylistShowLooks')) +
-    ' ' + svg('arrow') + '</button>' +
-    '<p class="stylist-footnote">' + escapeHtml(t('stylistNoNetwork')) + '</p></form>';
+    '<p class="stylist-owned">' + svg('hanger') + ' ' + escapeHtml(t('stylistStartOwned')) + '</p></details>' +
+    '<div class="agent-controls"><label for="stylist-mode">Stylist mode<select id="stylist-mode" name="mode"'+(agentBusy?' disabled':'')+'><option value="demo"'+(agentMode==='demo'?' selected':'')+'>Saved example · no network</option><option value="live"'+(agentMode==='live'?' selected':'')+'>Live AI · my wardrobe and memory</option></select></label>'+
+    (agentMode==='live'?'<label for="stylist-procedure">What would you like to do?<select id="stylist-procedure" name="procedure">'+Object.entries(PROCEDURES).map(([id,row])=>'<option value="'+id+'"'+(id===procedure?' selected':'')+'>'+escapeHtml(row.title)+'</option>').join('')+'</select></label><details><summary>Location, photos and paid preview settings</summary><label for="stylist-city">City, if relevant<input id="stylist-city" name="city" type="text" maxlength="100" value="'+escapeHtml(locationText)+'" placeholder="e.g. Warsaw"></label><label><input type="checkbox" name="allowPhotos"'+(allowPhotos?' checked':'')+'>Send my clothing photos for this session. They contain garments only, without faces.</label><label><input type="checkbox" name="allowRenders"'+(allowRenders?' checked':'')+'>Allow up to four new YouCam previews (eight credits). Clothing photos must be enabled.</label><p class="agent-status">Claude reads your profile, memory, available clothes and optional clothing photos. Photos sent for the agent are retained by our Worker for up to six hours and by providers under their own policies. AI styling opinions are separate from your ratings and the basket certificate.</p></details>':'')+'</div>'+
+    '<button type="submit" class="button button-primary full-width"'+(agentBusy?' disabled':'')+'>' + escapeHtml(agentBusy?'Working…':agentMode==='live'?'Ask my stylist':t(generated ? 'stylistChangeSuggestions' : 'stylistShowLooks')) + ' ' + svg('arrow') + '</button>' +
+    '<p class="stylist-footnote">' + escapeHtml(agentMode==='live'?'Live Sonnet 5.5 · 30 sessions/day, three per live token; twelve tools/session. Weather and merchant facts stay UNKNOWN when absent.':t('stylistNoNetwork')) + '</p></form>';
 }
 function lookPreview(wardrobe: WardrobeState, selection: StylistResult): string {
   const look = selection.looks[selected];
@@ -85,7 +105,7 @@ function lookPreview(wardrobe: WardrobeState, selection: StylistResult): string 
   const owned = look.itemIds
     .map(id => wardrobe.items.find(item => item.id === id))
     .filter((item): item is WardrobeItem => !!item);
-  const image = outfitVisual(look.itemIds, wardrobe);
+  const image = selection.source==='agent'?outfitBoard(look.itemIds,wardrobe):outfitVisual(look.itemIds, wardrobe);
   return '<section class="stylist-result"><div class="stylist-preview-column">' +
     '<div class="stylist-progress"><span>' + escapeHtml(t('stylistSuggestion',{index:selected+1,count:selection.looks.length})) + '</span>' +
     '<div class="stylist-arrows"><button type="button" data-look-prev aria-label="' + escapeHtml(t('stylistPrevious')) + '">' + svg('left') + '</button>' +
@@ -105,9 +125,13 @@ function lookPreview(wardrobe: WardrobeState, selection: StylistResult): string 
     '<button type="button" class="text-link stylist-next-link" data-look-next>' + escapeHtml(t('stylistChangeLook')) + ' ' + svg('arrow') + '</button>' +
     '<p class="stylist-disclaimer">' + escapeHtml(t('outfitBoardNote')) + '</p>' +
     (look.heroImagePath ? '<details class="stylist-preview-detail"><summary>' + escapeHtml(t('outfitRecordedDetail')) + '</summary><img src="' + escapeHtml(look.heroImagePath) + '" alt="' + escapeHtml(t('stylistSavedRender')) + '" /><p>' + escapeHtml(t('stylistImageNote')) + '</p></details>' : '') +
-    '<p class="stylist-disclaimer">' + escapeHtml(t('stylistDemoNote')) + '</p></div></section>';
+    '<p class="stylist-disclaimer">' + escapeHtml(selection.source==='agent'?'Live AI styling · available owned pieces verified. Subjective style, weather assumptions and human pair ratings remain separate.':t('stylistDemoNote')) + '</p></div></section>';
 }
-export function stylistPage(wardrobe: WardrobeState): string {
+export function stylistPage(wardrobe: WardrobeState,storage?:Storage,rerender?:()=>void): string {
+  agentMode??=wardrobe.exampleMode===false?'live':'demo';
+  if(!restored&&storage){restored=true;const previous=savedAgentRequest(storage);if(previous){
+    try{const raw=JSON.parse(previous.body) as {message:string;procedure:Procedure;snapshot:{date:string;location:string;profile:{style:string}}};brief={occasion:raw.message.slice(0,500),date:raw.snapshot.date,style:raw.snapshot.profile.style};procedure=raw.procedure;locationText=raw.snapshot.location;}catch{}
+    agentMode='live';agentBusy=true;queueMicrotask(()=>{const actions:UIActions={wardrobe,storage,rerender:rerender??(()=>{}),notice:()=>{}};void resumeLiveAgent(agentInput(actions,brief.occasion)).then(value=>{if(value)acceptAgent(value,actions);}).catch(e=>{agentNotice=e instanceof Error?e.message:'Cannot resume the previous session.';}).finally(()=>{agentBusy=false;if(window.location.hash==='#stylist')actions.rerender();});});}}
   const selection = validResult(wardrobe);
   return '<section class="page stylist-view ' + (generated ? 'show-result' : 'show-brief') + '" aria-labelledby="stylist-title">' +
     (generated ? '<div class="stylist-result-appbar"><button type="button" data-stylist-reset aria-label="' + escapeHtml(t('stylistBackToBrief')) + '">←</button>'+
@@ -116,7 +140,13 @@ export function stylistPage(wardrobe: WardrobeState): string {
     '<p>' + escapeHtml(t('stylistHeaderSubtitle')) + '</p></div>' +
     '<button type="button" class="text-link stylist-saved-link" data-nav="saved">' + escapeHtml(t('stylistSavedLink')) + ' ' + svg('arrow') + '</button></div>' +
     '<button type="button" class="stylist-mobile-back" data-stylist-reset>' + svg('left') + ' ' + escapeHtml(t('stylistBackToBrief')) + '</button>' +
-    '<div class="stylist-layout">' + briefForm(wardrobe) + lookPreview(wardrobe,selection) + '</div></section>';
+    (agentBusy?'<p role="status" class="agent-progress">'+escapeHtml(agentNotice||'Checking your wardrobe and memory…')+'</p>':agentNotice?'<p role="status" class="agent-status">'+escapeHtml(agentNotice)+'</p>':'')+
+    '<div class="stylist-layout">' + briefForm(wardrobe) + lookPreview(wardrobe,selection) + '</div>'+
+    (latestAgent?.answer?'<section class="agent-requirements"><h2>AI interpretation · edit and revise</h2><p>These are styling assumptions. The app verifies garment IDs and availability; it does not turn AI opinions into your would-wear ratings.</p><form id="agent-feedback-form"><ul>'+latestAgent.answer.requirements.map((r,i)=>'<li><label for="agent-need-'+i+'"><input id="agent-need-'+i+'" name="requirement" value="'+escapeHtml(r.label)+'" maxlength="160"></label><p>'+escapeHtml(r.status+' · '+r.reason)+'</p></li>').join('')+'</ul><label for="agent-feedback">What should change?</label><textarea name="feedback" id="agent-feedback" maxlength="1000" rows="3" required placeholder="Less formal, use my navy shirt, and remember I avoid wool…"'+(agentBusy?' disabled':'')+'></textarea><button class="button button-primary" type="submit"'+(agentBusy?' disabled':'')+'>Revise my proposal</button></form><p>'+escapeHtml(latestAgent.answer.missing.join(' '))+'</p><p>'+latestAgent.usage.modelCalls+' model steps · '+latestAgent.usage.toolCalls+' tools · '+latestAgent.usage.outputTokens+' output tokens</p>'+renderAgentPreviews()+'</section>':'')+
+    (agentMode==='live'&&!agentBusy?'<button class="text-link" type="button" data-agent-resume>Reopen last live result</button>':'')+'</section>';
+}
+function renderAgentPreviews():string{
+ return latestAgent?.renders.length?'<div class="agent-render-list">'+latestAgent.renders.map(raw=>{if(!record(raw)||typeof raw.renderKey!=='string')return '<p>Preview outcome UNKNOWN. No automatic retry or refund.</p>';const url=previewUrls.get(raw.renderKey);return '<article>'+(url?'<img src="'+escapeHtml(url)+'" alt="Actual YouCam garment preview">':'<p>Separate garment preview · '+escapeHtml(String(raw.status))+'</p>')+'<button class="button button-outline" type="button" data-agent-preview="'+raw.renderKey+'">Check / show preview</button><p>Reserved or charged units remain governed by UnitLedger.</p></article>';}).join('')+'</div>':'';
 }
 export function savedPage(storage?: Pick<Storage, 'getItem'>, wardrobe: WardrobeState = initialState(), detailId = ''): string {
   if (saved === null) saved = loadSaved(storage);
@@ -144,7 +174,10 @@ export function savedPage(storage?: Pick<Storage, 'getItem'>, wardrobe: Wardrobe
 }
 /** Return true if the click belongs to this workspace, without intercepting global navigation. */
 export function handleStylistClick(target: HTMLElement, actions: UIActions): boolean {
-  if (target.dataset.savedOpen) {
+  if(target.hasAttribute('data-agent-resume')){
+    if(agentBusy)return true;agentBusy=true;void resumeLiveAgent(agentInput(actions,brief.occasion)).then(value=>{if(value)acceptAgent(value,actions);else agentNotice='No previous live session is saved for this profile.';}).catch(e=>{agentNotice=e instanceof Error?e.message:'Could not resume.';}).finally(()=>{agentBusy=false;actions.rerender();});actions.rerender();return true;
+  }else if(target.dataset.agentPreview){const key=target.dataset.agentPreview;void agentPreviewImage(key,actions.storage).then(value=>{if(value.url){const old=previewUrls.get(key);if(old)URL.revokeObjectURL(old);previewUrls.set(key,value.url);}else actions.notice('Preview is still '+value.status+'. No new task was started.');}).catch(e=>actions.notice(e instanceof Error?e.message:'Preview unavailable.')).finally(actions.rerender);return true;
+  }else if (target.dataset.savedOpen) {
     actions.navigate?.('saved/' + target.dataset.savedOpen); return true;
   } else if (target.dataset.savedRemove) {
     saved = (saved ?? loadSaved(actions.storage)).filter(look => look.id !== target.dataset.savedRemove);
@@ -172,12 +205,14 @@ export function handleStylistClick(target: HTMLElement, actions: UIActions): boo
       if (saved === null) saved = loadSaved(actions.storage);
       saved = saveChosen(saved, look, {...brief,style:actions.wardrobe.style}, actions.wardrobe);
       actions.notice(persistSaved(saved,actions.storage) ? t('stylistSaved') : t('stylistSaveFailed'));
+      if(result?.source==='agent')try{remember(actions.storage,{id:'decision_'+crypto.randomUUID().replaceAll('-',''),kind:'decision',text:'I explicitly saved “'+look.title+'” for '+brief.occasion.slice(0,200)+'. Items: '+look.itemIds.join(', ')+'. This records a choice, not a wear or purchase.',updatedAt:new Date().toISOString()});}catch{/* Saved outfit is still available. */}
     }
   } else return false;
   actions.rerender();
   return true;
 }
 export function submitStylist(form: HTMLFormElement, actions: UIActions): void {
+  if(agentBusy)return;
   const values = new FormData(form);
   brief = {
     occasion: String(values.get('occasion') ?? ''),
@@ -185,6 +220,11 @@ export function submitStylist(form: HTMLFormElement, actions: UIActions): void {
     style: actions.wardrobe.style,
   };
   const token = ++requestSequence;
+  if(values.get('mode')==='live'){
+    agentMode='live';procedure=Object.hasOwn(PROCEDURES,String(values.get('procedure')))?String(values.get('procedure')) as Procedure:'occasion';locationText=String(values.get('city')??'');allowPhotos=values.get('allowPhotos')==='on';allowRenders=allowPhotos&&values.get('allowRenders')==='on';agentBusy=true;agentNotice='Checking your wardrobe and saved preferences…';actions.rerender();
+    void startLiveAgent(agentInput(actions,brief.occasion)).then(value=>{if(token===requestSequence)acceptAgent(value,actions);}).catch(e=>{agentNotice=e instanceof Error?e.message:'Live AI unavailable. Your data is unchanged.';}).finally(()=>{agentBusy=false;if(window.location.hash==='#stylist')actions.rerender();});return;
+  }
+  agentMode='demo';
   // No network request: default adapter is an offline verified demo.
   void proposeLooks(brief, actions.wardrobe).then(next => {
     if (token !== requestSequence) return;
@@ -198,4 +238,12 @@ export function submitStylist(form: HTMLFormElement, actions: UIActions): void {
     actions.notice(error instanceof Error ? error.message : t('stylistInvalidProposal'));
     actions.rerender();
   });
+}
+export function stylistChange(input:HTMLElement,rerender:()=>void):boolean{
+ if(input instanceof HTMLSelectElement&&input.id==='stylist-mode'){agentMode=input.value==='live'?'live':'demo';rerender();return true;}return false;
+}
+export function submitAgentFeedback(form:HTMLFormElement,actions:UIActions):boolean{
+ if(form.id!=='agent-feedback-form')return false;if(agentBusy)return true;const values=new FormData(form),feedback=String(values.get('feedback')??'').trim(),requirements=values.getAll('requirement').map(String).join('; ');
+ const message=brief.occasion+'\nUser feedback: '+feedback+'\nUpdated requirements: '+requirements;if(message.length>2000){actions.notice('Shorten your feedback or requirement labels to keep this request below 2000 characters.');actions.rerender();return true;}
+ agentBusy=true;agentNotice='Revising with your current wardrobe and the previous answer…';void startLiveAgent(agentInput(actions,message,true)).then(value=>acceptAgent(value,actions)).catch(e=>{agentNotice=e instanceof Error?e.message:'Revision unavailable. Existing choices remain unchanged.';}).finally(()=>{agentBusy=false;if(window.location.hash==='#stylist')actions.rerender();});actions.rerender();return true;
 }

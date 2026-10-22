@@ -1,14 +1,15 @@
 {
   "id": "/app/",
-  "name": "WearAgain - wardrobe web demo",
+  "name": "WearAgain",
   "short_name": "WearAgain",
-  "description": "An optional installable web shell for a sample wardrobe and saved single-garment previews. Native apps are separate.",
+  "description": "Your wardrobe in your pocket. Personal styling, considered purchases and your wardrobe dashboard.",
   "lang": "en",
-  "start_url": "/app/",
+  "start_url": "/app/?source=pwa",
   "scope": "/app/",
   "display": "standalone",
   "background_color": "#f8f6f1",
   "theme_color": "#30392f",
+  "shortcuts": [{"name":"My wardrobe","url":"/app/#wardrobe"},{"name":"My stylist","url":"/app/#stylist"},{"name":"Buy nothing demo","url":"/app/?scenario=zero#check"}],
   "icons": [
     {
       "src": "/icons/icon-192.png",

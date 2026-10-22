@@ -50,7 +50,7 @@ try{
  const bucket={limitUnits:440,spentUnits:0,reservedUnits:0,remainingUnits:440};const budget={utcDay:'2026-10-22',unitsPerRender:2,total:bucket,daily:bucket,sessionDaily:bucket};
  await page.route('https://wearagain-api.oli-struska.workers.dev/**',async route=>{
   apiCalls++;const req=route.request(),url=new URL(req.url());
-  if(url.pathname==='/api/session')return route.fulfill({json:{sessionToken:'qa-synthetic-token',unitsPerRender:2}});
+  if(url.pathname==='/api/session')return route.fulfill({json:{sessionToken:'qa-synthetic-token',expiresAt:Date.now()+3600000,unitsPerRender:2}});
   if(url.pathname==='/api/ledger')return route.fulfill({json:budget});
   if(url.pathname==='/api/renders'){
    submitted++;const key=String(submitted).padStart(64,'a');

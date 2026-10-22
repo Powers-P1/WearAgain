@@ -15,7 +15,7 @@ test('v1 landing source imagery, copy and static CSS crops are preserved without
  const [src,css,build,headers,marketing]=await Promise.all([
   get('web2/src/landing-v1.ts'),get('web2/src/landing-v1.css'),
   get('scripts/build-web2.mjs'),get('web2/_headers'),get('web2/src/marketing.ts')]);
- assert.match(src,/Buy what earns a place/);
+ assert.match(src,/Your wardrobe/);
  assert.match(src,/Sometimes, the best basket is empty/);
  assert.match(src,/For judges/);
  assert.match(src,/href="\/retail\//);

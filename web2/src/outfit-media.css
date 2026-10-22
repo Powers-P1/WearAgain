@@ -39,6 +39,9 @@
 .stylist-photo>.outfit-illustration{width:100%;height:100%}
 .stylist-photo>.outfit-board{width:100%;height:100%;grid-auto-rows:minmax(0,1fr)}
 .stylist-photo>.outfit-board .outfit-board-piece img{aspect-ratio:auto}
+.stylist-photo>.outfit-board .outfit-board-piece img{height:0;flex:1;min-height:0}
+.stylist-photo>.outfit-board .outfit-board-piece .no-photo{flex:1;min-height:0}
+.stylist-photo>.outfit-board .outfit-board-piece figcaption{flex:none;font-size:14px;line-height:1.35}
 .saved-look-item>.outfit-illustration{height:340px}
 .saved-detail-layout>.outfit-illustration{height:560px}
 @media(max-width:800px){.saved-detail-layout>.outfit-illustration{height:420px}.saved-look-item>.outfit-illustration{height:390px}}

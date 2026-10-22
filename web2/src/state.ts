@@ -26,6 +26,7 @@ export interface WardrobeItem {
   readonly order: number;
 }
 export interface WardrobeState {
+  readonly exampleMode?:boolean;
   readonly version: 1;
   readonly items: readonly WardrobeItem[];
   readonly style: string;
@@ -62,7 +63,7 @@ const OLD_AVAILABILITY: Record<string, Availability> = {
 const OLD_DEMO_STYLE = 'Lubię klasykę, beż i granat. Nie noszę wzorów. Chciałabym wyglądać bardziej elegancko, bez przesady.';
 
 export function initialState(): WardrobeState {
-  return { version: 1, items: EXAMPLES.map(item => ({ ...item })), style: DEMO_STYLE };
+  return { version: 1, exampleMode:true,items: EXAMPLES.map(item => ({ ...item })), style: DEMO_STYLE };
 }
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === 'object' && !Array.isArray(value);
@@ -109,9 +110,9 @@ export function parseStored(value: unknown): WardrobeState {
   // recorded-example tops without changing any user-entered garments or
   // availability choices. Never truncate a full 200-item wardrobe.
   const recorded = EXAMPLES.filter(item => item.id.startsWith('recorded-') && !ids.has(item.id));
-  const migrated = items.length + recorded.length <= 200
+  const migrated = value.exampleMode!==false&&items.length + recorded.length <= 200
     ? [...items, ...recorded.map(item => ({ ...item }))] : items;
-  return { version: 1, items: migrated, style: value.style === OLD_DEMO_STYLE ? DEMO_STYLE : value.style };
+  return { version: 1,...(typeof value.exampleMode==='boolean'?{exampleMode:value.exampleMode}:{}),items: migrated, style: value.style === OLD_DEMO_STYLE ? DEMO_STYLE : value.style };
 }
 export function loadState(storage?: Pick<Storage, 'getItem'>): WardrobeState {
   try {

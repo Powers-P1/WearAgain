@@ -1,5 +1,8 @@
 import type { LiveClient, LiveRenderResponse } from '../../web/src/live.js';
 import { readPhoto, storePhoto, deletePhoto } from './photo-store.js';
+import {sessionTransport,storedCredential} from './session-auth.js';
+import {API_ORIGIN} from '../../web/src/config.js';
+import {selectedAvatar} from './account-ui.js';
 
 export type JobStatus = 'queued' | 'submitting' | 'processing' | 'ready' | 'error' | 'unknown';
 export interface PreviewJob { readonly itemId: string; readonly status: JobStatus; readonly renderKey: string | null; readonly photoId: string | null; readonly error: string | null }
@@ -9,7 +12,7 @@ class QueueError extends Error { constructor(readonly code:string,readonly statu
 const apiFailure=(error:unknown):error is Error & {code:string;status:number;retryAfterMs:number} =>
   error instanceof Error && 'code' in error && typeof error.code==='string' && 'status' in error && typeof error.status==='number';
 interface PhotoRepository { input(id: string): Promise<File>; output(id: string, blobUrl: string): Promise<void>; remove?(id: string): Promise<void> }
-export function parseQueue(raw: unknown): PreviewJob[] {
+export function parseQueue(raw: unknown,resume=false): PreviewJob[] {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return [];
   const value = raw as Record<string, unknown>;
   if (value.version !== 1 || !Array.isArray(value.jobs) || value.jobs.length > 120) return [];
@@ -24,9 +27,9 @@ export function parseQueue(raw: unknown): PreviewJob[] {
       !(row.error === null || typeof row.error === 'string' && row.error.length <= 100)) return [];
     if (row.status === 'ready' && !row.photoId) return [];
     seen.add(row.itemId);
-    // The existing API deliberately keeps anonymous credentials in memory.
-    // A reload cannot safely resubmit an interrupted task under a new session.
-    const interrupted = row.status === 'submitting' || row.status === 'processing';
+    // Only a known key bound to the exact still-valid capability can resume GET polling.
+    // A lost POST response never starts a replacement submission.
+    const interrupted = row.status === 'submitting' || row.status === 'processing'&&(!resume||!row.renderKey);
     return [{ itemId: row.itemId, status: interrupted ? 'unknown' : row.status as JobStatus,
       renderKey: row.renderKey as string | null, photoId: row.photoId as string | null,
       error: interrupted ? 'session_ended' : row.error as string | null }];
@@ -65,15 +68,18 @@ export class PreviewQueue {
   #enabled = false;
   #disposed = false;
   #changed: () => void;
+  #sessionToken:string|null=null;
   constructor(store: Store, changed: () => void, client?: LiveClient, photos: PhotoRepository = browserPhotos) {
     this.#store=store; this.#client=client??null; this.#photos=photos; this.#changed=changed;
-    try { const raw=store?.getItem(QUEUE_KEY); this.#jobs=raw?parseQueue(JSON.parse(raw)):[]; } catch { /* Fresh device queue. */ }
+    try { const raw=store?.getItem(QUEUE_KEY),value=raw?JSON.parse(raw) as Record<string,unknown>:null,credential=storedCredential(store);this.#sessionToken=credential?.sessionToken??null;this.#jobs=value?parseQueue(value,!!credential&&value.sessionToken===credential.sessionToken):[]; } catch { /* Fresh device queue. */ }
   }
   get enabled(): boolean { return this.#enabled; }
   get jobs(): readonly PreviewJob[] { return this.#jobs; }
   async enable(): Promise<void> {
-    this.#client??=(await import('../../web/src/live.js')).createLiveClient();
-    await this.#client.startSession();this.#enabled=true;this.#changed();this.#pump();
+    this.#client??=(await import('../../web/src/live.js')).createLiveClient(API_ORIGIN,sessionTransport(this.#store));
+    await this.#client.startSession();const token=storedCredential(this.#store)?.sessionToken??null;
+    if(this.#sessionToken&&token!==this.#sessionToken)this.#jobs=this.#jobs.map(job=>job.status==='processing'?{...job,status:'unknown',error:'session_ended'}:job);
+    this.#sessionToken=token;this.#enabled=true;this.#persist();this.#pump();
   }
   pause(): void { this.#enabled=false; this.#changed(); }
   enqueue(itemId: string): void {
@@ -89,7 +95,7 @@ export class PreviewQueue {
     this.#persist();
   }
   #persist(): void {
-    try { this.#store?.setItem(QUEUE_KEY,JSON.stringify({version:1,jobs:this.#jobs})); } catch { /* Queue remains usable in this tab. */ }
+    try { this.#store?.setItem(QUEUE_KEY,JSON.stringify({version:1,sessionToken:this.#sessionToken,jobs:this.#jobs})); } catch { /* Queue remains usable in this tab. */ }
     this.#changed();
   }
   #update(itemId:string,change:Partial<PreviewJob>):void {
@@ -99,7 +105,7 @@ export class PreviewQueue {
     if (!this.#enabled || this.#disposed) return;
     for (const job of this.#jobs) {
       if (this.#active.size>=2) break;
-      if (job.status!=='queued'||this.#active.has(job.itemId)) continue;
+      if (!['queued','processing'].includes(job.status)||this.#active.has(job.itemId)) continue;
       this.#active.add(job.itemId);
       void this.#run(job).finally(()=>{this.#active.delete(job.itemId);this.#pump();});
     }
@@ -109,14 +115,16 @@ export class PreviewQueue {
     try {
       // Mark as submitting before the request. No automatic new attempt on an
       // uncertain outcome, and no rating is ever inferred from an API error.
+      let record:LiveRenderResponse;
+      if(job.status==='processing'&&job.renderKey){record=await this.#client!.poll(job.renderKey);submitted=true;}
+      else{
       this.#update(job.itemId,{status:'submitting',error:null});
       const garment=await this.#photos.input(job.itemId);
       if(this.#disposed||!this.#jobs.some(row=>row.itemId===job.itemId))return;
       if(!this.#enabled){this.#update(job.itemId,{status:'queued'});return;}
-      let record:LiveRenderResponse;
       try {
         submitted=true;
-        record=await this.#client!.submit({element:{kind:'outerwear',id:job.itemId},avatarId:'woman_neutral_01',attempt:0,garment,garmentContainsNoFace:true});
+        record=await this.#client!.submit({element:{kind:'outerwear',id:job.itemId},avatarId:selectedAvatar(this.#store),attempt:0,garment,garmentContainsNoFace:true});
       } catch(error) {
         if(apiFailure(error)&&error.code==='render_busy') {
           submitted=false;
@@ -126,6 +134,7 @@ export class PreviewQueue {
         throw error;
       }
       this.#update(job.itemId,{renderKey:record.renderKey,status:'processing'});
+      }
       while(record.status==='pending'&&!this.#disposed) {
         if(record.requiresReconciliation) {this.#update(job.itemId,{status:'unknown',error:'reconciliation_required'});return;}
         await new Promise(resolve=>setTimeout(resolve,3000));

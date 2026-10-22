@@ -5,6 +5,7 @@ import { coreDecision, demoEvidence, demoStep, money, retailExample, sampleWardr
   type DemoStep, type MarketingRoute } from './marketing-model.js';
 import { scenarioForDemo, type PurchaseDemo } from './purchase.js';
 import './marketing.css';
+import {phoneHandoff} from './pwa.js';
 
 const CODE='https://github.com/Powers-P1/WearAgain';
 const SETUP=CODE+'/blob/main/README.md';
@@ -135,11 +136,12 @@ function judgesLanding():string{
   return '<div class="mkt-site mkt-judges"><div class="mkt-judges-band">'+h('mktJudgesOverline')+'</div>'+
     siteHeader('judges')+'<main id="main-content" tabindex="-1">'+
     '<section class="mkt-hero mkt-judges-hero"><div class="mkt-hero-copy">'+
-    '<p class="mkt-eyebrow">'+h('mktJudgesNav')+'</p>'+
-    '<h1>'+h('mktJudgesHero1')+'<em>'+h('mktJudgesHero2')+'</em></h1>'+
-    '<p>'+h('mktJudgesHeroBody')+'</p><p class="mkt-judges-role">'+h('mktJudgesHeroRoles')+'</p>'+
+    '<p class="mkt-eyebrow">MOBILE FIRST · INSTALLABLE APP · NO SIGN-IN</p>'+
+    '<h1>Your wardrobe<em>in your pocket.</em></h1>'+
+    '<p>AI styling and smarter shopping on your phone. Your wardrobe dashboard on desktop.</p><p class="mkt-judges-role">'+h('mktJudgesHeroRoles')+'</p>'+
     link('/judges/demo/',h('mktJudgesPrimary'),'mkt-button mkt-button-dark')+
     link('#walkthrough',h('mktJudgesWatch'),'mkt-secondary-action')+
+    '<div class="mobile-entry-actions"><button type="button" class="mkt-outline-button" data-install-app>Install WearAgain</button>'+link('/app/#wardrobe','Open wardrobe dashboard')+'</div>'+phoneHandoff(mode)+
     '<div class="mkt-evidence-links">'+link(CODE,h('mktJudgesCode'))+
     link(SETUP,h('mktJudgesTests'))+'</div>'+
     '<small>'+h('mktJudgesSample')+'</small></div>'+
@@ -157,6 +159,7 @@ function judgesLanding():string{
     '<p><strong>WearAgain</strong> · '+h('mktJudgesWearAgainRole')+'</p></div>'+
     '<small>'+h('mktJudgesNotComposited')+'</small>'+
     link(API,h('mktJudgeSeeApi'))+'</section>'+
+    '<section class="mkt-youcam-band"><h2>A stylist who knows your wardrobe.</h2><p>Try live Sonnet 5.5 with actual wardrobe tools, saved preferences and follow-up feedback. Occasion, purchase, packing and wear-it-again procedures use your current data. Saved examples remain available without a model request.</p>'+link('/app/?stylist=live#stylist','Try the live stylist','mkt-button mkt-button-dark')+' '+link('/app/#profile','Start an empty wardrobe','mkt-secondary-action')+'<p>Local profiles stay separate. Photos and paid previews require explicit permission. Unknown facts stay UNKNOWN.</p></section>'+
     '<details class="mkt-landing-limits"><summary>'+h('mktJudgeDisclosureSection')+'</summary>'+judgeDisclosures()+'</details>'+
     '<section class="mkt-review-index"><h2>'+h('mktJudgesEvidenceHeading')+'</h2>'+
     ([
@@ -235,13 +238,14 @@ function verdictStep():string{
       escapeHtml(entry.failedRequirements.map(req=>scenario.requirements.find(r=>r.id===req.requirementId)?.label??req.requirementId).join(', '))+
     '</span></li>').join('')+'</ul>':
     result.status==='solved'&&!basket.length?'<p class="mkt-no-cheaper">'+h('mktJudgeNoCheaper')+'</p>':'')+
-    link('/app/#check',h('mktJudgeGoApp'))+'</aside></div>';
+    link('/app/?scenario='+mode+'#check',h('mktJudgeGoApp'))+'</aside></div>';
 }
 function guidedDemo():string{
   // Explicit review links (?step=preview or ?step=verdict) let Chromium
   // screenshot each real guided state; arbitrary query strings are ignored.
   if(!stepQueryLoaded&&typeof window!=='undefined'){
     step=demoStep(new URLSearchParams(window.location.search).get('step'));
+    mode=new URLSearchParams(window.location.search).get('scenario')==='zero'?'zero':'minimum';
     stepQueryLoaded=true;
   }
   const pageIndex=1+(['wardrobe','preview','verdict'] as readonly DemoStep[]).indexOf(step);
@@ -257,7 +261,7 @@ function guidedDemo():string{
       '" class="mkt-outline-button">'+h('mktJudgeBack')+'</button>':'<span></span>')+
       (next?'<button type="button" class="mkt-button mkt-button-dark" data-guide-step="'+next+'">'+
       h('mktJudgeNext',{title:t(next==='preview'?'mktJudgeStep2':'mktJudgeStep3')})+'</button>':
-      link('/app/#check',h('mktJudgeGoApp'),'mkt-button mkt-button-dark'))+'</div>'+
+      link('/app/?scenario='+mode+'#check',h('mktJudgeGoApp'),'mkt-button mkt-button-dark'))+'</div>'+phoneHandoff(mode)+
     '<div class="mkt-guide-top"><span>'+h('mktJudgeNoAccount')+'</span><nav>'+link(CODE,h('mktJudgesCode'))+link(SETUP,h('mktJudgesTests'))+'</nav></div>'+
     '<details class="mkt-guide-limits"><summary>'+h('mktJudgeDisclosureSection')+'</summary>'+judgeDisclosures()+'</details>'+
     '<p class="mkt-guided-note">'+h('mktJudgeLiveSeparate')+' '+
@@ -285,7 +289,7 @@ export function marketingTitle(route:MarketingRoute):string {
 export function handleMarketingClick(target:HTMLElement,rerender:()=>void):boolean{
   if(target.dataset.guideStep){
     step=demoStep(target.dataset.guideStep);
-    if(typeof window!=='undefined')window.history.replaceState(null,'','?step='+step);
+    if(typeof window!=='undefined')window.history.replaceState(null,'','?step='+step+'&scenario='+mode);
     rerender();
     if(typeof window!=='undefined')window.scrollTo({top:0,behavior:'instant'});
     const title=typeof document==='undefined'?null:document.querySelector<HTMLElement>('.mkt-guide-heading h1');if(title){title.setAttribute('tabindex','-1');title.focus({preventScroll:true});}
@@ -293,7 +297,7 @@ export function handleMarketingClick(target:HTMLElement,rerender:()=>void):boole
   }
   if(target.dataset.judgeMode){
     if(target.dataset.judgeMode==='minimum'||target.dataset.judgeMode==='zero'){
-      mode=target.dataset.judgeMode;rerender();return true;
+      mode=target.dataset.judgeMode;if(typeof window!=='undefined'){window.history.replaceState(null,'','?step='+step+'&scenario='+mode);try{localStorage.setItem('wearagain:approved-demo:v1',mode);}catch{}}rerender();return true;
     }
   }
   if(target.hasAttribute('data-retail-panel-open')){

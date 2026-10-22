@@ -4,6 +4,9 @@
  */
 const DB_NAME='wearagain-device-photos-v1';
 const STORE='photos';
+let namespace='default';
+export function setPhotoNamespace(value:string):void{if(!/^[A-Za-z0-9_-]{1,64}$/.test(value))throw Error('Invalid photo namespace');namespace=value;}
+const photoKey=(id:string,scope=namespace)=>scope==='default'?id:scope+':'+id;
 export const MAX_PHOTO_BYTES=12_000_000;
 export function supportedPhoto(file:Pick<File,'type'|'size'>):boolean {
   return ['image/jpeg','image/png','image/webp'].includes(file.type) && file.size>0 && file.size<=MAX_PHOTO_BYTES;
@@ -35,34 +38,34 @@ async function transact<T>(mode:IDBTransactionMode,run:(store:IDBObjectStore,res
     }catch(e){fail(e);}
   }).finally(()=>db.close());
 }
-export async function storePhoto(id:string,file:File):Promise<void>{
+export async function storePhoto(id:string,file:File,scope=namespace):Promise<void>{
   if(!/^[a-zA-Z0-9_-]{1,64}$/.test(id)||!supportedPhoto(file))throw Error('Unsupported photo format or size');
   // Completion, not request success, confirms the transaction was committed.
   const db=await database();
   await new Promise<void>((resolve,reject)=>{
     try{
       const tx=db.transaction(STORE,'readwrite');
-      tx.objectStore(STORE).put(file,id);
+      tx.objectStore(STORE).put(file,photoKey(id,scope));
       tx.oncomplete=()=>resolve();
       tx.onerror=()=>reject(tx.error??Error('Photo not saved'));
       tx.onabort=()=>reject(tx.error??Error('Photo not saved'));
     }catch(e){reject(e);}
   }).finally(()=>db.close());
 }
-export async function readPhoto(id:string):Promise<Blob|null>{
+export async function readPhoto(id:string,scope=namespace):Promise<Blob|null>{
   if(!/^[a-zA-Z0-9_-]{1,64}$/.test(id))return null;
   return transact<Blob|null>('readonly',(store,resolve,reject)=>{
-    const req=store.get(id);
+    const req=store.get(photoKey(id,scope));
     req.onsuccess=()=>resolve(req.result instanceof Blob?req.result:null);
     req.onerror=()=>reject(req.error);
   });
 }
-export async function deletePhoto(id:string):Promise<void>{
+export async function deletePhoto(id:string,scope=namespace):Promise<void>{
   if(!/^[a-zA-Z0-9_-]{1,64}$/.test(id))return;
   const db=await database();
   await new Promise<void>((resolve,reject)=>{
     const tx=db.transaction(STORE,'readwrite');
-    tx.objectStore(STORE).delete(id);
+    tx.objectStore(STORE).delete(photoKey(id,scope));
     tx.oncomplete=()=>resolve();
     tx.onerror=()=>reject(tx.error??Error('Cannot delete photo'));
     tx.onabort=()=>reject(tx.error??Error('Cannot delete photo'));

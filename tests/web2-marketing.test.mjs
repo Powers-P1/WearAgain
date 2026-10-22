@@ -69,7 +69,7 @@ test('public routes render English links with no invented task identifiers or re
   }
   const judges=marketing.marketingPage('/judges');
   assert.match(judges,/Try it on/);
-  assert.match(judges,/Know why/);
+  assert.match(judges,/in your pocket/);
   assert.match(judges,/<video controls playsinline/);
   assert.match(judges,/src="\/video\/wearagain-demo.webm"/);
   assert.match(judges,/kind="captions"/);
@@ -148,7 +148,7 @@ test('judges pages and each guided step include implementation, concept and quan
     assert.match(html,/no fresh tasks|not live YouCam calls/i);
     assert.match(html,/No conversion, returns or impact improvements have been measured/);
     assert.match(html,/private.*reviewer access/);
-    assert.doesNotMatch(html,/https:\/\/wearagain\.pages\.dev\/app\//);
+    assert.doesNotMatch(html,/href="https:\/\/wearagain\.pages\.dev\/app\//);
   }
   marketing.handleMarketingClick({dataset:{guideStep:'wardrobe'}},()=>{});
 });
@@ -179,9 +179,9 @@ test('direct-upload Pages switch documentation is accurate and does not deploy',
   assert.match(docs,/no build output directory setting/i);
 });
 
-test('owner-selected v1 landing keeps original headline, narrative and a quiet jury link',()=>{
+test('owner-selected v1 landing keeps its layout and narrative with the requested mobile-first entry',()=>{
   const html=marketing.marketingPage('/');
-  assert.match(html,/Buy what earns a place/);
+  assert.match(html,/Your wardrobe/);
   assert.match(html,/Sometimes, the best basket is empty/);
   assert.match(html,/landing-hero-pair/);
   assert.match(html,/For judges/);
@@ -196,5 +196,6 @@ test('legacy v1 landing uses truthful jury CTA and routes directly to zero-purch
   assert.doesNotMatch(html,/View on GitHub/);
   assert.match(html,/href="\/app\/\?scenario=zero#check">Explore the buy-nothing example/);
   const source=await read('../web2/src/purchase-ui.ts');
-  assert.match(source,/purchaseDemoFromSearch\(typeof window === 'undefined' \? '' : window\.location\.search\)/);
+  assert.match(source,/initialPurchase\(launchDemo\(\)\)/);
+  assert.match(source,/wearagain:approved-demo:v1/);
 });

@@ -18,6 +18,18 @@ const record={mode:'live',renderKey:'a'.repeat(64),status:'succeeded',assetId:'y
 const photos={input:async()=>new File(['test'],'garment.jpg',{type:'image/jpeg'}),output:async()=>{}};
 const client=()=>({startSession:async()=>({}),submit:async()=>record,loadImage:async()=>({url:'blob:example',assetId:record.assetId}),releaseImage:()=>{},dispose:()=>{}});
 
+test('reload resumes a known render by GET under its exact live capability without another POST',async()=>{
+ const store=memory(),credential={sessionToken:'private-fixture-capability',expiresAt:Date.now()+3600000};
+ store.setItem('wearagain:agent:credential:v1',JSON.stringify(credential));
+ store.setItem(queue.QUEUE_KEY,JSON.stringify({version:1,sessionToken:credential.sessionToken,jobs:[{itemId:'existing',status:'processing',renderKey:record.renderKey,photoId:null,error:null}]}));
+ let posts=0,polls=0;const api={...client(),submit:async()=>{posts++;return record;},poll:async key=>{assert.equal(key,record.renderKey);polls++;return record;}};
+ const restored=new queue.PreviewQueue(store,()=>{},api,photos);assert.equal(restored.jobs[0].status,'processing');await restored.enable();await until(()=>restored.jobs[0].status==='ready');
+ assert.equal(posts,0);assert.equal(polls,1);restored.dispose();
+ store.setItem('wearagain:agent:credential:v1',JSON.stringify({...credential,sessionToken:'another-person'}));
+ store.setItem(queue.QUEUE_KEY,JSON.stringify({version:1,sessionToken:credential.sessionToken,jobs:[{itemId:'existing',status:'processing',renderKey:record.renderKey,photoId:null,error:null}]}));
+ const other=new queue.PreviewQueue(store,()=>{},api,photos);assert.equal(other.jobs[0].status,'unknown');await other.enable();assert.equal(polls,1);other.dispose();
+});
+
 test('trip dates shift existing occasions and clamp a shorter trip without losing selected outfits',()=>{
  const wardrobe=state.initialState(),look=stylist.demoLooks(wardrobe).looks[0];
  let trip=plans.initialTrip(new Date(2026,9,22,23));
