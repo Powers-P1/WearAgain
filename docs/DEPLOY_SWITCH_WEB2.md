@@ -1,36 +1,52 @@
-# Prepared web/ -> web2/ Pages switch (NOT DEPLOYED)
+# Prepared web/ to web2/ Pages switch (NOT DEPLOYED)
 
-Status: proposal prepared in PR-E only. Production still builds from \`web/dist\`. The Worker, Durable Object ledger, unit limits and deployed Pages project remain unchanged.
+**Status:** PR-E prepares a release artifact and documents a later manual action. **No production deploy or Pages settings change occurs in this PR.** The Worker, Durable Object ledger, limits and secrets stay unchanged.
 
-## Exact build output now available
+## Real Pages project configuration
 
-Run \`npm ci --ignore-scripts && npm run check\`. The same script builds the old public app in \`web/dist/\` and the new static frontend in \`web2/dist/\`.
+The Cloudflare Pages project **wearagain** is **direct upload**. It has no Git-connected build, no Pages build command and **no build output directory setting to change**. Merging this PR does not deploy it. Locally, `npm run check` builds both `web/dist/` (previous site) and `web2/dist/` (the proposed release).
 
-The new \`web2/dist/\` layout is ready to be used as a Cloudflare Pages output directory **after an explicit approval**:
-- \`/\`: marketing landing, board 13.
-- \`/app/\`: consumer wardrobe/stylist/Check/morning/mall/overview, old v2 hash routing preserved.
-- \`/retail/\`, \`/retail/demo/\`: fictional retailer and its sample product/wardrobe panel.
-- \`/judges/\`, \`/judges/demo/\`: jury evidence index and guided saved-recording / core-verdict replay.
-- \`/_headers\`: self-only CSP, same-origin fonts/assets and Worker disabled in this frontend, \`img-src blob:\` for device-only photos, \`microphone=(self)\` for opted-in browser dictation and \`camera=(self)\`.
-- \`/_redirects\`: canonical directory-style Pages URLs.
-- \`/manifest.webmanifest\`, \`/app/sw.js\`, public icons, fonts and approved recordings: add-on PWA under **scope /app/** only.
+`web2/dist/` must contain `/`, `/app/`, `/retail/`, `/retail/demo/`, `/judges/`, `/judges/demo/`, `/_headers`, `/_redirects`, `/manifest.webmanifest`, the approved static images and local fonts, and two different service-worker scripts:
 
-## Manual production change after PR review (do not execute in PR-E)
+- **`/sw.js`** - root-scope *legacy v1 cleanup* (JavaScript, no caching and no fetch handler);
+- **`/app/sw.js`** - optional v2 static-install PWA, restricted to scope `/app/`.
 
-1. Review 390 × 844 and 1280 × 800 screenshot artifacts from the PR-E **Web2 visual review** GitHub Actions workflow. Test keyboard navigation, mobile judges header, saved-vs-fresh labels, camera permissions and CSP *on an actual Pages preview*.
-2. Run \`npm run check\` and inspect the exact generated \`web2/dist/_headers\`, \`web2/dist/_redirects\` and \`web2/dist/app/sw.js\`.
-3. Once the separate business approval to switch is given, change **only the Pages production build output directory** from \`web/dist\` to \`web2/dist\`, keeping the install build command equivalent to \`npm ci --ignore-scripts && npm run check\`. Verify that Pages uses the new generated \`_headers\`. **Do not touch Worker secrets or budgets.**
-4. Deploy production only as a new, separate authorized action. Verify all five public URLs and /app/ through HTTPS, and all route fallbacks, fonts, PWA scope and CSP. Test real phone capture at the chosen production origin.
-5. Rollback, if required: revert only the Pages build output directory to \`web/dist\` and redeploy the previous known-good release. The existing PWA web service worker may remain in existing clients until its normal lifecycle; document upgrade behaviour. Do not clear other-origin browser local data.
+## Future manual production deployment - only with separate authorization
 
-## Security / integrity
+Review the 390x844 and 1280x800 real-browser artifacts, audit the static output and validate the preview with actual Cloudflare Pages security headers. The authorized operator may then run:
 
-- Self-host DM Sans and Cormorant Garamond WOFF2 fonts from \`web2/public/fonts\`; upstream open font licenses are preserved as text. The old Google Fonts CSS import is removed only in the v2 path.
-- No iframe retailer integration, consented external personal-wardrobe sync, size fitting or merchant checkout is implemented. Retailer examples are local and fictional.
-- \`/judges/demo/\` uses the real six \`fixtures/youcam/demo-manifest.json\` recordings, explicitly **single-garment**. New task status is always \`not submitted\` in the guided replay; fresh generating is a separate link to the existing live-capable client and may require configured limits.
-- The code and setup links point to this **private GitHub repository**. They require authorized reviewer access. No public source availability is claimed.
-- A 1–3 minute submission video has **not** been supplied in this repository. The judge page explicitly shows this as missing, not a completed submission requirement.
-- Web2 PWA install is an add-on under /app/; its cache allowlist rejects API/live/auth/range/private uploads and never caches runtime local photos, shopper metadata or retailer routes.
-- \`_headers\` are enforced by Cloudflare Pages and not by an ordinary local \`python -m http.server\`. Validate headers independently on the staging Pages deployment **before** production switching.
+```sh
+npm ci --ignore-scripts
+npm run check
+# Inspect web2/dist/_headers, web2/dist/_redirects, web2/dist/sw.js,
+# web2/dist/app/sw.js, the local font files and the saved render manifest.
+wrangler pages deploy web2/dist --project-name wearagain --branch main
+```
 
-No production release or Cloudflare deployment command is included in the PR. No Pages project settings are changed by this repository commit.
+**This is a manual direct upload, not a settings update. Do not execute this command in PR-E or CI.** After future authorization, verify all public routes, actual CSP/Permissions-Policy, local fonts, microphone opt-in, photo capture, a previously installed v1 PWA, and that the Worker budgets are unchanged.
+
+## Why the root legacy worker must be retired
+
+The existing deployed `/sw.js` registers at scope `/` and uses cache-first responses for `/`, `/app/` and `/retailers/`, stored in `wearagain-demo-*` caches. Omitting the old script path from a web2 deployment can cause Cloudflare Pages to return its HTML SPA fallback at `/sw.js`, making browser updates fail JavaScript MIME verification. Returning clients could keep the old cached UI.
+
+PR-E includes `web2/public/sw.js`, copied to **`web2/dist/sw.js`**. The `/_headers` rule sets `Cache-Control: no-cache, no-store, must-revalidate` for `/sw.js`, ensuring a real JavaScript update. The script uses `skipWaiting()` on install. On activate it deletes **only** `wearagain-demo-*` caches, unregisters its own root-scope registration, then best-effort navigates connected same-origin tabs so their next load uses the network. It does not register again and has **no fetch handler**.
+
+The new `/app/sw.js` continues independently and keeps its own `wearagain-web2-public-*` caches. This cleanup does **not** delete user wardrobe state, local photos, browser storage or other-origin caches. It only takes effect when a previous client comes online and the browser performs a service-worker update check: permanently offline devices cannot be migrated immediately.
+
+## Rollback - separate future action
+
+Use Cloudflare Pages **rollback to the previous known-good production deployment**, or after an authorized check and with a verified previous build output run:
+
+```sh
+wrangler pages deploy web/dist --project-name wearagain --branch main
+```
+
+Do not attempt to 'revert the Pages build output directory': none exists. Evaluate `/sw.js` behavior again during rollback to avoid reintroducing stale PWA clients.
+
+## Evidence, privacy and constraints
+
+- The v2 frontend self-hosts licensed DM Sans and Cormorant Garamond WOFF2 fonts. Static CSP uses `img-src blob:` for local photo thumbnails and `microphone=(self)` for explicit browser dictation.
+- The hosted `/judges/demo/` replays six genuine immutable *single-garment* YouCam recordings. **It does not submit fresh API tasks.** The separate Worker API contract is documented in `docs/API.md`; the guided UI does not point to a hardcoded old production live-client URL.
+- Real size fitting, multi-garment layering, personal photo sync, retailer checkout and measured pilot impact remain unimplemented in this demo. The hackathon walkthrough video has not been supplied.
+- Repository links point to the **private** source repository and require reviewer access. No code is presented as publicly accessible.
+- `_headers` is enforced by Cloudflare Pages, not ordinary local file servers. Validate CSP and Permissions-Policy on HTTPS Pages preview before any authorized production switch.

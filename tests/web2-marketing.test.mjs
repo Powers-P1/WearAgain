@@ -165,3 +165,13 @@ test('build copies a JS root-scope legacy worker and serves no-cache headers',as
   assert.match(worker,/registration\.unregister\(\)/);
   assert.doesNotMatch(worker,/addEventListener\(['"]fetch['"]/);
 });
+
+test('direct-upload Pages switch documentation is accurate and does not deploy',async()=>{
+  const docs=await read('../docs/DEPLOY_SWITCH_WEB2.md');
+  assert.match(docs,/direct upload/i);
+  assert.match(docs,/wrangler pages deploy web2\/dist --project-name wearagain --branch main/);
+  assert.match(docs,/previous known-good production deployment/);
+  assert.match(docs,/web2\/dist\/sw\.js/);
+  assert.doesNotMatch(docs,/change \*\*only the Pages production build output directory\*\*/);
+  assert.match(docs,/no build output directory setting/i);
+});
