@@ -7,6 +7,16 @@ export const DEFAULT_LOCALE = 'en' as const;
 export type Locale = 'en' | 'pl';
 
 export const en = {
+  purchaseDesktopSkipLineOne: 'You can skip',
+  purchaseDesktopSkipLineTwo: 'this one.',
+  purchaseDesktopNotRequiredReason: 'The cheapest basket for these recorded needs does not include this piece.',
+  purchaseDesktopRecommendedReason: 'The cheapest feasible basket for this example includes this piece.',
+  purchaseDesktopZeroReason: 'The recorded example needs are covered by the pieces you already own.',
+  purchaseDesktopIncompleteReason: 'Some unresolved ratings could still change this decision.',
+  purchaseDesktopInfeasibleReason: 'No basket satisfies all the recorded example needs.',
+  purchaseDesktopNotEquivalent: 'Excluding a candidate does not establish that it duplicates anything owned.',
+  purchaseNoExactGarment: 'No matching saved garment image for {item}.',
+  purchaseNoMatchingImage: 'No matching saved preview',
   purchaseDesktopReadCertificate: 'View complete certificate',
   purchaseDesktopWear: 'I wear it',
   purchaseDesktopNotWear: 'I do not wear it',
@@ -14,7 +24,7 @@ export const en = {
   purchaseDesktopOwn: 'From your wardrobe',
   purchaseDesktopSave: 'Save anyway',
   purchaseAddAnother: 'Add another item',
-  purchaseShopUnknownSource: 'Shop / floor not provided · synthetic example',
+  purchaseShopUnknownSource: 'Shop / floor not supplied',
   mktJudgeDisclosureSection: 'Implementation status and limits',
   mktJudgeImplementedHeading: 'Implemented now',
   mktJudgeImplementedBody: 'Six genuine saved single-garment YouCam cloth-v4 previews on an approved synthetic model; owned-item checks, a deterministic minimum-basket solver and its certificate. A budgeted Worker API exists separately, but this hosted replay submits no fresh tasks.',
