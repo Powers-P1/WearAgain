@@ -1,0 +1,70 @@
+name: Web2 visual review
+
+on:
+  pull_request:
+    paths:
+      - 'web2/**'
+      - 'scripts/build-web2.mjs'
+      - 'tests/web2-*'
+      - '.github/workflows/web2-visual.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web2-visual
+  cancel-in-progress: true
+
+jobs:
+  snapshots:
+    name: Chromium screenshots (mobile + desktop)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run build:web2
+      - name: Install pinned screenshot browser
+        run: npx --yes playwright@1.56.1 install --with-deps chromium
+      - name: Capture actual built screens
+        shell: bash
+        run: |
+          python3 -m http.server 8788 --directory web2/dist >/tmp/wearagain-web2-http.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8788/ >/dev/null; then break; fi
+            sleep 1
+          done
+          mkdir -p screenshots
+          for viewport in '390 844' '1280 800'; do
+            read -r width height <<<"$viewport"
+            for pair in \
+              'landing|/' \
+              'retail|/retail/' \
+              'retail-demo|/retail/demo/' \
+              'judges|/judges/' \
+              'judges-demo-wardrobe|/judges/demo/' \
+              'judges-demo-preview|/judges/demo/?step=preview' \
+              'judges-demo-verdict|/judges/demo/?step=verdict' \
+              'consumer-wardrobe|/app/#wardrobe' \
+              'consumer-purchase|/app/#check'; do
+                IFS='|' read -r name route <<<"$pair"
+                npx --yes playwright@1.56.1 screenshot \
+                  --browser chromium --viewport-size "$width,$height" \
+                  --full-page --wait-for-timeout 1100 \
+                  "http://127.0.0.1:8788$route" "screenshots/$name-$width.png"
+            done
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wearagain-web2-pr-e-screenshots
+          path: screenshots/
+          if-no-files-found: warn
+          retention-days: 14
