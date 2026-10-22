@@ -53,7 +53,9 @@ jobs:
               'judges-demo-preview|/judges/demo/?step=preview' \
               'judges-demo-verdict|/judges/demo/?step=verdict' \
               'consumer-wardrobe|/app/#wardrobe' \
-              'consumer-purchase|/app/#check'; do
+              'consumer-purchase|/app/#check' \
+              'consumer-overview|/app/#overview' \
+              'consumer-stylist|/app/#stylist'; do
                 IFS='|' read -r name route <<<"$pair"
                 npx --yes playwright@1.56.1 screenshot \
                   --browser chromium --viewport-size "$width,$height" \
@@ -61,10 +63,53 @@ jobs:
                   "http://127.0.0.1:8788$route" "screenshots/$name-$width.png"
             done
           done
+          # Owner requested board-08 and overview checks at 1536x1024 too.
+          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "1536,1024" --full-page --wait-for-timeout 1100 "http://127.0.0.1:8788/app/#check" "screenshots/consumer-purchase-1536.png"
+          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "1536,1024" --full-page --wait-for-timeout 1100 "http://127.0.0.1:8788/app/#overview" "screenshots/consumer-overview-1536.png"
+      - name: Capture references and board comparisons (no image substitutions)
+        shell: bash
+        run: |
+          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "1280,800" --full-page --wait-for-timeout 1000 "https://wearagain.pages.dev/" screenshots/landing-live-v1-1280.png
+          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "390,844" --full-page --wait-for-timeout 1000 "https://wearagain.pages.dev/" screenshots/landing-live-v1-390.png
+          cp docs/mockups/v2/WearAgain-05-Desktop-Szafa.png screenshots/board-05-reference.png
+          cp docs/mockups/v2/WearAgain-06-Desktop-Przeglad.png screenshots/board-06-reference.png
+          cp docs/mockups/v2/WearAgain-07-Desktop-Stylistka.png screenshots/board-07-reference.png
+          cp docs/mockups/v2/WearAgain-08-Desktop-Sprawdz-zakup.png screenshots/board-08-reference.png
+          mkdir -p screenshots/viewport
+          for viewport in '390 844' '1280 800'; do
+            read -r width height <<<"$viewport"
+            for pair in 'landing|/' 'consumer-wardrobe|/app/#wardrobe' 'consumer-overview|/app/#overview' 'consumer-stylist|/app/#stylist' 'consumer-purchase|/app/#check'; do
+              IFS='|' read -r name route <<<"$pair"
+              npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "$width,$height" --wait-for-timeout 1100 "http://127.0.0.1:8788$route" "screenshots/viewport/$name-$width.png"
+            done
+          done
+          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "1536,1024" --wait-for-timeout 1100 "http://127.0.0.1:8788/app/#check" screenshots/viewport/consumer-purchase-1536.png
+          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "1536,1024" --wait-for-timeout 1100 "http://127.0.0.1:8788/app/#overview" screenshots/viewport/consumer-overview-1536.png
+          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "1280,800" --wait-for-timeout 1000 "https://wearagain.pages.dev/" screenshots/viewport/landing-live-v1-1280.png
+          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "390,844" --wait-for-timeout 1000 "https://wearagain.pages.dev/" screenshots/viewport/landing-live-v1-390.png
+          node --input-type=module <<'JS'
+          import sharp from 'sharp';
+          import {mkdir} from 'node:fs/promises';
+          await mkdir('screenshots/comparisons',{recursive:true});
+          const items=[
+            ['viewport/landing-1280.png','viewport/landing-live-v1-1280.png','landing-desktop'],
+            ['viewport/landing-390.png','viewport/landing-live-v1-390.png','landing-mobile'],
+            ['viewport/consumer-wardrobe-1280.png','board-05-reference.png','board05-wardrobe'],
+            ['viewport/consumer-overview-1280.png','board-06-reference.png','board06-overview'],
+            ['viewport/consumer-stylist-1280.png','board-07-reference.png','board07-stylist'],
+            ['viewport/consumer-purchase-1280.png','board-08-reference.png','board08-check'],
+          ];
+          for(const [actual,reference,label] of items){
+            const fit=async path=>await sharp('screenshots/'+path).resize({width:900,height:1100,fit:'contain',background:'#f8f6f1'}).png().toBuffer();
+            await sharp({create:{width:1800,height:1100,channels:4,background:'#f8f6f1'}})
+              .composite([{input:await fit(actual),left:0,top:0},{input:await fit(reference),left:900,top:0}])
+              .png().toFile('screenshots/comparisons/'+label+'-actual-left-reference-right.png');
+          }
+          JS
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: wearagain-web2-pr-e-screenshots
+          name: wearagain-web2-desktop-parity-review
           path: screenshots/
           if-no-files-found: warn
           retention-days: 14

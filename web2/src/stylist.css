@@ -118,3 +118,12 @@
   .stylist-form h2 { font-size: 40px; }
   .stylist-garments { gap: 5px; }
 }
+
+/* Board 07: desktop editor/preview/property strip is a tall editorial portrait,
+   while the single YouCam top remains honestly labelled on the image. */
+@media(min-width:801px){
+ .stylist-photo{aspect-ratio:.75;max-height:540px}
+ .stylist-photo>img{object-fit:cover;object-position:center top}
+ .stylist-result{grid-template-columns:minmax(0,1.15fr) minmax(195px,.85fr);gap:19px}
+ .stylist-layout{gap:25px}
+}

@@ -25,6 +25,16 @@ const draw=(item:WardrobeItem):string=>{
     saved?'<img src="'+esc(saved)+'" loading="lazy" alt="'+esc(item.name)+'"/>':
     '<span class="overview-no-photo">'+esc(t('noPhoto'))+'</span>';
 };
+let selectedOverviewMonth: string | null = null;
+function activeOverviewMonth(): string {
+  return selectedOverviewMonth ?? localISODate(new Date()).slice(0,7);
+}
+/** A visible, functional month selector - no invented wear dates or activity. */
+export function handleOverviewMonthChange(input: HTMLInputElement): boolean {
+  if (input.id !== 'overview-month') return false;
+  if (/^\d{4}-(0[1-9]|1[0-2])$/.test(input.value)) selectedOverviewMonth=input.value;
+  return true;
+}
 const reasons:Readonly<Record<AttentionItem['kind'],TranslationKey>>={
   repair:'overviewNeedsRepair',ironing:'overviewNeedsIroning',no_log:'overviewNoLoggedWear',
 };
@@ -34,10 +44,12 @@ function attentionRow(item:WardrobeItem,kind:AttentionItem['kind']):string{
   return '<button type="button" class="overview-attention-row" data-overview-review="'+esc(item.id)+'">'+
     '<span class="overview-attention-image">'+draw(item)+'</span><span class="overview-attention-content">'+
     '<small>'+esc(t(demoCondition?'overviewSampleStatus':reasons[kind]))+'</small><strong>'+esc(item.name)+'</strong><span>'+esc(label)+'</span></span>'+
-    '<span class="overview-attention-arrow">→</span></button>';
+    '<span class="overview-attention-action">'+esc(t(kind==='repair'?'overviewPlanRepair':'overviewBrowseItem'))+'</span>'+
+    '<span class="overview-attention-arrow" aria-hidden="true">→</span></button>';
 }
 export function overviewPage(wardrobe:WardrobeState,daily:DailyState,decisions:DecisionsState):string{
-  const metrics=overviewFor(wardrobe,daily,decisions,localISODate(new Date()));
+  const month=activeOverviewMonth();
+  const metrics=overviewFor(wardrobe,daily,decisions,month+'-01');
   const suggested=morningLooks(wardrobe)[0];
   const imagePath=suggested?.heroImagePath??null;
   const profile=wardrobe.style||t('overviewNoProfile');
@@ -47,7 +59,9 @@ export function overviewPage(wardrobe:WardrobeState,daily:DailyState,decisions:D
     '<p>'+esc(t('overviewSubtitle'))+'</p></div>'+
     '<button class="button button-primary overview-add" data-nav="add" type="button">+ '+esc(t('addItem'))+'</button></header>'+
     '<div class="overview-tabs"><button type="button" data-nav="overview" aria-current="page">'+esc(t('overviewTab'))+'</button>'+
-    '<button type="button" data-nav="wardrobe">'+esc(t('overviewAllThings'))+'</button></div>'+
+    '<button type="button" data-nav="wardrobe">'+esc(t('overviewAllThings'))+'</button>'+
+    '<label class="overview-month-control"><span class="visually-hidden">'+esc(t('overviewChooseMonth'))+'</span>'+
+    '<input id="overview-month" type="month" value="'+esc(month)+'" aria-label="'+esc(t('overviewChooseMonth'))+'"/></label></div>'+
     '<div class="overview-metrics">'+
     '<div><strong>'+metrics.items+'</strong><span>'+esc(t('overviewMetricItems'))+'</span></div>'+
     '<div><strong>'+metrics.loggedThisMonth+'</strong><span>'+esc(t('overviewMetricWorn'))+'</span></div>'+

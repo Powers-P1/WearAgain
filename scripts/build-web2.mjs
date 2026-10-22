@@ -60,6 +60,10 @@ await sharp(join(root, 'docs/mockups/v2/WearAgain-03-Personalizacja-i-wyjazd.png
 // Individual cloth-v4 outputs must never be described as complete outfit renders.
 await mkdir(join(dest, 'demo'), { recursive: true });
 await cp(join(root, 'web/demo/renders'), join(dest, 'demo/renders'), { recursive: true });
+// Identical v1 approved design-reference visuals on the v2 public landing.
+await cp(join(root, 'docs/mockups/landing-v1.png'),join(dest,'assets/reference-shoppers.png'));
+await cp(join(root, 'docs/mockups/landing-retailers-v1.webp'),join(dest,'assets/reference-retailers.webp'));
+
 await cp(join(root, 'fixtures/youcam/demo-manifest.json'), join(dest, 'demo/manifest.json'));
 
 const output = await build({
