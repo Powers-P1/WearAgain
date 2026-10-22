@@ -85,7 +85,9 @@ test('review #16: UI draft sync and fallback focus are wired for captures and ro
   assert.match(main,/handleGalleryInput\(target\)/);
   assert.match(main,/focusTarget\.focus\(\{preventScroll:true\}\)/);
   assert.match(main,/focusTarget\.setAttribute\('tabindex','-1'\)/);
-  assert.match(main,/querySelector<HTMLElement>\('main \.page h1'\)/);
+  assert.match(main,/querySelectorAll<HTMLElement>\('main \.page h1, main \.page h2, main h1'\)/);
+  assert.match(main,/focusCandidates\.find\(el=>el\.getClientRects\(\)\.length>0/);
+  assert.match(main,/mainElement\.focus\(\{preventScroll:true\}\)/);
   assert.match(gallery,/actions\.focus\?\.\('#mall-camera'\)/);
   assert.match(morning,/spoken=target\.value/);
   assert.match(morning,/t\(morningHeadingKey\(looks\.length\)/);
