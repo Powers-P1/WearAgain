@@ -97,3 +97,13 @@ test('web2 headers restrict external connections while allowing local fonts, blo
   assert.match(buildScript,/NO production deploy switch/i);
   assert.match(oldBuild,/const destination = join\(root, 'web\/dist'\)/);
 });
+
+test('review screenshot URLs select real guided preview/verdict steps without inventing API runs',async()=>{
+ const source=await read('../web2/src/marketing.ts');
+ assert.match(source,/new URLSearchParams\(window\.location\.search\)\.get\('step'\)/);
+ assert.match(source,/step=demoStep\(/);
+ const workflow=await read('../.github/workflows/web2-visual.yml');
+ assert.match(workflow,/judges-demo-preview\|\/judges\/demo\/\?step=preview/);
+ assert.match(workflow,/judges-demo-verdict\|\/judges\/demo\/\?step=verdict/);
+ assert.match(workflow,/actions\/upload-artifact@v4/);
+});

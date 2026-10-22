@@ -366,6 +366,7 @@ root.addEventListener('keydown',event=>{
   const next=event.key==='Home'?0:event.key==='End'?choices.length-1:
     (index+(event.key==='ArrowRight'||event.key==='ArrowDown'?1:choices.length-1))%choices.length;
   event.preventDefault();
+  choices[next]?.focus({preventScroll:true});
   choices[next]?.click();
 });
 root.addEventListener('input', event => {

@@ -1,7 +1,7 @@
 import { t, type TranslationKey } from './i18n.js';
 import { coreDecision, demoEvidence, demoStep, money, retailExample, sampleWardrobe,
   type DemoStep, type MarketingRoute } from './marketing-model.js';
-import { type PurchaseDemo } from './purchase.js';
+import { scenarioForDemo, type PurchaseDemo } from './purchase.js';
 import './marketing.css';
 
 const CODE='https://github.com/Powers-P1/WearAgain';
@@ -9,6 +9,7 @@ const SETUP=CODE+'/blob/main/README.md';
 const API=CODE+'/blob/main/docs/API.md';
 const CURRENT_LIVE_CLIENT='https://wearagain.pages.dev/app/';
 let step:DemoStep='wardrobe';
+let stepQueryLoaded=false;
 let mode:PurchaseDemo='minimum';
 let openRetailPanel=true;
 let retailSize='M';
@@ -232,6 +233,7 @@ function previewStep():string{
 }
 function verdictStep():string{
   const evaluated=coreDecision(mode),result=evaluated.result;
+  const scenario=scenarioForDemo(mode);
   const basket=result.status==='solved'?result.basket.candidateIds.map(id=>evaluated.candidateLabels[id]??id):[];
   const failed=result.status==='solved'?result.certificate.cheaperBaskets:[];
   return '<div class="mkt-verdict"><div class="mkt-verdict-main"><div class="mkt-verdict-tabs" role="group">'+
@@ -252,10 +254,16 @@ function verdictStep():string{
     '<ul>'+failed.map(entry=>'<li><strong>'+escapeHtml(entry.basket.candidateIds.length?
       entry.basket.candidateIds.map(id=>evaluated.candidateLabels[id]??id).join(' + '):t('purchaseBuyNothing'))+
     '</strong> · '+escapeHtml(money(entry.basket.costMinor,entry.basket.currency))+
-    ' · '+escapeHtml(entry.failedRequirements.map(req=>req.requirementId).join(', '))+'</li>').join('')+'</ul>'+
+    ' · '+escapeHtml(entry.failedRequirements.map(req=>scenario.requirements.find(r=>r.id===req.requirementId)?.label??req.requirementId).join(', '))+'</li>').join('')+'</ul>'+
     link('/app/#check',h('mktJudgeGoApp'))+'</aside></div>';
 }
 function guidedDemo():string{
+  // Explicit review links (?step=preview or ?step=verdict) let Chromium
+  // screenshot each real guided state; arbitrary query strings are ignored.
+  if(!stepQueryLoaded&&typeof window!=='undefined'){
+    step=demoStep(new URLSearchParams(window.location.search).get('step'));
+    stepQueryLoaded=true;
+  }
   const pageIndex=1+(['wardrobe','preview','verdict'] as readonly DemoStep[]).indexOf(step);
   const next=pageIndex<3?(['wardrobe','preview','verdict'] as const)[pageIndex]:null;
   const prev=pageIndex>1?(['wardrobe','preview','verdict'] as const)[pageIndex-2]:null;
