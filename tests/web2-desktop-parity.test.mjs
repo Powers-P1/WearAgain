@@ -14,7 +14,7 @@ test('desktop board 08 keeps three explicitly separate columns and mobile origin
  assert.match(ui,/purchase-desktop-meta/);
  assert.match(ui,/certificateExplanation\(result\)/);
  assert.match(css,/@media\(min-width:801px\)/);
- assert.match(css,/purchase-desktop-layout\{display:grid;grid-template-columns:/);
+ assert.match(css,/purchase-desktop-layout\{display:grid;\s*grid-template-columns:/);
  assert.match(css,/@media\(max-width:800px\)\{\.purchase-desktop-layout,\.purchase-desktop-meta\{display:none\}\}/);
 });
 test('v1 landing source imagery, copy and static CSS crops are preserved without inline styles',async()=>{
