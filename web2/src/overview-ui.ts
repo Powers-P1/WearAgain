@@ -29,10 +29,31 @@ let selectedOverviewMonth: string | null = null;
 function activeOverviewMonth(): string {
   return selectedOverviewMonth ?? localISODate(new Date()).slice(0,7);
 }
-/** A visible, functional month selector - no invented wear dates or activity. */
-export function handleOverviewMonthChange(input: HTMLInputElement): boolean {
-  if (input.id !== 'overview-month') return false;
-  if (/^\d{4}-(0[1-9]|1[0-2])$/.test(input.value)) selectedOverviewMonth=input.value;
+const MONTH_KEY = /^\d{4}-(0[1-9]|1[0-2])$/;
+/** English, explicitly selected month names instead of a locale-dependent
+ * native type=month widget. Only recorded months + the last two years appear.
+ * A month with no wears still truthfully reports zero recorded wears. */
+export function overviewMonthOptions(
+  daily: DailyState, today: Date = new Date(),
+): readonly { readonly value: string; readonly label: string }[] {
+  const months = new Set<string>();
+  for (let offset = 0; offset < 24; offset++) {
+    months.add(localISODate(new Date(today.getFullYear(),today.getMonth()-offset,1)).slice(0,7));
+  }
+  for (const wear of daily.wears) months.add(wear.date.slice(0,7));
+  if (selectedOverviewMonth) months.add(selectedOverviewMonth);
+  const formatter = new Intl.DateTimeFormat('en-US',{
+    month:'long',year:'numeric',timeZone:'UTC',
+  });
+  return [...months].filter(month=>MONTH_KEY.test(month))
+    .sort((a,b)=>b.localeCompare(a)).map(value=>({
+      value,
+      label:formatter.format(new Date(Date.UTC(Number(value.slice(0,4)),Number(value.slice(5,7))-1,1))),
+    }));
+}
+export function handleOverviewMonthChange(control: Pick<HTMLSelectElement,'id'|'value'>): boolean {
+  if (control.id !== 'overview-month') return false;
+  if (MONTH_KEY.test(control.value)) selectedOverviewMonth=control.value;
   return true;
 }
 const reasons:Readonly<Record<AttentionItem['kind'],TranslationKey>>={
@@ -60,8 +81,12 @@ export function overviewPage(wardrobe:WardrobeState,daily:DailyState,decisions:D
     '<button class="button button-primary overview-add" data-nav="add" type="button">+ '+esc(t('addItem'))+'</button></header>'+
     '<div class="overview-tabs"><button type="button" data-nav="overview" aria-current="page">'+esc(t('overviewTab'))+'</button>'+
     '<button type="button" data-nav="wardrobe">'+esc(t('overviewAllThings'))+'</button>'+
-    '<label class="overview-month-control"><span class="visually-hidden">'+esc(t('overviewChooseMonth'))+'</span>'+
-    '<input id="overview-month" type="month" value="'+esc(month)+'" aria-label="'+esc(t('overviewChooseMonth'))+'"/></label></div>'+
+    '<label class="overview-month-control" for="overview-month"><span>'+esc(t('overviewMonthLabel'))+'</span>'+
+    '<select id="overview-month" aria-label="'+esc(t('overviewChooseMonth'))+'">'+
+      overviewMonthOptions(daily).map(option=>
+        '<option value="'+esc(option.value)+'"'+(option.value===month?' selected':'')+'>'+
+          esc(option.label)+'</option>').join('')+
+    '</select></label></div>'+
     '<div class="overview-metrics">'+
     '<div><strong>'+metrics.items+'</strong><span>'+esc(t('overviewMetricItems'))+'</span></div>'+
     '<div><strong>'+metrics.loggedThisMonth+'</strong><span>'+esc(t('overviewMetricWorn'))+'</span></div>'+

@@ -10,6 +10,11 @@ import { parseScenario, solveBasket, type Scenario, type SolveResult, type Outfi
 import { t, type TranslationKey } from './i18n.js';
 
 export type PurchaseDemo = 'minimum' | 'zero';
+/** Marketing deep links choose an approved fixture only; unknown parameters
+ * never fabricate a third scenario or mutate the recorded solver evidence. */
+export function purchaseDemoFromSearch(search: string): PurchaseDemo {
+  return new URLSearchParams(search).get('scenario') === 'zero' ? 'zero' : 'minimum';
+}
 export type PurchaseDecision = 'skip' | 'save';
 export type Rating = 'would_wear' | 'would_not_wear' | 'unrated';
 export interface PurchaseSession {

@@ -8,12 +8,13 @@ export type Locale = 'en' | 'pl';
 
 export const en = {
   overviewChooseMonth: 'Choose month for logged wardrobe wears',
+  overviewMonthLabel: 'Month',
   overviewPlanRepair: 'Plan repair',
   overviewBrowseItem: 'Review',
   purchaseDesktopSkipLineOne: 'You can skip',
   purchaseDesktopSkipLineTwo: 'this one.',
   purchaseDesktopNotRequiredReason: 'The cheapest basket for these recorded needs does not include this piece.',
-  purchaseDesktopRecommendedReason: 'The cheapest feasible basket for this example includes this piece.',
+  purchaseDesktopRecommendedReason: 'This piece is in the lowest-cost basket for the sample needs.',
   purchaseDesktopZeroReason: 'The recorded example needs are covered by the pieces you already own.',
   purchaseDesktopIncompleteReason: 'Some unresolved ratings could still change this decision.',
   purchaseDesktopInfeasibleReason: 'No basket satisfies all the recorded example needs.',

@@ -1,6 +1,6 @@
 import {
   candidatePosition, choosePurchaseDemo, clearRatings, computeDecision,
-  initialPurchase, itemLabel, rateSelected, recordDecision, recordingFor,
+  initialPurchase, itemLabel, purchaseDemoFromSearch, rateSelected, recordDecision, recordingFor,
   replayRatings, selectCandidate, selectedPair, selectedRating, selectTop,
   type PurchaseDemo, type Rating,
 } from './purchase.js';
@@ -9,7 +9,10 @@ import type { Outerwear, SolveResult } from '../../src/core/index.js';
 import { t, type TranslationKey } from './i18n.js';
 import './purchase.css';
 
-let session: PurchaseSession = initialPurchase();
+// A direct /app/?scenario=zero#check visit must show the zero-purchase
+// scenario before the first render. Afterward the in-page toggle owns state.
+let session: PurchaseSession = initialPurchase(
+  purchaseDemoFromSearch(typeof window === 'undefined' ? '' : window.location.search));
 type Actions = { readonly rerender: () => void; readonly notice: (value: string) => void };
 
 function esc(value: unknown): string {
