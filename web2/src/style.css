@@ -1,4 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+@font-face{font-family:'DM Sans';src:url('/fonts/dm-sans-latin-400-normal.woff2') format('woff2');font-display:swap;font-style:normal;font-weight:400}
+@font-face{font-family:'DM Sans';src:url('/fonts/dm-sans-latin-500-normal.woff2') format('woff2');font-display:swap;font-style:normal;font-weight:500}
+@font-face{font-family:'DM Sans';src:url('/fonts/dm-sans-latin-600-normal.woff2') format('woff2');font-display:swap;font-style:normal;font-weight:600}
+@font-face{font-family:'DM Sans';src:url('/fonts/dm-sans-latin-700-normal.woff2') format('woff2');font-display:swap;font-style:normal;font-weight:700}
+@font-face{font-family:'Cormorant Garamond';src:url('/fonts/cormorant-garamond-latin-400-normal.woff2') format('woff2');font-display:swap;font-style:normal;font-weight:400}
+@font-face{font-family:'Cormorant Garamond';src:url('/fonts/cormorant-garamond-latin-500-normal.woff2') format('woff2');font-display:swap;font-style:normal;font-weight:500}
+@font-face{font-family:'Cormorant Garamond';src:url('/fonts/cormorant-garamond-latin-400-italic.woff2') format('woff2');font-display:swap;font-style:italic;font-weight:400}
 
 :root {
   --ivory: #f8f6f1;
@@ -244,3 +250,27 @@ p { line-height: 1.55; }
 @media (min-width: 801px) {
   .mobile-add, .mobile-only, .more-button, .bottom-nav, .mobile-bar { display: none !important; }
 }
+
+/* PR-E: minimum 44 px touch targets on real mobile actions. */
+@media(max-width:800px){
+ .bottom-nav .navigation-item{min-height:50px;}
+ .wordmark-button,.avatar-button{min-height:44px;min-width:44px;}
+ .text-link,.back-link,.mall-step-controls button,.mall-coffee-actions button,
+ .mall-return-row button,.purchase-candidate-pager button,.purchase-demo-modes button,
+ .occasion-suggestions button,.stylist-result-appbar button,.mall-filter button{min-height:44px;}
+ .mall-filter button{padding:10px 9px;}
+ .purchase-candidate-pager button{width:44px;height:44px;}
+ .mall-step-controls button{padding:10px 12px;}
+ .mall-return-row button{padding:10px 7px;}
+}
+h1:focus:not(:focus-visible),h2:focus:not(:focus-visible),main:focus:not(:focus-visible){outline:none;}
+.mall-example-verdict{font-weight:600;color:var(--olive)!important;border-left:2px solid #6a7e60;padding-left:12px;margin:13px 0!important;}
+
+
+.v2-pwa-banner{position:fixed;z-index:45;left:14px;right:14px;bottom:max(15px,env(safe-area-inset-bottom));
+  max-width:420px;margin:0 auto;padding:18px 60px 18px 18px;background:#fcfbf8;color:#30392f;
+  border:1px solid #bbc6b2;box-shadow:0 8px 28px #1d271d22;font:12px/1.45 var(--sans);}
+.v2-pwa-banner>strong{display:block;font:500 24px/1.05 var(--serif);}
+.v2-pwa-banner>p{margin:10px 0;color:#576355;font-size:12px;}
+.v2-pwa-banner>button:not(.v2-pwa-dismiss){min-height:44px;background:#30392f;color:#f8f6f1;border:0;padding:9px 15px;font-size:12px;}
+.v2-pwa-banner>.v2-pwa-dismiss{position:absolute;top:6px;right:6px;min-width:44px;min-height:44px;border:0;background:transparent;font-size:22px;}

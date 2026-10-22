@@ -1,6 +1,7 @@
 import { build } from 'esbuild';
 import sharp from 'sharp';
-import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -8,6 +9,21 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dest = join(root, 'web2/dist');
 await rm(dest, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 await mkdir(join(dest, 'assets/items'), { recursive: true });
+await mkdir(join(dest, 'fonts'), { recursive: true });
+await mkdir(join(dest, 'icons'), { recursive: true });
+// Local licensed webfonts are static public assets. No network CSS dependency.
+await cp(join(root, 'web2/public/fonts'), join(dest, 'fonts'), { recursive: true });
+await cp(join(root, 'web2/_headers'), join(dest, '_headers'));
+// Replace the former root-scope PWA with a one-time cleanup worker; keep
+// the optional new app PWA independently scoped under /app/sw.js.
+await cp(join(root, 'web2/public/sw.js'), join(dest, 'sw.js'));
+await cp(join(root, 'web2/manifest.webmanifest'), join(dest, 'manifest.webmanifest'));
+await cp(join(root, 'web/public/icons/icon.svg'), join(dest, 'icons/icon.svg'));
+for (const size of [192,512]) {
+  await sharp(join(root, 'web/public/icons/icon.svg')).resize(size,size).png()
+    .toFile(join(dest,'icons',`icon-${size}.png`));
+}
+
 
 /*
  * Use the eight separate garment photographs already approved on board 05.
@@ -51,6 +67,9 @@ const output = await build({
   bundle: true, minify: true, metafile: true,
   outdir: join(dest, 'assets'), entryNames: 'web2-[hash]',
   format: 'esm', platform: 'browser', target: ['es2022'],
+  // Absolute URLs resolve from the Pages origin; the licensed WOFF2 files
+  // are copied into /fonts/ above, not bundled as JS dependencies.
+  external: ['/fonts/*'],
   logLevel: 'warning',
 });
 const emitted = Object.keys(output.metafile.outputs).map(path => '/' + path.replaceAll('\\', '/').split('web2/dist/').at(-1));
@@ -59,7 +78,50 @@ const style = emitted.find(path => path.endsWith('.css'));
 if (!script || !style) throw new Error('No compiled script or stylesheet for web2.');
 const markup = (await readFile(join(root, 'web2/index.html'), 'utf8'))
   .replace('__APP_SCRIPT__', script).replace('__APP_STYLE__', style);
-await writeFile(join(dest, 'index.html'), markup);
-await mkdir(join(dest, 'app'), { recursive: true });
-await writeFile(join(dest, 'app/index.html'), markup);
-console.log('web2 staging build: ' + photos.length + ' garment crops, 6 unmodified recorded previews, no deploy switch.');
+await writeFile(join(dest, 'index.html'),
+  markup.replace('<title>Your wardrobe - WearAgain</title>','<title>WearAgain - Your wardrobe, more you</title>'));
+// Pages ships one static HTML shell on each route; the client resolves the exact
+// pathname. Root is now board 13 landing, the original demo is under /app/.
+for (const directory of ['app','retail','retail/demo','judges','judges/demo']) {
+  await mkdir(join(dest,directory),{recursive:true});
+  const titles = {
+    app: 'Your wardrobe - WearAgain',
+    retail: 'For retailers - WearAgain',
+    'retail/demo': 'Demo Atelier - WearAgain',
+    judges: 'For judges - WearAgain',
+    'judges/demo': 'Guided demo - WearAgain',
+  };
+  await writeFile(join(dest,directory,'index.html'),
+    markup.replace('<title>Your wardrobe - WearAgain</title>',
+      '<title>'+titles[directory]+'</title>'));
+}
+await writeFile(join(dest,'_redirects'),
+  '/app /app/ 301\n/retail /retail/ 301\n/retail/demo /retail/demo/ 301\n/judges /judges/ 301\n/judges/demo /judges/demo/ 301\n');
+
+// Only explicitly public, read-only assets enter the optional web app shell.
+// No private browser photo, localStorage, Worker responses or live URLs.
+const publicCache=['/app/','/manifest.webmanifest','/demo/manifest.json'];
+async function gatherPublic(relative) {
+  const path=join(dest,relative);
+  for (const item of await readdir(path,{withFileTypes:true})) {
+    const child=[relative,item.name].filter(Boolean).join('/');
+    if(item.isDirectory()) await gatherPublic(child);
+    else if(!item.name.endsWith('.txt') && !item.name.startsWith('_') &&
+      /^((assets|fonts|icons)\/|demo\/renders\/)/.test(child)) publicCache.push('/'+child);
+  }
+}
+for (const directory of ['assets','fonts','icons','demo/renders']) await gatherPublic(directory);
+publicCache.sort();
+const digest=createHash('sha256');
+for (const relative of publicCache) {
+  const actual=relative==='/app/'?'app/index.html':relative.slice(1);
+  digest.update(relative);digest.update(await readFile(join(dest,actual)));
+}
+const template=await readFile(join(root,'web2/sw-template.js'),'utf8');
+const version=digest.digest('hex').slice(0,16);
+await writeFile(join(dest,'app/sw.js'),template
+  .replace('__PRECACHE_FILES__',JSON.stringify(publicCache))
+  .replace('__CACHE_VERSION__',version));
+console.log('web2 staging: 5 public routes + /app, '+photos.length+
+  ' garment references, 6 saved render assets; PWA public files '+publicCache.length+
+  '; NO production deploy switch.');

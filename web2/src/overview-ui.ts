@@ -30,9 +30,10 @@ const reasons:Readonly<Record<AttentionItem['kind'],TranslationKey>>={
 };
 function attentionRow(item:WardrobeItem,kind:AttentionItem['kind']):string{
   const label=kind==='no_log'?t('overviewLogNotProof'):availabilityLabel(item.availability);
+  const demoCondition=['coat','dress','bag'].includes(item.id)&&kind!=='no_log';
   return '<button type="button" class="overview-attention-row" data-overview-review="'+esc(item.id)+'">'+
     '<span class="overview-attention-image">'+draw(item)+'</span><span class="overview-attention-content">'+
-    '<small>'+esc(t(reasons[kind]))+'</small><strong>'+esc(item.name)+'</strong><span>'+esc(label)+'</span></span>'+
+    '<small>'+esc(t(demoCondition?'overviewSampleStatus':reasons[kind]))+'</small><strong>'+esc(item.name)+'</strong><span>'+esc(label)+'</span></span>'+
     '<span class="overview-attention-arrow">→</span></button>';
 }
 export function overviewPage(wardrobe:WardrobeState,daily:DailyState,decisions:DecisionsState):string{
@@ -102,7 +103,7 @@ export function reviewItemPage(id:string,wardrobe:WardrobeState,daily:DailyState
     '<div class="review-decision-options" role="radiogroup" aria-label="'+esc(t('overviewDecisionLabel'))+'">'+
     ([['keep','overviewKeep'],['repair','overviewRepair'],['donate','overviewDonate'],['sell','overviewSell']] as const)
       .map(([key,label])=>'<button type="button" role="radio" aria-checked="'+(chosen===key)+
-        '" class="'+(chosen===key?'selected':'')+'" data-overview-decision="'+key+'">'+esc(t(label))+'</button>').join('')+'</div>'+
+        '" tabindex="'+(chosen===key||(!chosen&&key==='keep')?'0':'-1')+'" class="'+(chosen===key?'selected':'')+'" data-overview-decision="'+key+'">'+esc(t(label))+'</button>').join('')+'</div>'+
     '<p>'+esc(t('overviewIntentNotDisposal'))+'</p>'+
     '<button type="button" class="button button-primary full-width" data-overview-save '+(!chosen?'disabled':'')+'>'+
     esc(t('overviewSaveDecision'))+'</button>'+
