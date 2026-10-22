@@ -118,3 +118,55 @@
   .purchase-image-wrap { aspect-ratio: .66; }
   .purchase-rating-buttons button { font-size: 10px; }
 }
+
+/* Board 08 desktop composition. Mobile remains the existing decision-first board 02 layout. */
+.purchase-desktop-layout,.purchase-desktop-meta{display:none}
+@media(min-width:801px){
+.purchase-intro{align-items:start;padding-bottom:27px}
+.purchase-intro h1{font-size:clamp(42px,4.4vw,61px);line-height:1}
+.purchase-intro>div:nth-child(2){margin-left:auto}
+.purchase-intro .purchase-demo-modes,.purchase-view>.purchase-data-strip,.purchase-view>.purchase-layout{display:none!important}
+.purchase-desktop-layout{display:grid;grid-template-columns:minmax(160px,.68fr) minmax(250px,1.23fr) minmax(265px,1.08fr);gap:clamp(13px,2.5vw,37px);align-items:start;padding:34px 0 12px}
+.purchase-desktop-layout>*{min-width:0}
+.purchase-desktop-layout .purchase-section-head h2{font-family:var(--serif);font-weight:400;font-size:30px}
+.purchase-desktop-layout .purchase-candidate-list{display:flex;flex-direction:column;gap:4px}
+.purchase-desktop-layout .purchase-candidate{min-width:0;max-width:none;padding:12px 0;border:0;border-bottom:1px solid var(--line)}
+.purchase-desktop-layout .purchase-candidate.selected{border-left:0;background:#e9e9e1}
+.purchase-desktop-layout .purchase-candidate img{width:74px;height:83px;flex:0 0 74px;object-fit:contain;clip-path:none;background:var(--stone)}
+.purchase-desktop-layout .purchase-candidate-info strong{font-size:13px}
+.purchase-desktop-layout .purchase-candidate-info small{font-size:10px}
+.purchase-desktop-layout .purchase-candidate-pager{display:none}
+.purchase-add-item{border:0;border-top:1px solid var(--line);background:transparent;text-align:left;padding:18px 1px;width:100%;font-size:13px}
+.purchase-desktop-model{text-align:center}
+.purchase-model-stage{position:relative;height:clamp(315px,43vw,520px);background:var(--stone);overflow:hidden}
+.purchase-model-stage img{width:100%;height:100%;object-fit:cover;object-position:50% 16%;display:block}
+.purchase-model-stamp{position:absolute;bottom:12px;left:12px;padding:6px;background:#faf8f2e8;font-size:10px}
+.purchase-model-controls{display:flex;align-items:center;justify-content:space-between;padding:11px 7px;font-size:12px}
+.purchase-model-controls button{border:0;background:transparent;min-width:44px;min-height:35px}
+.purchase-model-caption{font-size:11px;color:var(--muted);margin:-5px 0 14px}
+.purchase-model-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.purchase-model-actions button{min-height:47px;background:transparent;border:1px solid var(--olive);font-size:12px;padding:6px}
+.purchase-model-actions button[aria-pressed=true]{background:var(--olive);color:var(--ivory)}
+.purchase-model-honesty{font-size:10px;line-height:1.4;color:var(--muted);margin-top:12px}
+.purchase-desktop-verdict h2{font-size:clamp(36px,3.5vw,54px);line-height:1;max-width:400px}
+.purchase-desktop-reason{font-size:13px;margin:16px 0 25px;line-height:1.45}
+.purchase-desktop-products{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.purchase-desktop-products figure{margin:0;min-width:0}
+.purchase-desktop-products figure>span{font-size:11px;display:block;margin-bottom:8px}
+.purchase-desktop-products img{width:100%;height:130px;object-fit:contain;background:var(--stone)}
+.purchase-desktop-products figcaption{font-size:11px;margin-top:8px}
+.purchase-desktop-verdict .purchase-certificate{border-top:1px solid var(--line);margin-top:18px;padding:15px 0}
+.purchase-desktop-verdict>.button{min-height:48px}
+.purchase-desktop-save{display:block;border:0;background:transparent;text-decoration:underline;font-size:12px;margin:15px auto}
+.purchase-desktop-foot{color:var(--muted);font-size:11px;margin-top:18px}
+.purchase-desktop-meta{display:block;border-top:1px solid var(--line);padding:14px 0 35px;text-align:right}
+.purchase-desktop-meta details>summary{display:inline-block;cursor:pointer;font-size:11px;color:var(--muted)}
+.purchase-desktop-meta details>p,.purchase-desktop-meta details>button{font-size:11px}
+.purchase-desktop-meta .purchase-demo-modes{justify-content:flex-end;margin:12px 0}
+}
+@media(min-width:801px) and (max-width:1050px){
+.purchase-desktop-layout{grid-template-columns:minmax(155px,.7fr) minmax(210px,1fr) minmax(205px,1fr);gap:13px}
+.purchase-desktop-layout .purchase-candidate img{width:52px;height:70px;flex-basis:52px}
+.purchase-desktop-products img{height:98px}
+}
+@media(max-width:800px){.purchase-desktop-layout,.purchase-desktop-meta{display:none}}

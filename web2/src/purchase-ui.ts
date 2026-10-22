@@ -39,15 +39,19 @@ function candidateButtons(): string {
       const image = recordingFor('outerwear',item.id);
       return '<button type="button" class="purchase-candidate ' + (session.candidateId === item.id ? 'selected' : '') +
         '" data-purchase-candidate="' + esc(item.id) + '" aria-pressed="' + (session.candidateId === item.id) + '">' +
-        (image ? '<img src="' + esc(image.imagePath) + '" alt="" loading="lazy" />' :
+        '<img src="/assets/items/coat.webp" alt="" loading="lazy" />' +
+        /* Saved YouCam recordings show the model, never a standalone shop product. */
+        (false ? '<span>' + esc(image?.id) + '</span>' : '') +
+        (false ? '<img src="' + esc(image?.imagePath) + '" alt="" />' :
           '<span class="purchase-small-placeholder" aria-hidden="true">+</span>') +
         '<span class="purchase-candidate-info"><strong>' + esc(item.label) + '</strong>' +
-        '<small>' + esc(t('purchaseSamplePrice')) + ' · ' + esc(formatMoney(item.priceMinor,session.scenario.currency)) +
+        '<small>' + esc(t('purchaseShopUnknownSource')) + '</small><small>' + esc(t('purchaseSamplePrice')) + ' · ' + esc(formatMoney(item.priceMinor,session.scenario.currency)) +
         '</small></span></button>';
     }).join('') + '</div>' +
     '<div class="purchase-candidate-pager"><button type="button" data-purchase-prev aria-label="' + esc(t('purchasePrevItem')) + '">←</button>' +
     '<span>' + esc(t('purchaseCandidateNumber',{index:Math.max(0,choices.findIndex(item=>item.id===session.candidateId))+1,count:choices.length})) + '</span>' +
     '<button type="button" data-purchase-next aria-label="' + esc(t('purchaseNextItem')) + '">→</button></div>' +
+    '<button class="purchase-add-item" type="button" data-nav="gallery">+ ' + esc(t('purchaseAddAnother')) + '</button>' +
     '<p class="purchase-smallprint">' + esc(t('purchaseNoStoreStock')) + '</p></section>';
 }
 function formatMoney(minor: number, currency: string): string {
@@ -145,6 +149,49 @@ function verdictColumn(): string {
       esc(t(choice === 'skip' ? 'purchaseSkipConfirmed' : 'purchaseSaveConfirmed')) + '</p>' : '') +
     '<p class="purchase-smallprint">' + esc(t('purchaseNoCheckout')) + '</p></section>';
 }
+function desktopPreview():string {
+ const candidate=session.scenario.outerwear.find(item=>item.id===session.candidateId);
+ const saved=candidate?recordingFor('outerwear',candidate.id):null;
+ const all=session.scenario.outerwear.filter(item=>item.kind==='candidate');
+ const index=Math.max(0,all.findIndex(item=>item.id===session.candidateId))+1;
+ const rating=selectedRating(session);
+ const pair=selectedPair(session);
+ const canRate=!!pair&&!!recordingFor('top',session.topId)&&!!saved;
+ return '<section class="purchase-desktop-model">'+
+   '<div class="purchase-model-stage">'+(saved?'<img src="'+esc(saved.imagePath)+'" alt="'+esc(t('purchaseSavedAlt',{item:candidate?.label??''}))+'"/>':
+      '<p>'+esc(t('purchaseImageMissing'))+'</p>')+
+   '<span class="purchase-model-stamp">'+esc(t('demoModel'))+' · '+esc(t('purchaseSavedSingle'))+'</span></div>'+
+   '<div class="purchase-model-controls"><button type="button" data-purchase-prev aria-label="'+esc(t('purchasePrevItem'))+'">←</button>'+
+   '<span>'+index+' / '+all.length+'</span><button type="button" data-purchase-next aria-label="'+esc(t('purchaseNextItem'))+'">→</button></div>'+
+   '<p class="purchase-model-caption">'+esc(t('demoModel'))+'</p>'+
+   '<div class="purchase-model-actions"><button type="button" data-purchase-rating="would_wear" aria-pressed="'+(canRate&&rating?.status==='would_wear')+'" '+(!canRate?'disabled':'')+'>'+
+      esc(t('purchaseDesktopWear'))+'</button><button type="button" data-purchase-rating="would_not_wear" aria-pressed="'+(canRate&&rating?.status==='would_not_wear')+'" '+(!canRate?'disabled':'')+'>'+
+      esc(t('purchaseDesktopNotWear'))+'</button></div>'+
+   '<p class="purchase-model-honesty">'+esc(t('purchaseRatingsNote'))+'</p>'+
+ '</section>';
+}
+function desktopVerdict():string {
+ const result=computeDecision(session),position=candidatePosition(session);
+ const candidate=session.scenario.outerwear.find(item=>item.id===session.candidateId);
+ const owned=session.scenario.tops.find(item=>item.id===session.topId);
+ const title=position==='none'?t('purchaseOwnEnough'):position==='not_required'?t('purchaseNotNeeded'):
+    position==='recommended'?t('purchaseWorthChecking'):position==='unresolved'?t('purchaseNeedRatings'):t('purchaseNotFeasible');
+ const reason=position==='none'?t('purchaseZeroWhy'):position==='not_required'?t('purchaseNotNeededWhy'):
+    position==='recommended'?t('purchaseRecommendedWhy'):position==='unresolved'?t('purchaseIncompleteWhy'):t('purchaseInfeasibleWhy');
+ const cert=result.status==='solved'?result.certificate:null;
+ return '<section class="purchase-desktop-verdict" aria-live="polite"><h2>'+esc(title)+'</h2>'+
+   '<p class="purchase-desktop-reason">'+esc(reason)+'</p>'+
+   '<div class="purchase-desktop-products">'+
+     '<figure><span>'+esc(t('purchaseDesktopShop'))+'</span><img src="/assets/items/coat.webp" alt=""/><figcaption>'+esc(candidate?.label??'')+'</figcaption></figure>'+
+     '<figure><span>'+esc(t('purchaseDesktopOwn'))+'</span><img src="/assets/items/cashmere.webp" alt=""/><figcaption>'+esc(owned?.label??'')+'</figcaption></figure></div>'+
+   '<details class="purchase-certificate"><summary>'+esc(t('purchaseWhy'))+'</summary>'+
+      '<p>'+esc(t('purchaseCertificateScope',{count:result.evaluatedBasketCount}))+'</p>'+
+      '<p>'+esc(cert?(cert.priceOptimality==='proven'?t('purchasePriceProven'):t('purchasePriceProvisional')):t('purchaseNeedRatings'))+'</p>'+
+      certificateExplanation(result)+'</details>'+
+   '<button class="button button-primary full-width" data-purchase-choice="skip">'+esc(t('purchaseKeepMine'))+'</button>'+
+   '<button class="purchase-desktop-save" data-purchase-choice="save">'+esc(t('purchaseDesktopSave'))+'</button>'+
+   '<p class="purchase-desktop-foot">'+esc(t('purchaseNoCheckout'))+'</p></section>';
+}
 export function purchasePage(): string {
   return '<section class="page purchase-view" aria-labelledby="purchase-title">' +
     '<div class="purchase-intro"><div><h1 id="purchase-title">' + esc(t('purchaseHeadline')) + '</h1>' +
@@ -160,7 +207,15 @@ export function purchasePage(): string {
     '<span>' + esc(t(session.ratingsOrigin === 'example' ? 'purchaseExampleRatings' : 'purchaseEditedRatings')) + '</span>' +
     '<button type="button" data-purchase-clear>' + esc(t('purchaseClearRatings')) + '</button>' +
     '<button type="button" data-purchase-replay>' + esc(t('purchaseReplayRatings')) + '</button></div>' +
-    '<div class="purchase-layout">' + candidateButtons() + previewColumn() + verdictColumn() + '</div></section>';
+    '<div class="purchase-layout">' + candidateButtons() + previewColumn() + verdictColumn() + '</div>'+
+    '<div class="purchase-desktop-layout">' + candidateButtons() + desktopPreview() + desktopVerdict() + '</div>'+
+    '<div class="purchase-desktop-meta">' +
+      '<details><summary>'+esc(t('purchaseDemoOnly'))+'</summary>'+
+      '<div class="purchase-demo-modes" role="group">'+(['minimum','zero'] as const).map(mode=>
+        '<button data-purchase-demo="'+mode+'" aria-pressed="'+(session.demo===mode)+'">'+esc(t(mode==='minimum'?'purchaseMinimumDemo':'purchaseZeroDemo'))+'</button>').join('')+'</div>'+
+      '<p>'+esc(t(session.ratingsOrigin==='example'?'purchaseExampleRatings':'purchaseEditedRatings'))+'</p>'+
+      '<button data-purchase-clear>'+esc(t('purchaseClearRatings'))+'</button> '+
+      '<button data-purchase-replay>'+esc(t('purchaseReplayRatings'))+'</button></details></div></section>';
 }
 export function handlePurchaseClick(button: HTMLElement, actions: Actions): boolean {
   try {

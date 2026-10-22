@@ -7,6 +7,13 @@ export const DEFAULT_LOCALE = 'en' as const;
 export type Locale = 'en' | 'pl';
 
 export const en = {
+  purchaseDesktopWear: 'I wear it',
+  purchaseDesktopNotWear: 'I do not wear it',
+  purchaseDesktopShop: 'From the shop',
+  purchaseDesktopOwn: 'From your wardrobe',
+  purchaseDesktopSave: 'Save anyway',
+  purchaseAddAnother: 'Add another item',
+  purchaseShopUnknownSource: 'Shop / floor not provided · synthetic example',
   mktJudgeDisclosureSection: 'Implementation status and limits',
   mktJudgeImplementedHeading: 'Implemented now',
   mktJudgeImplementedBody: 'Six genuine saved single-garment YouCam cloth-v4 previews on an approved synthetic model; owned-item checks, a deterministic minimum-basket solver and its certificate. A budgeted Worker API exists separately, but this hosted replay submits no fresh tasks.',
