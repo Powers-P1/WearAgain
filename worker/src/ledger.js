@@ -113,12 +113,15 @@ export class Ledger {
         PRIMARY KEY (session_id, render_key)
       )`);
       this.sql.exec("CREATE INDEX IF NOT EXISTS render_due_tasks ON render_reservations(status, next_poll_at)");
+      // Older holds have no new positive pre-submission marker and cannot auto-expire.
+      if(!this.sql.exec('PRAGMA table_info(render_reservations)').toArray().some(column=>column.name==='pre_submission_guard'))this.sql.exec('ALTER TABLE render_reservations ADD COLUMN pre_submission_guard INTEGER NOT NULL DEFAULT 0');
       this.sql.exec("CREATE INDEX IF NOT EXISTS render_settled_at ON render_reservations(status, settled_at)");
       this.sql.exec(`CREATE TABLE IF NOT EXISTS provider_requests (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         requested_at INTEGER NOT NULL
       )`);
       this.sql.exec("CREATE INDEX IF NOT EXISTS provider_request_time ON provider_requests(requested_at)");
+      this.sql.exec(`CREATE TABLE IF NOT EXISTS reservation_release_audit(session_id TEXT NOT NULL,render_key TEXT NOT NULL,reason TEXT NOT NULL,evidence TEXT NOT NULL,actor TEXT NOT NULL,released_at INTEGER NOT NULL,PRIMARY KEY(session_id,render_key))`);
     });
   }
 
@@ -127,6 +130,35 @@ export class Ledger {
     return record(this.sql.exec(
       "SELECT * FROM render_reservations WHERE session_id = ? AND render_key = ?", sessionId, renderKey,
     ).toArray()[0]);
+  }
+
+  heldReservations(now,limit=100){
+    timestamp(now);integer(limit,'limit',1);if(limit>100)throw new LedgerError('invalid_input','At most 100 holds');
+    return this.sql.exec("SELECT * FROM render_reservations WHERE status NOT IN ('succeeded','failed_free') ORDER BY created_at LIMIT ?",limit).toArray().map(row=>({...record(row),ageMs:Math.max(0,now-row.created_at),knownNotSubmitted:row.pre_submission_guard===1&&row.submitted_at===null&&row.task_id===null&&(row.status==='reserved'||row.reason==='upload_failed_before_submission')}));
+  }
+
+  releaseReservation({sessionId,renderKey,reason,evidence,actor,now}){
+    identity(sessionId,renderKey);timestamp(now);
+    if(typeof reason!=='string'||reason.trim().length<10||reason.length>500||typeof evidence!=='string'||evidence.trim().length<10||evidence.length>500||!['operator','system-before-submission'].includes(actor))throw new LedgerError('invalid_input','A reason, evidence reference and supported actor are required');
+    return this.storage.transactionSync(()=>{
+      const current=this._required(sessionId,renderKey);this._clock(current,now);
+      const prior=this.sql.exec('SELECT * FROM reservation_release_audit WHERE session_id=? AND render_key=?',sessionId,renderKey).toArray()[0];
+      if(prior){if(prior.reason!==reason||prior.evidence!==evidence||prior.actor!==actor)throw new LedgerError('conflict','A different release is already recorded');return current;}
+      if(TERMINAL.has(current.status))throw new LedgerError('invalid_state','A terminal task cannot be released by this operation');
+      const guard=this.sql.exec('SELECT pre_submission_guard FROM render_reservations WHERE session_id=? AND render_key=?',sessionId,renderKey).toArray()[0]?.pre_submission_guard;
+      const knownNotSubmitted=guard===1&&current.submittedAt===null&&current.taskId===null&&(current.status==='reserved'||current.reason==='upload_failed_before_submission');
+      if(actor==='system-before-submission'&&!knownNotSubmitted)throw new LedgerError('invalid_state','Ambiguous submissions never expire automatically');
+      this.sql.exec('INSERT INTO reservation_release_audit(session_id,render_key,reason,evidence,actor,released_at) VALUES (?,?,?,?,?,?)',sessionId,renderKey,reason,evidence,actor,now);
+      this.sql.exec("UPDATE render_reservations SET status='failed_free',settled_at=?,updated_at=?,next_poll_at=NULL,reason=? WHERE session_id=? AND render_key=?",now,now,actor==='operator'?'operator_release':'expired_before_submission',sessionId,renderKey);
+      return this._required(sessionId,renderKey);
+    });
+  }
+
+  expireUnsubmitted(now){
+    timestamp(now);
+    const rows=this.sql.exec("SELECT session_id,render_key FROM render_reservations WHERE pre_submission_guard=1 AND submitted_at IS NULL AND task_id IS NULL AND (status='reserved' OR (status='pending' AND reason='upload_failed_before_submission')) AND created_at<=? LIMIT 100",now-600000).toArray();
+    for(const row of rows)this.releaseReservation({sessionId:row.session_id,renderKey:row.render_key,reason:'Expired after ten minutes before any createTask submission.',evidence:'Durable pre-submission state; submitted_at and task_id are null.',actor:'system-before-submission',now});
+    return rows.length;
   }
 
   _required(sessionId, renderKey) {
@@ -186,8 +218,8 @@ export class Ledger {
         }
       }
       this.sql.exec(`INSERT INTO render_reservations
-        (session_id, render_key, request_hash, status, units, created_at, updated_at)
-        VALUES (?, ?, ?, 'reserved', ?, ?, ?)`, sessionId, renderKey, requestHash, UNITS_PER_RENDER, now, now);
+        (session_id, render_key, request_hash, status, units, created_at, updated_at,pre_submission_guard)
+        VALUES (?, ?, ?, 'reserved', ?, ?, ?,1)`, sessionId, renderKey, requestHash, UNITS_PER_RENDER, now, now);
       return { created: true, record: this._required(sessionId, renderKey) };
     });
   }
@@ -199,7 +231,7 @@ export class Ledger {
       // One-shot ownership boundary before the non-idempotent provider POST.
       // Never re-submit an ambiguous task, even when there is no task ID yet.
       if (current.status !== "reserved") throw new LedgerError("invalid_state", "Task submission was already claimed");
-      this.sql.exec(`UPDATE render_reservations SET status = 'submitting', submitted_at = ?, updated_at = ?
+      this.sql.exec(`UPDATE render_reservations SET status = 'submitting', submitted_at = ?, updated_at = ?,pre_submission_guard=0
         WHERE session_id = ? AND render_key = ?`, now, now, sessionId, renderKey);
       return this._required(sessionId, renderKey);
     });

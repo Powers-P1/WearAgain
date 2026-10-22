@@ -18,5 +18,5 @@
     "verbatimModuleSyntax": true,
     "skipLibCheck": false
   },
-  "include": ["src/core/**/*.ts", "src/youcam/**/*.ts"]
+  "include": ["src/core/**/*.ts", "src/youcam/**/*.ts", "src/agent/**/*.ts"]
 }

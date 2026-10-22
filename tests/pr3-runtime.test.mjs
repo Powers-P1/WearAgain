@@ -7,10 +7,43 @@ import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 import { testPng } from './helpers/image.mjs';
+import {snapshot as agentSnapshot} from './helpers/agent-snapshot.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const now = 1_792_598_400_000;
 const requestHash = 'a'.repeat(64);
+
+test('production agent runs model/tools with real SQLite, authenticated private photos, SSE, replay and per-user isolation',{timeout:30000},async t=>{
+ const directory=await mkdtemp(join(tmpdir(),'wearagain-agent-runtime-')),network=[],provider=[];
+ const script=await bundle("export { default, UnitLedger } from './worker/src/index.js';");
+ const image=testPng(81),image64=Buffer.from(image).toString('base64'),hash=Buffer.from(await crypto.subtle.digest('SHA-256',image)).toString('hex');
+ const mf=emulator(script,directory,network,{durableObjects:{UNIT_LEDGER:{className:'UnitLedger',useSQLite:true}},bindings:{VERSION:'agent-runtime',YOUCAM_API_KEY:'fake-youcam-key',ANTHROPIC_API_KEY:'fake-anthropic-key',LIVE_ENABLED:'true',LIVE_TOTAL_UNITS:'24',LIVE_DAILY_UNITS:'12',LIVE_SESSION_DAILY_UNITS:'6',ALLOWED_ORIGINS:'https://wearagain.pages.dev'},
+  outboundService:async request=>{
+   network.push(request.url);assert.equal(new URL(request.url).hostname,'api.anthropic.com','No render/provider/photo URL may escape this test');
+   const body=await request.json();provider.push(body);await new Promise(r=>setTimeout(r,80));
+   const call=(name,input={})=>({type:'tool_use',id:'tool_'+name,name,input});
+   const isSecond=body.messages.some(m=>m.role==='user'&&Array.isArray(m.content)&&m.content.some(c=>c.type==='tool_result'));
+   const look={id:'outfit1',title:'Owned navy outfit',explanation:'Your ready clothes and remembered preference.',itemIds:['topA','bottomA','shoeA']};
+   return Response.json({type:'message',id:'response'+provider.length,role:'assistant',model:'claude-sonnet-5-5',stop_reason:'tool_use',content:isSecond?[call('submit_answer',{reply:'Based on your own saved profile and tool data.',looks:[look,{...look,id:'outfit2',itemIds:['topB','bottomA','shoeA']}],requirements:[],missing:[]})]:[call('get_profile'),call('get_wardrobe'),call('search_memory',{query:'wool'}),call('inspect_clothing_photo',{itemId:'topA'})],usage:{input_tokens:100,output_tokens:100}});
+  }});
+ t.after(()=>cleanupRuntime(mf,directory));
+ const origin='https://wearagain.pages.dev';
+ const post=(path,body,token)=>mf.dispatchFetch('https://worker.test'+path,{method:'POST',headers:{Origin:origin,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body)});
+ const get=(path,token)=>mf.dispatchFetch('https://worker.test'+path,{headers:{Origin:origin,Authorization:'Bearer '+token}});
+ const alpha=(await(await post('/api/session',{})).json()).sessionToken,beta=(await(await post('/api/session',{})).json()).sessionToken;
+ assert.equal((await post('/api/agent/assets',{id:hash,mediaType:'image/png',base64:image64,garmentContainsNoFace:true},alpha)).status,201);
+ const snap=agentSnapshot('ALPHA_ONLY');snap.wardrobe[0]={...snap.wardrobe[0],photoId:hash};
+ const input={requestId:'request-alpha',snapshot:snap,message:'A work outfit, respecting wool preference',procedure:'occasion'};
+ let response=await post('/api/agent',input,alpha);assert.equal(response.status,201);const first=await response.json();
+ response=await post('/api/agent',input,alpha);assert.equal(response.status,200);assert.equal((await response.json()).id,first.id);
+ response=await get('/api/agent/'+first.id+'/events',alpha);assert.match(response.headers.get('Content-Type'),/text\/event-stream/);const stream=await response.text();assert.match(stream,/event: progress/);assert.match(stream,/event: result/);
+ const state=await(await get('/api/agent/'+first.id,alpha)).json();assert.equal(state.status,'completed');assert.equal(state.result.answer.looks.length,2);assert.equal(provider.length,2);assert.ok(JSON.stringify(provider[1]).includes(image64),'Actual private clothing bytes reach the vision tool result');assert.equal(JSON.stringify(state).includes(image64),false,'Photo bytes never enter saved response/transcript');
+ assert.equal((await get('/api/agent/'+first.id,beta)).status,404);assert.equal((await post('/api/agent',{...input,message:'A different request'},alpha)).status,409);assert.equal(provider.length,2);
+ await post('/api/agent',input,alpha);assert.equal(provider.length,2,'Replay does not rerun the model');
+ const betaSnap=agentSnapshot('BETA_ONLY');betaSnap.wardrobe[0]={...betaSnap.wardrobe[0],photoId:hash};const second=await(await post('/api/agent',{...input,requestId:'request-beta',snapshot:betaSnap},beta)).json();await(await get('/api/agent/'+second.id+'/events',beta)).text();
+ assert.equal(provider.length,4);assert.equal(JSON.stringify(provider.slice(2)).includes('ALPHA_ONLY'),false);assert.equal(JSON.stringify(provider.slice(2)).includes(image64),false);assert.ok(JSON.stringify(provider.slice(2)).includes('BETA_ONLY'));
+ const budget=await(await get('/api/ledger',alpha)).json();assert.equal(budget.total.spentUnits,0);assert.equal(budget.total.reservedUnits,0);
+});
 
 async function cleanupRuntime(mf, directory) {
   try { await mf.dispose(); }
@@ -124,7 +157,7 @@ test('production Worker bundles and serves demo, signed sessions and SQLite with
   const origin = 'https://wearagain.pages.dev';
   const call = (path, init = {}) => mf.dispatchFetch('https://worker.test' + path, init);
   let response = await call('/health');
-  assert.deepEqual(await response.json(), { ok: true, version: 'offline-runtime', liveAvailable: true });
+  assert.deepEqual(await response.json(), { ok: true, version: 'offline-runtime', liveAvailable: true,agentAvailable:false,agentVersion:'wearagain.agent.v1',agentCaps:{dailySessions:30,perToken:3,tools:12,outputTokens:20000,newRenders:4,renderUnits:8} });
   response = await call('/do-check');
   assert.deepEqual(await response.json(), { ok: true, ledger: 'sqlite', unitsPerRender: 2 });
   const demo = await (await call('/api/demo/renders')).json();

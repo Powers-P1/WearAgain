@@ -2,6 +2,8 @@ import { Ledger } from './ledger.js';
 import { fetchAvatar, resolveAvatar } from './assets.js';
 import { MAX_REQUEST_BYTES, PIPELINE_REVISION, POLL_INTERVAL_MS, RETENTION_MS, ledgerLimits } from './config.js';
 import { HttpError, digest, errorResponse, exactObject, json, opaque, readBounded } from './http.js';
+import {AgentService} from './agent-service.js';
+import {AgentStore} from './agent-store.js';
 
 const encoder = new TextEncoder();
 const defaultSleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -38,16 +40,18 @@ async function parseRender(request, inspectImage) {
 }
 
 /** Dependencies keep network-free integration tests on the actual orchestration. */
-export function createUnitLedgerClass({ clientFactory, inspectImage, fetchImpl = fetch, fetchAvatarImage = fetchAvatar, now = Date.now, sleep = defaultSleep }) {
+export function createUnitLedgerClass({ clientFactory, inspectImage, fetchImpl = fetch, fetchAvatarImage = fetchAvatar, now = Date.now, sleep = defaultSleep,agentRunner,parseAgentSnapshot,agentProcedures }) {
   return class {
     constructor(ctx, env) {
       this.ctx = ctx;
       this.env = env;
       this.ledger = new Ledger(ctx.storage, ledgerLimits(env));
+      this.agentStore=new AgentStore(ctx.storage);
       this.polling = new Map();
       this.submitting = new Set();
       this.client = null;
       this.heavyInFlight = false;
+      this.agent=null;
     }
 
     async withImageMemory(operation) {
@@ -86,7 +90,9 @@ export function createUnitLedgerClass({ clientFactory, inspectImage, fetchImpl =
         status: record.status === 'succeeded' ? 'succeeded' : record.status === 'failed_free' ? 'error' : 'pending',
         accounting: record.status === 'succeeded' ? 'charged' : record.status === 'failed_free' ? 'released' : 'reserved',
         reservedUnits: terminal ? 0 : 2, chargedUnits: record.status === 'succeeded' ? 2 : 0,
-        reason: record.reason,
+        reason: record.reason==='provider_running'?null:record.reason,
+        providerStatus:record.reason==='provider_running'?'running':record.status==='succeeded'?'succeeded':record.status==='failed_free'?'error':'unknown',
+        retryAfterMs:terminal?0:Math.max(1000,(record.nextPollAt??now()+3000)-now()),
         requiresReconciliation: !terminal && (!record.taskId || record.nextPollAt === null) && !this.submitting.has(`${record.sessionId}:${record.renderKey}`),
         assetId: record.status === 'succeeded' ? `youcam:${record.renderKey}` : null,
         imageUrl: record.status === 'succeeded' ? `/api/renders/${record.renderKey}/image` : null,
@@ -103,8 +109,10 @@ export function createUnitLedgerClass({ clientFactory, inspectImage, fetchImpl =
 
     async schedule() {
       const row = this.ctx.storage.sql.exec('SELECT MIN(next_poll_at) AS next FROM render_reservations WHERE status = ? AND task_id IS NOT NULL', 'pending').toArray()[0];
-      if (row?.next !== null && row?.next !== undefined) {
-        await this.ctx.storage.setAlarm(Math.max(now() + 100, row.next));
+      const expiry=this.ctx.storage.sql.exec("SELECT MIN(created_at+600000) AS next FROM render_reservations WHERE pre_submission_guard=1 AND submitted_at IS NULL AND task_id IS NULL AND (status='reserved' OR (status='pending' AND reason='upload_failed_before_submission'))").toArray()[0];
+      const next=Math.min(row?.next??Infinity,expiry?.next??Infinity,this.agentStore.nextExpiry());
+      if (Number.isFinite(next)) {
+        await this.ctx.storage.setAlarm(Math.max(now() + 100, next));
       }
     }
 
@@ -123,6 +131,7 @@ export function createUnitLedgerClass({ clientFactory, inspectImage, fetchImpl =
       catch { throw new HttpError(503, 'avatar_image_invalid'); }
       const reserved = this.ledger.reserve({ sessionId, renderKey: input.renderKey, requestHash: input.renderKey, now: now() });
       if (!reserved.created) return this.result(reserved.record, { identity: input.identity, replayed: true });
+      await this.schedule();
       this.submitting.add(id);
       try {
         const src = await provider.uploadImage(person);
@@ -140,7 +149,7 @@ export function createUnitLedgerClass({ clientFactory, inspectImage, fetchImpl =
           this.ledger.settleFreeError(sessionId, input.renderKey, { kind: 'create_validation', errorCode: 'InvalidParameters', httpStatus: 400 }, now());
         } else {
           const current = this.ledger.get(sessionId, input.renderKey);
-          this.ledger.markPending(sessionId, input.renderKey, current.taskId ? 'poll_pending' : 'submission_outcome_unknown', now());
+          this.ledger.markPending(sessionId, input.renderKey, current.taskId ? 'poll_pending' : current.submittedAt===null?'upload_failed_before_submission':'submission_outcome_unknown', now());
           if (current.taskId) this.ledger.setNextPoll(sessionId, input.renderKey, now() + POLL_INTERVAL_MS, now());
         }
       } finally { this.submitting.delete(id); }
@@ -197,7 +206,21 @@ export function createUnitLedgerClass({ clientFactory, inspectImage, fetchImpl =
       try {
         const path = new URL(request.url).pathname;
         if (path === '/health' && request.method === 'GET') return json({ ok: true, ledger: 'sqlite', unitsPerRender: 2 });
+        this.ledger.expireUnsubmitted(now());
+        if(path.startsWith('/operator/')){
+          if(request.headers.get('X-WearAgain-Operator')!=='verified')throw new HttpError(401,'operator_required');
+          if(path==='/operator/holds'&&request.method==='GET')return json({holds:this.ledger.heldReservations(now()),releaseScope:'Only an authenticated operator may release ambiguous holds after confirming no charge.'});
+          if(path==='/operator/releases'&&request.method==='POST'){
+            let body;try{body=JSON.parse(new TextDecoder().decode(await readBounded(request.body,4096)));}catch{throw new HttpError(400,'invalid_request');}
+            if(body?.confirmedNoCharge!==true)throw new HttpError(400,'operator_evidence_required');
+            const record=this.ledger.releaseReservation({sessionId:body.sessionId,renderKey:body.renderKey,reason:body.reason,evidence:body.evidence,actor:'operator',now:now()});return json({status:record.status,accounting:'released',renderKey:record.renderKey});
+          }throw new HttpError(404,'not_found');
+        }
         const sessionId = opaque(request.headers.get('X-WearAgain-Session'));
+        if(path==='/agent'||path.startsWith('/agent/')){
+          this.agent??=new AgentService(this,{now,fetchImpl,inspectImage,runner:agentRunner,parseSnapshot:parseAgentSnapshot,procedures:agentProcedures});
+          return await this.agent.handle(request,path,sessionId);
+        }
         if (path === '/summary' && request.method === 'GET') return json(this.ledger.summary(sessionId, now()));
         if (path === '/renders' && request.method === 'POST') return await this.withImageMemory(() => this.start(request, sessionId));
         const match = /^\/renders\/([a-f0-9]{64})(\/image)?$/.exec(path);
@@ -216,6 +239,8 @@ export function createUnitLedgerClass({ clientFactory, inspectImage, fetchImpl =
       // Bounded batch; the next alarm resumes remaining work. Pending state
       // survives browser closure and alarms can be delivered more than once.
       try {
+        this.ledger.expireUnsubmitted(now());
+        this.agentStore.cleanup(now());
         for (const record of this.ledger.dueTasks(now(), 5)) await this.reconcile(record);
       } finally { await this.schedule(); }
     }

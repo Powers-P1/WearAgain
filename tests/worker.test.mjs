@@ -14,6 +14,16 @@ const origin = 'https://wearagain.pages.dev';
 const secret = 'offline-test-key';
 const assetUrl = 'https://yce-us.s3-accelerate.amazonaws.com/fixture/result.png?sig=private-fixture';
 const bytes = testPng();
+
+test('operator endpoint stays unavailable without its distinct secret; session tokens cannot operate holds',async t=>{
+ const h=harness(t),token=await h.token();
+ assert.equal((await h.request('/api/operator/holds',{},token)).status,503);
+ h.env.OPERATOR_TOKEN='operator-private-fixture-token-123456789';
+ assert.equal((await h.request('/api/operator/holds',{},token)).status,401);
+ const response=await h.request('/api/operator/holds',{headers:{Authorization:'Bearer '+h.env.OPERATOR_TOKEN}});
+ assert.equal(response.status,200);assert.deepEqual((await response.json()).holds,[]);
+ assert.equal(h.creates,0);
+});
 const metadata = { element: { kind: 'top', id: 'top-1' }, avatarId: 'woman_neutral_01', attempt: 0, garmentContainsNoFace: true };
 const json = (body, status = 200) => Response.json(body, { status });
 function form(meta = metadata, data = bytes) {

@@ -3,7 +3,7 @@ main = "src/index.js"
 compatibility_date = "2026-10-21"
 
 [vars]
-VERSION = "0.3.0-youcam-ledger"
+VERSION = "0.4.0-agent-personalization"
 ALLOWED_ORIGINS = "https://wearagain.pages.dev,https://v2-preview.wearagain.pages.dev"
 # Team allocation decided 21 Oct 2026: 440 units total (220 renders), 240 per UTC day, 40 per session; the rest of the provider balance stays in reserve.
 LIVE_ENABLED = "true"
