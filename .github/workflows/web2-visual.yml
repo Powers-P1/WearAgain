@@ -72,17 +72,27 @@ jobs:
           cp docs/mockups/v2/WearAgain-06-Desktop-Przeglad.png screenshots/board-06-reference.png
           cp docs/mockups/v2/WearAgain-07-Desktop-Stylistka.png screenshots/board-07-reference.png
           cp docs/mockups/v2/WearAgain-08-Desktop-Sprawdz-zakup.png screenshots/board-08-reference.png
+          mkdir -p screenshots/viewport
+          for viewport in '390 844' '1280 800'; do
+            read -r width height <<<"$viewport"
+            for pair in 'landing|/' 'consumer-wardrobe|/app/#wardrobe' 'consumer-overview|/app/#overview' 'consumer-stylist|/app/#stylist' 'consumer-purchase|/app/#check'; do
+              IFS='|' read -r name route <<<"$pair"
+              npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "$width,$height" --wait-for-timeout 1100 "http://127.0.0.1:8788$route" "screenshots/viewport/$name-$width.png"
+            done
+          done
+          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "1280,800" --wait-for-timeout 1000 "https://wearagain.pages.dev/" screenshots/viewport/landing-live-v1-1280.png
+          npx --yes playwright@1.56.1 screenshot --browser chromium --viewport-size "390,844" --wait-for-timeout 1000 "https://wearagain.pages.dev/" screenshots/viewport/landing-live-v1-390.png
           node --input-type=module <<'JS'
           import sharp from 'sharp';
           import {mkdir} from 'node:fs/promises';
           await mkdir('screenshots/comparisons',{recursive:true});
           const items=[
-            ['landing-1280.png','landing-live-v1-1280.png','landing-desktop'],
-            ['landing-390.png','landing-live-v1-390.png','landing-mobile'],
-            ['consumer-wardrobe-1280.png','board-05-reference.png','board05-wardrobe'],
-            ['consumer-overview-1280.png','board-06-reference.png','board06-overview'],
-            ['consumer-stylist-1280.png','board-07-reference.png','board07-stylist'],
-            ['consumer-purchase-1280.png','board-08-reference.png','board08-check'],
+            ['viewport/landing-1280.png','viewport/landing-live-v1-1280.png','landing-desktop'],
+            ['viewport/landing-390.png','viewport/landing-live-v1-390.png','landing-mobile'],
+            ['viewport/consumer-wardrobe-1280.png','board-05-reference.png','board05-wardrobe'],
+            ['viewport/consumer-overview-1280.png','board-06-reference.png','board06-overview'],
+            ['viewport/consumer-stylist-1280.png','board-07-reference.png','board07-stylist'],
+            ['viewport/consumer-purchase-1280.png','board-08-reference.png','board08-check'],
           ];
           for(const [actual,reference,label] of items){
             const fit=async path=>await sharp('screenshots/'+path).resize({width:900,height:1100,fit:'contain',background:'#f8f6f1'}).png().toBuffer();
