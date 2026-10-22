@@ -272,3 +272,10 @@
 .v1-crop-8,.v1-crop-8 .landing-photo-frame{aspect-ratio:153/131} .v1-crop-8 img{width:518.30065%;left:-18.95425%;top:-544.27481%}
 .v1-crop-9,.v1-crop-9 .landing-photo-frame{aspect-ratio:184/162} .v1-crop-9 img{width:430.97826%;left:-330.43478%;top:-826.54321%}
 .v1-crop-10,.v1-crop-10 .landing-photo-frame{aspect-ratio:417/252} .v1-crop-10 img{width:190.16787%;left:-89.44844%;top:-659.12698%}
+
+/* The two original audience links retain their v1 position and treatment.
+   The added jury link is deliberately secondary, not an emphasized board-13 CTA. */
+.landing-audiences .landing-quiet-judge{background:transparent;color:#62655e;border:0;padding:.65rem .9rem;font-size:.82rem;font-weight:400}
+.landing-audiences .landing-quiet-judge:hover{background:#e8e7dc;color:#304d33}
+@media(max-width:760px){.landing-audiences .landing-quiet-judge{padding:.5rem .55rem;font-size:.7rem}}
+@media(max-width:420px){.landing-audiences .landing-quiet-judge{padding:.42rem .35rem;font-size:.63rem}}
