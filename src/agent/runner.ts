@@ -41,7 +41,7 @@ export interface AgentRuntime {
  readonly render?:(item:AgentSnapshot['wardrobe'][number],avatarId:string,kind:'top'|'outerwear')=>Promise<unknown>;
 }
 async function getJson(url:URL,transport:typeof fetch):Promise<unknown>{
- const response=await transport(url.toString(),{signal:AbortSignal.timeout(8000),redirect:'error',headers:{Accept:'application/json','User-Agent':'WearAgain/0.4 (+https://wearagain.pages.dev)'}});if(!response.ok)throw Error('HTTP_'+response.status);
+ const response=await transport(url.toString(),{signal:AbortSignal.timeout(8000),redirect:'manual',headers:{Accept:'application/json','User-Agent':'WearAgain/0.4 (+https://wearagain.pages.dev)'}});if(!response.ok)throw Error('HTTP_'+response.status);
  const reader=response.body?.getReader();if(!reader)throw Error('Unavailable');const chunks:Uint8Array[]=[];let size=0;
  try{for(;;){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>200000){await reader.cancel();throw Error('Response too large');}chunks.push(value);}}finally{reader.releaseLock();}
  const bytes=new Uint8Array(size);let offset=0;for(const c of chunks){bytes.set(c,offset);offset+=c.length;}return JSON.parse(new TextDecoder().decode(bytes)) as unknown;
