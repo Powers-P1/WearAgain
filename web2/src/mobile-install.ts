@@ -37,5 +37,5 @@ export function initInstallation():void{
  });
  if('serviceWorker'in navigator&&window.isSecureContext)void navigator.serviceWorker.register('/app/sw.js',{scope:'/app/',updateViaCache:'none'}).catch(()=>{});
  const keyboard=()=>document.body.classList.toggle('keyboard-open',!!window.visualViewport&&innerHeight-window.visualViewport.height>150&&!!document.activeElement?.matches('input,textarea,select'));window.visualViewport?.addEventListener('resize',keyboard);document.addEventListener('focusin',keyboard);document.addEventListener('focusout',keyboard);
- window.setTimeout(()=>{let dismissed=false;try{dismissed=localStorage.getItem(DISMISSED)==='1';}catch{}if(mobile&&!dismissed&&!standalone()&&!document.activeElement?.matches('input,textarea,select'))openDialog?.();},1500);refresh();
+ window.setTimeout(()=>{let dismissed=false;try{dismissed=localStorage.getItem(DISMISSED)==='1';}catch{}if(mobile&&!dismissed&&!standalone()&&!document.body.classList.contains('wear-guide-active')&&!document.activeElement?.matches('input,textarea,select'))openDialog?.();},1500);refresh();
 }

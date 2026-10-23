@@ -26,6 +26,10 @@ The mobile-first PWA stores separate local profiles and clothing photos on the d
 
 The live Sonnet stylist uses bounded tools over the current profile, wardrobe, editable preferences, history, enabled clothing photos, dated weather, catalogue, preview planning and solver. Saved examples are a separate labelled mode. AI suggestions and ready images never manufacture the user's wear ratings.
 
+An optional [nine-step interactive walkthrough](https://wearagain.pages.dev/app/?guide=start#wardrobe) uses actual item inspection, preference saving, a human pair rating, the zero-purchase solver, outfit saving, a new clothing photo and coffee review, wear logging, packing and item review. Next is conditional on the relevant result. It starts no paid API automatically, supports pause/minimize/keyboard controls, and keeps progress separate for each local profile. An empty wardrobe requires the user's real input; it is never silently filled with sample clothes.
+
+English [VTT captions](https://wearagain.pages.dev/video/wearagain-final-v7.en.vtt) and [SRT subtitles](https://wearagain.pages.dev/video/wearagain-final-v7.en.srt) are downloadable. The jury player selects English captions by default.
+
 ### Value and limits
 
 The decision links a proposed purchase to clothes and needs the shopper supplied. An independently tested deterministic solver produces the certificate. We verified the working API path and actual app flows; we have not measured reduced returns, spending, time savings or conversion uplift.

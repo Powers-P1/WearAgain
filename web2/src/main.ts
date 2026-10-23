@@ -7,7 +7,7 @@ import { DEFAULT_LOCALE, t, type TranslationKey } from './i18n.js';
 import { marketingRoute } from './marketing-model.js';
 import { marketingPage, marketingTitle, handleMarketingClick } from './marketing.js';
 import { setupPwa, canInstall, installWebApp } from './pwa.js';
-import { purchasePage, handlePurchaseClick, handlePurchaseChange } from './purchase-ui.js';
+import { purchasePage, handlePurchaseClick, handlePurchaseChange,purchaseWalkthroughFacts } from './purchase-ui.js';
 import { loadDaily, loadDecisions, wearToday, storeDaily, localISODate, type DailyState, type DecisionsState } from './daily.js';
 import { tripPage, surprisePage, balancePage, handlePlansClick, handlePlansChange, handlePlansSubmit } from './plans-ui.js';
 import { itemPicture, configurePhotoMedia } from './ui.js';
@@ -19,7 +19,10 @@ import './agent.css';
 import { stopCamera } from './camera.js';
 import { morningPage, handleMorningInput, handleMorningClick, submitMorning, stopMorningDictation } from './morning-ui.js';
 import { overviewPage, reviewItemPage, handleOverviewClick, handleOverviewMonthChange } from './overview-ui.js';
-import { galleryPage, handleGalleryInput, handleGalleryClick, handleGallerySubmit, handleGalleryFile } from './gallery-ui.js';
+import { galleryPage, handleGalleryInput, handleGalleryClick, handleGallerySubmit, handleGalleryFile,galleryWalkthroughFacts } from './gallery-ui.js';
+import {createWardrobeWalkthrough,type WardrobeWalkthrough} from './walkthrough.js';
+import {loadSaved} from './stylist.js';
+import {readTrip} from './plans.js';
 import { handleStylistClick, savedPage, stylistPage, submitStylist,stylistChange,submitAgentFeedback } from './stylist-ui.js';
 import './style.css';
 
@@ -27,6 +30,7 @@ const root = document.querySelector<HTMLElement>('#app');
 if (!root) throw new Error('Missing app root.');
 document.documentElement.lang = DEFAULT_LOCALE;
 const publicRoute = marketingRoute(window.location.pathname);
+let walkthrough:WardrobeWalkthrough|null=null,guideStyleSaves=0;
 setupPwa();
 
 type Screen = 'wardrobe' | 'profile' | 'stylist' | 'check' | 'my-check' | 'saved' | 'gallery' | 'add' | 'item' | 'morning' | 'overview' | 'review' | 'trip' | 'surprise' | 'balance';
@@ -85,9 +89,9 @@ function navigate(to: string): void {
   else window.location.hash = to;
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
-function persist(next: WardrobeState): void {
+function persist(next: WardrobeState): boolean {
   data = next;
-  if (!saveState(data, storage)) message = t('localStorageDenied');
+  const saved=saveState(data, storage);if (!saved) message = t('localStorageDenied');return saved;
 }
 function navButton(id: NavId, desktop: boolean, active: NavId): string {
   const labels: Record<NavId, TranslationKey> = {
@@ -350,6 +354,7 @@ function render(): void {
     current.screen==='gallery'?t('galleryPageTitle'):
     current.screen==='check'?t('checkPageTitle'):t('generalPageTitle');
   message='';
+  if(!publicRoute){const page=root!.querySelector('.page');page?.insertAdjacentHTML('beforeend','<button type="button" class="text-link guide-launch" data-guide-start>Guided walkthrough</button>');}
   window.dispatchEvent(new Event('wearagain:rendered'));
 }
 root.addEventListener('click', event => {
@@ -357,6 +362,7 @@ root.addEventListener('click', event => {
   if (!(target instanceof Element)) return;
   const control = target.closest<HTMLElement>('button, [data-nav]');
   if (!control) return;
+  if(control.hasAttribute('data-guide-start')){walkthrough?.start();return;}
   if(!publicRoute&&accountClick(control,{base:baseStorage,store:storage,notice:value=>{message=value;},rerender:render}))return;
   if(!publicRoute&&personalClick(control,{wardrobe:data,storage,notice:value=>{message=value;},rerender:render}))return;
   if(publicRoute){
@@ -449,7 +455,7 @@ root.addEventListener('submit', event => {
   } else if (handleGallerySubmit(form,{storage,rerender:render,notice:value=>{message=value;},focus:focusAfterRender})) {
     // Mall metadata and link capture handled locally.
   } else if (form.id === 'style-form') {
-    persist(setStyle(data, (form.elements.namedItem('style') as HTMLTextAreaElement).value));
+    if(persist(setStyle(data, (form.elements.namedItem('style') as HTMLTextAreaElement).value)))guideStyleSaves++;
     message ||= t('styleSaved'); render();
   } else if (form.id === 'add-form') {
     const entries = new FormData(form);
@@ -478,4 +484,6 @@ if(!publicRoute)document.addEventListener('visibilitychange',()=>{
   if(document.hidden){stopCamera();stopMorningDictation();}
   else if(route().screen==='gallery'||route().screen==='morning')render();
 });
+if(!publicRoute)walkthrough=createWardrobeWalkthrough({storage,navigate,facts:()=>({route:location.hash.slice(1)||'wardrobe',itemExists:data.items.some(item=>item.id===route().itemId),styleSaves:guideStyleSaves,...purchaseWalkthroughFacts(),saved:JSON.stringify(loadSaved(storage)),...galleryWalkthroughFacts(storage),wears:JSON.stringify(daily.wears),packed:JSON.stringify(readTrip(storage).packed)})});
 render();
+if(!publicRoute&&new URL(location.href).searchParams.get('guide')==='start'){const url=new URL(location.href);url.searchParams.delete('guide');history.replaceState(history.state,'',url);walkthrough?.start();}

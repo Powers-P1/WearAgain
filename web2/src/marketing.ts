@@ -141,6 +141,7 @@ function judgesLanding():string{
     '<p>AI styling and smarter shopping on your phone. Your wardrobe dashboard on desktop.</p><p class="mkt-judges-role">'+h('mktJudgesHeroRoles')+'</p>'+
     link('/judges/demo/',h('mktJudgesPrimary'),'mkt-button mkt-button-dark')+
     link('#walkthrough',h('mktJudgesWatch'),'mkt-secondary-action')+
+    link('/app/?guide=start#wardrobe','Learn the app step by step','mkt-secondary-action')+
     '<div class="mobile-entry-actions"><button type="button" class="mkt-outline-button" data-install-app>Install WearAgain</button>'+link('/app/#wardrobe','Open wardrobe dashboard')+'</div>'+phoneHandoff(mode)+
     '<div class="mkt-evidence-links">'+link(CODE,h('mktJudgesCode'))+
     link(SETUP,h('mktJudgesTests'))+'</div>'+
@@ -171,7 +172,7 @@ function judgesLanding():string{
       '<a href="'+url+'" class="mkt-index-row"><strong>'+h(title)+'</strong>'+
       '<span>'+h(desc)+'</span><b>↗</b></a>').join('')+
     '<section class="mkt-walkthrough" id="walkthrough"><h2>'+h('mktJudgesVideo')+'</h2><p>'+h('mktJudgesVideoDescription')+'</p><video controls playsinline preload="metadata" poster="/video/wearagain-final-v7-poster.jpg" aria-label="'+h('mktJudgesVideo')+'"><source src="/video/wearagain-final-v7.mp4" type="video/mp4" /><track kind="captions" src="/video/wearagain-final-v7.en.vtt" srclang="en" label="English" default /></video><p>'+link('/video/transcript.txt',h('mktJudgesTranscript'))+'</p></section>'+
-    '<p>'+h('mktJudgesFootnote')+'</p></section></main>'+footer()+'</div>';
+    '<p>'+link('/video/wearagain-final-v7.en.vtt','English captions (VTT)')+' · '+link('/video/wearagain-final-v7.en.srt','English subtitles (SRT)')+'</p><p>'+h('mktJudgesFootnote')+'</p></section></main>'+footer()+'</div>';
 }
 function stepper():string{
   return '<nav class="mkt-judge-steps" aria-label="'+h('mktJudgeProgress',{index:1+(['wardrobe','preview','verdict'] as const).indexOf(step)})+'">'+

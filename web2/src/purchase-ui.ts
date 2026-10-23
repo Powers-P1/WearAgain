@@ -12,6 +12,8 @@ import {nextUnresolvedAssessment} from '../../src/core/selection.js';
 
 function launchDemo():PurchaseDemo{if(typeof window==='undefined')return 'minimum';const scenario=new URLSearchParams(window.location.search).get('scenario');if(scenario==='zero'||scenario==='minimum'){try{localStorage.setItem('wearagain:approved-demo:v1',scenario);}catch{}return scenario;}try{return localStorage.getItem('wearagain:approved-demo:v1')==='zero'?'zero':'minimum';}catch{return 'minimum';}}
 let session: PurchaseSession = initialPurchase(launchDemo());
+let walkthroughZeroSelections=0;
+export function purchaseWalkthroughFacts(){const result=computeDecision(session);return {humanRating:session.ratingsOrigin==='edited'&&session.scenario.ratings.some(row=>row.status==='would_wear'||row.status==='would_not_wear'),zeroSelected:walkthroughZeroSelections,zeroSolved:session.demo==='zero'&&result.status==='solved'&&result.basket.costMinor===0&&result.basket.candidateIds.length===0};}
 let comparisonId = '';
 let comparing = false;
 const equivalents = new Map<string, string>();
@@ -111,7 +113,7 @@ export function handlePurchaseChange(input: HTMLSelectElement): boolean {
 export function handlePurchaseClick(button: HTMLElement, actions: Actions): boolean {
   try {
     const d = button.dataset;
-    if (d.purchaseDemo) { session = choosePurchaseDemo(session, d.purchaseDemo as PurchaseDemo);try{localStorage.setItem('wearagain:approved-demo:v1',session.demo);}catch{} equivalents.clear(); }
+    if (d.purchaseDemo) { session = choosePurchaseDemo(session, d.purchaseDemo as PurchaseDemo);if(session.demo==='zero')walkthroughZeroSelections++;try{localStorage.setItem('wearagain:approved-demo:v1',session.demo);}catch{} equivalents.clear(); }
     else if (d.purchaseCandidate) session = selectCandidate(session, d.purchaseCandidate);
     else if (d.purchaseTop) session = selectTop(session, d.purchaseTop);
     else if (d.purchaseRating) session = rateSelected(session, d.purchaseRating as Rating);

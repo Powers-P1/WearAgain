@@ -15,6 +15,7 @@ import './gallery.css';
 type StorageLike=Pick<Storage,'getItem'|'setItem'>|undefined;
 type Actions={readonly storage:StorageLike;readonly rerender:()=>void;readonly notice:(s:string)=>void;readonly focus?:(selector:string)=>void};
 type View='capture'|'coffee'|'returns';
+export function galleryWalkthroughFacts(store:StorageLike){const value=session??loadShopping(store);return {photos:value.items.filter(row=>row.source==='photo'&&!!row.photoId).length,coffee:current==='coffee'};}
 let session:ShoppingSession|null=null;
 let current:View='capture';
 let selectedId:string|null=null;

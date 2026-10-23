@@ -105,6 +105,7 @@ for (const [source, target] of [
   ['WearAgain-smooth-final-v7.mp4', 'wearagain-final-v7.mp4'],
   ['poster.jpg', 'wearagain-final-v7-poster.jpg'],
   ['captions.en.vtt', 'wearagain-final-v7.en.vtt'],
+  ['captions.en.srt', 'wearagain-final-v7.en.srt'],
   ['transcript.en.md', 'transcript.txt'],
 ]) {
   const bytes = await readFile(join(filmRoot, source));
