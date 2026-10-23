@@ -15,33 +15,33 @@
   "files": [
     {
       "name": ".gitattributes",
-      "bytes": 8,
-      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+      "bytes": 38,
+      "sha256": "15fb8f3c7b3320668d43aaf110c108d11e7be9e0b0bc174c106bbaacb5442231"
     },
     {
       "name": "captions.en.srt",
-      "bytes": 1270,
-      "sha256": "6e3fe720a8b6ea0978a7deb94da1c649f7f2db974a3485bb4fc14b7e46acc240"
+      "bytes": 1223,
+      "sha256": "cdc8e4f6120cfe0417f097017fe86f53561efffd3f1c14cf0159b1f7afd5b3df"
     },
     {
       "name": "captions.en.vtt",
-      "bytes": 1241,
-      "sha256": "e93957d180433da4b78c09e5fd0ac81f622140acf287d6f51f81bf4c72681889"
+      "bytes": 1204,
+      "sha256": "8375b2f076df1f6f4b9ee3c7090bf12d68e499f27c748364de3c1304addd030e"
     },
     {
       "name": "film-final-v5-PROVENANCE.json",
-      "bytes": 5828,
-      "sha256": "e5aeacbfa85a85b93751012c2e05f09f0ccf8dca2cea1f4048ff0e7ef05b26ea"
+      "bytes": 5730,
+      "sha256": "f0ca64e9a87ba6f1235d5afedf2dc3eb87a5231b1b8885195dc2c5db54df8eee"
     },
     {
       "name": "film-sample-v3-PROVENANCE.json",
-      "bytes": 4165,
-      "sha256": "bd3df9db3cc0376d61536a804eba851bf506ba5be0fab59b3a97e1d07443f9e6"
+      "bytes": 4103,
+      "sha256": "0482a97a80e4976b477d537197473b9d58c7128e19467a5a543dbb17d6b5d900"
     },
     {
       "name": "motion-ledger.json",
-      "bytes": 6854,
-      "sha256": "007c287faaba45d1a51711c0f8f82a4ddcb5eb309912043c59332eb716726329"
+      "bytes": 6526,
+      "sha256": "17664b78a17d97fc5fe8845ab70878472346eb102e936aee5daae26e18799c1c"
     },
     {
       "name": "motion-review.json",
@@ -55,18 +55,18 @@
     },
     {
       "name": "PROVENANCE.json",
-      "bytes": 7603,
-      "sha256": "a701e39344659c8f07ca42f734d0df8e1c6fa6eabfecd1a36f6dd41fc8f4bd1d"
+      "bytes": 7317,
+      "sha256": "8be438ccb80d0573e2d03c83c1e7a6121f65c4ae2fa47dc1fc43a5b4c2efb58a"
     },
     {
       "name": "QA.json",
-      "bytes": 2684,
-      "sha256": "a6cafd7db3f712d8ee681101c334d14da292dda84fbeec1b6b2a3801d867b05c"
+      "bytes": 2617,
+      "sha256": "817e405e09ab87a0d3c21d3ceaef79d38dc33985b8994e84e9c3f5bb627b2c81"
     },
     {
       "name": "transcript.en.md",
-      "bytes": 1454,
-      "sha256": "b7a2fb8cbe9bd5617097f994bec211b8fbca020b6d7b079b1f6ca31bef94aec3"
+      "bytes": 1403,
+      "sha256": "8854549eb8da763475c03c22c8109e1740a042fe6ac2ba59b53b4f0c6da849d4"
     },
     {
       "name": "WearAgain-smooth-final-v7.mp4",

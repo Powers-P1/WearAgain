@@ -1,1 +1,3 @@
-* -text
+* text eol=lf
+*.mp4 -text
+*.jpg -text
