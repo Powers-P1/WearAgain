@@ -17,7 +17,7 @@ try{for(const width of [390,1280]){
  await page.locator('[data-purchase-demo=minimum]').click();await page.locator('[data-purchase-rating=would_wear]').click();await advance(3);
  await page.locator('[data-purchase-demo=zero]').click();assert.match(await page.locator('.purchase-verdict').innerText(),/buy nothing|what you own|enough/i);await advance(4);
  await page.locator('#stylist-mode').selectOption('demo');await page.locator('#stylist-form [type=submit]').click();await page.locator('.stylist-details [data-save-look]').click();await advance(5);
- assert.equal(await next.isEnabled(),false);await page.locator('#mall-camera').setInputFiles(resolve('web2/dist/assets/items/coat.webp'));await page.waitForFunction(()=>document.querySelectorAll('.mall-queue-item').length>3);await page.locator('[data-mall-view=coffee]').click();await advance(6);
+ assert.equal(await next.isEnabled(),false);await page.locator('#mall-camera').setInputFiles(resolve('web2/dist/assets/items/coat.webp'));await page.waitForFunction(()=>document.querySelectorAll('.mall-queue-item').length>3);await page.getByRole('button',{name:'Coffee review',exact:true}).click();await advance(6);
  await page.locator('#morning-form [type=submit]').click();await page.locator('[data-morning-wear]').click();await advance(7);
  await page.locator('.trip-person [data-trip-select-event]').click();await page.locator('[data-trip-choose-look="0"]').click();await page.locator('[data-trip-packed]').first().check();await advance(8);
  await page.locator('[data-overview-review]').first().click();
