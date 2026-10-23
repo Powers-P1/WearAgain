@@ -171,6 +171,7 @@ test('judges pages and each guided step include implementation, concept and quan
     assert.match(html,/Style preview, not size fit/);
     assert.match(html,/2 units/);
     assert.match(html,/24 hours/);
+    assert.doesNotMatch(html,/provider retains uploaded and generated images for 24 hours/);
     assert.match(html,/no fresh tasks|not live YouCam calls/i);
     assert.match(html,/No conversion, returns or impact improvements have been measured/);
     assert.match(html,/private.*reviewer access/);

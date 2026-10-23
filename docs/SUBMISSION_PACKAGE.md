@@ -46,7 +46,7 @@ No sign-in is needed for the public demo. The private source needs the judging a
 4. In Check purchase -> Use my wardrobe, declare needs, shop candidates, prices and human ratings. Changing inputs recomputes the certificate; unresolved cheaper pairings leave it provisional.
 5. Explore Stylist, saved looks, trip packing and return lists in saved-example mode. Live AI/YouCam are separately opt-in and consume a limited team allowance; the initial safe journey does not need them.
 
-For a local check use Node 24, `npm ci --ignore-scripts`, then `npm run check`. All **335 offline tests**, strict types and both frontend builds passed on 23 October for the prepared final-player revision. Workerd tests intercept network traffic; no production key is required.
+For a local check use Node 24, `npm ci --ignore-scripts`, then `npm run check`. All **339 offline tests**, strict types and both frontend builds passed on 23 October for the guided-walkthrough revision. Workerd tests intercept network traffic; no production key is required.
 
 PWA hooks/offline behavior have earlier automated browser evidence. Physical Android/iPhone installation remains a manual check. The film used responsive mobile/touch browser emulation, not an installed physical iPhone.
 
