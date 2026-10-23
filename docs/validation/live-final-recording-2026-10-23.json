@@ -1,0 +1,36 @@
+{
+  "capturedAt": "2026-10-23T00:32:38.611Z",
+  "base": "https://wearagain.pages.dev",
+  "liveSession": {
+    "sessionId": "98cb3f54-21eb-448d-a78d-77bab03a0da2",
+    "model": "claude-sonnet-5-5",
+    "status": "completed",
+    "usage": {
+      "inputTokens": 20778,
+      "outputTokens": 1288,
+      "modelCalls": 4,
+      "toolCalls": 7
+    },
+    "evidence": [
+      {
+        "tool": "inspect_clothing_photo",
+        "status": "known",
+        "subject": "own_mvk8hehy_1o5t",
+        "capturedAt": "2026-10-23T00:31:17.736Z",
+        "detail": "Actual uploaded clothing image supplied to the model; no size verification."
+      }
+    ],
+    "mutationKinds": [
+      "outfit"
+    ]
+  },
+  "agentPosts": 1,
+  "photoUploads": 1,
+  "newYouCamTasks": 0,
+  "youCamCredits": 0,
+  "errors": [],
+  "note": "Actual production UI and one actual live Sonnet session. QA demonstration wardrobe with one existing garment-only project reference, not a consumer trial. Gallery shows labelled saved YouCam results. No new render, checkout or physical OS installation.",
+  "workerVersion": "0.4.3-review",
+  "estimatedCostUsd": 0.054436,
+  "costBasis": "Project configured estimate $2/$10 per million input/output tokens, not a provider invoice."
+}

@@ -57,6 +57,7 @@
 .stylist-details .button { min-height: 47px; }
 .stylist-trip-link { display: block; border: 0; background: transparent; margin: 11px auto 0; padding: 3px 0; color: var(--muted); font-size: 12px; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
 .stylist-next-link { display: flex; justify-content: center; margin: 10px auto 0; font-weight: 400; }
+.stylist-details > .text-link { display:flex;justify-content:center;width:100%;min-height:44px;margin:8px 0 0; }
 .stylist-disclaimer { color: var(--muted); font-size: 11px; line-height: 1.5; margin-top: 9px; }
 .stylist-mobile-back { display: none; }
 .stylist-result-appbar { display:none; }

@@ -1,5 +1,7 @@
 # WearAgain
 
+[Jury demo](https://wearagain.pages.dev/judges/) · [Submission handoff](docs/HACKATHON_HANDOFF.md) · [136-second mobile demonstration](docs/demo/README.md)
+
 WearAgain helps a shopper find the cheapest additional outerwear purchase that meets her declared outfit needs using tops she already owns. She judges pairs of separate garment previews; a deterministic solver chooses the basket and explains why every cheaper basket fails. The answer may be to buy nothing.
 
 Built for the YouCam API Skin AI & eCommerce VTO Hackathon. The live Sonnet 5.5 stylist uses real wardrobe tools and editable private preferences; the deterministic core verifies availability and purchase certificates. Rendering remains per garment because the team's probe found that a second garment replaces the first. Three tops and three outerwear items need six successful images (12 YouCam units), reused across nine pair cards.

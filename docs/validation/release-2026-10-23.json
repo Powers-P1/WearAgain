@@ -1,0 +1,38 @@
+{
+  "pagesDeployment": "728f5a25-1ac7-48c8-a667-7785d98449aa",
+  "deploymentUrl": "https://728f5a25.wearagain.pages.dev",
+  "workerVersion": "968cb720-c11a-4df0-81fc-731f73403dde",
+  "checkedAt": "2026-10-23T00:31:10.928957+00:00",
+  "production": "https://wearagain.pages.dev",
+  "frontendSource": "8764bf6",
+  "mergedMain": "0ce278f",
+  "apiVersion": "0.4.3-review",
+  "preview": "https://c99f8543.wearagain.pages.dev",
+  "rollbackBeforeNight": {
+    "pages": "3ed2e330-2eea-41b5-ae96-541c5c89a5c2",
+    "workerVersion": "69a3d986-989b-4825-913e-898484110ab4"
+  },
+  "tests": {
+    "unit": 334,
+    "existingWorkflows": 10,
+    "responsiveStates": 198,
+    "ownDataAndFinalReviewWidths": [
+      390,
+      1280
+    ],
+    "pwaOfflineAndUpdate": true,
+    "windowsLinuxChromiumCI": "passed"
+  },
+  "paidYouCamVerification": {
+    "authorizedTasks": 1,
+    "chargedCredits": 2,
+    "receipt": "production-live-2026-10-22.json",
+    "additionalTestRenders": 0
+  },
+  "manualNotClaimed": [
+    "Physical Android/iOS installation",
+    "Consumer garment fitting trial",
+    "YouTube/Vimeo publication and final Devpost submission"
+  ],
+  "deploymentPolicy": "Same account, Worker addresses/routes and secrets. No existing legacy UNKNOWN holds released. Preview checked before production."
+}
