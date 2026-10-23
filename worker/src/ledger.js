@@ -1,8 +1,8 @@
 /**
  * The SQLite authority for the single provider key. Every mutation is synchronous
  * in one Durable Object transaction; no provider I/O belongs inside this class.
- * A reservation is never an expiring lease: an ambiguous outcome stays charged
- * against the budget until there is positive evidence of success or a free error.
+ * An ambiguous submission is never an expiring lease. Only a new reservation
+ * with positive pre-submission evidence can expire; legacy/unknown holds remain.
  */
 export const UNITS_PER_RENDER = 2;
 const DAY_MS = 86_400_000;

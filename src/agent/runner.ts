@@ -70,11 +70,17 @@ export async function runStylist(options:AgentRuntime):Promise<AgentResult>{
    usage.modelCalls++;
    const response=await client.message({system:SYSTEM,messages,tools:STYLIST_TOOLS,maxTokens:Math.min(4000,AGENT_CAPS.outputTokens-usage.outputTokens),signal:deadline});
    usage.inputTokens+=response.usage.inputTokens;usage.outputTokens+=response.usage.outputTokens;
+   // Each photo is delivered once. Keep its tool text/provenance, but retire
+   // already-inspected bytes before the next turn to bound context and cost.
+   for(let i=0;i<messages.length;i++){
+    const message=messages[i]!;if(typeof message.content==='string')continue;
+    messages[i]={...message,content:message.content.map(block=>block.type==='tool_result'&&Array.isArray(block.content)?{...block,content:block.content.map(part=>record(part)&&part.type==='image'?{type:'text',text:'Previously supplied clothing image omitted after inspection. Use prior observations, or request reinspection if needed.'}:part)}:block)};
+   }
    messages.push({role:'assistant',content:response.content});
    if(['max_tokens','model_context_window_exceeded','refusal'].includes(response.stopReason)){warnings.push('The provider returned an incomplete response.');break;}
    const calls=response.content.filter(block=>block.type==='tool_use');
    if(!calls.length){messages.push({role:'user',content:'Finish by calling submit_answer using verified data. Plain text has not saved or submitted anything.'});continue;}
-   const results:JsonRecord[]=[];
+   const results:JsonRecord[]=[];let photoAdmitted=false;
    for(const call of calls){
     if(usage.toolCalls>=AGENT_CAPS.tools){warnings.push('The twelve-tool allowance was reached.');break;}usage.toolCalls++;
     let data:unknown,images:JsonRecord[]=[];let failed=false;
@@ -88,8 +94,10 @@ export async function runStylist(options:AgentRuntime):Promise<AgentResult>{
       case 'inspect_clothing_photo':{
        const itemId=identifier(input.itemId),item=snapshot.wardrobe.find(i=>i.id===itemId),product=catalogue.products.find(p=>p.id===itemId);if(!item&&!product)throw Error('Unknown garment');
        const photoId=item?.photoId??snapshot.candidatePhotos?.[itemId],photo=photoId?await options.photo?.(photoId):null;
+       if(photo&&photoAdmitted){data=unknown('One clothing image can be inspected per model turn. Request this item again next turn; it has not been inspected yet.');observe('inspect_clothing_photo','UNKNOWN',itemId,'Deferred to the next turn by the aggregate image budget.');break;}
+       if(photo&&photo.base64.length>190000){data=unknown('This clothing image exceeds the bounded inspection size. Use a smaller clothing photo.');observe('inspect_clothing_photo','UNKNOWN',itemId,'Image too large for this inspection.');break;}
        data=photo?{status:'known',itemId,source:'User supplied clothing photo; appearance evidence, not sizing'}:unknown('No clothing photo was supplied for this item in this session');observe('inspect_clothing_photo',photo?'known':'UNKNOWN',itemId,photo?'Actual uploaded clothing image supplied to the model; no size verification.':'No current-session image available.');
-       if(photo)images=[{type:'image',source:{type:'base64',media_type:photo.mediaType,data:photo.base64}}];break;
+       if(photo){photoAdmitted=true;images=[{type:'image',source:{type:'base64',media_type:photo.mediaType,data:photo.base64}}];}break;
       }
       case 'search_catalogue':data=executeAgentTool({name:'search_catalogue',input:{shopId:catalogue.shopId,...(input.query?{query:text(input.query,100)}:{})}},context);break;
       case 'lookup_city':{

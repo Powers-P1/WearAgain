@@ -40,7 +40,7 @@ function header(kind: LandingKind): string {
 }
 
 function footer(kind: LandingKind): string {
-  return `<footer class="landing-footer"><a class="landing-brand" href="/">WearAgain</a><p>${kind === "shoppers" ? "Try-on: YouCam API. Purchase logic: deterministic.<br>AI proposes (planned)." : "Retail pilot concept. Illustrative previews.<br>Retailer integration and checkout handoff are planned."}</p><nav aria-label="Footer"><a href="/">For shoppers</a><a href="/retail/">For retailers</a><a href="/judges/">For judges ${mark("arrow")}</a></nav></footer>`;
+  return `<footer class="landing-footer"><a class="landing-brand" href="/">WearAgain</a><p>${kind === "shoppers" ? "Try-on: YouCam API. Purchase logic: deterministic.<br>AI Stylist uses your wardrobe and preferences." : "Retail pilot concept. Illustrative previews.<br>Retailer integration and checkout handoff are planned."}</p><nav aria-label="Footer"><a href="/">For shoppers</a><a href="/retail/">For retailers</a><a href="/judges/">For judges ${mark("arrow")}</a></nav></footer>`;
 }
 
 function pairPreview(): string {
@@ -86,7 +86,7 @@ function shoppers(): string {
 
     <section class="landing-trust landing-section"><h2>Your taste leads. The calculation explains.</h2><div class="landing-trust-grid">${benefit("person", "You choose what you<br>would wear.")}${benefit("image", "An image error is<br>never a dislike.")}${benefit("document", "The certificate explains<br>cheaper alternatives.")}</div></section>
 
-    <section class="landing-stylist landing-section"><div><p class="landing-overline">Planned · AI Stylist</p><h2>Dress me for the moment.</h2><p>Describe the occasion. The agent proposes outfits from your wardrobe; the solver certifies the purchase.</p><p class="landing-occasion">Dinner at the Ritz, London, 19:00 <span>Planned</span></p></div><div class="landing-stylist-photo">${photograph(shoppersArt, 590, 1413, 177, 132, "Illustrative synthetic fashion model in an evening setting")}</div></section>
+    <section class="landing-stylist landing-section"><div><p class="landing-overline">Personal · AI Stylist</p><h2>Dress me for the moment.</h2><p>Describe the occasion. The stylist uses your wardrobe and preferences. For purchases, the solver checks your needs and ratings.</p><p class="landing-occasion">Dinner at the Ritz, London, 19:00 <span>Try in the app</span></p></div><div class="landing-stylist-photo">${photograph(shoppersArt, 590, 1413, 177, 132, "Illustrative synthetic fashion model in an evening setting")}</div></section>
 
     <section class="landing-retail-invitation landing-section"><div><p class="landing-overline">For retailers · Retail pilot concept</p><h2>Help customers see what belongs.</h2><p>Put your catalogue in the context of what a shopper already owns.</p><div class="landing-inline-benefits">${benefit("hanger", "Wardrobe-aware<br>discovery")}${benefit("chart", "Explainable<br>recommendations")}${benefit("bag", "One-store basket<br><small>Planned</small>")}</div><div class="landing-actions"><a class="button" href="/retail/">Explore a retail pilot ${mark("arrow")}</a><span class="landing-muted">Retailer integration planned.<br>No live checkout.</span></div></div><div class="landing-retail-photo">${photograph(retailersArt, 580, 1677, 210, 234, "Illustration of a rail of neutral coats and knits")}</div></section>
 

@@ -30,7 +30,8 @@ export function parseQueue(raw: unknown,resume=false): PreviewJob[] {
     // Only a known key bound to the exact still-valid capability can resume GET polling.
     // A lost POST response never starts a replacement submission.
     const interrupted = row.status === 'submitting' || row.status === 'processing'&&(!resume||!row.renderKey);
-    return [{ itemId: row.itemId, status: interrupted ? 'unknown' : row.status as JobStatus,
+    const recoverable = resume && !!row.renderKey && row.status === 'unknown' && row.error !== 'session_ended';
+    return [{ itemId: row.itemId, status: interrupted ? 'unknown' : recoverable ? 'processing' : row.status as JobStatus,
       renderKey: row.renderKey as string | null, photoId: row.photoId as string | null,
       error: interrupted ? 'session_ended' : row.error as string | null }];
   });
@@ -82,6 +83,20 @@ export class PreviewQueue {
     this.#sessionToken=token;this.#enabled=true;this.#persist();this.#pump();
   }
   pause(): void { this.#enabled=false; this.#changed(); }
+  canCheckExisting(itemId:string):boolean {
+    const job=this.#jobs.find(row=>row.itemId===itemId),credential=storedCredential(this.#store);
+    return !!job?.renderKey && ['unknown','processing'].includes(job.status) && !this.#active.has(itemId) && job.error!=='session_ended' && !!credential && credential.sessionToken===this.#sessionToken;
+  }
+  checkExisting(itemId:string):void {
+    if(!this.canCheckExisting(itemId)||this.#active.has(itemId)||this.#disposed)return;
+    this.#active.add(itemId);this.#update(itemId,{status:'processing',error:null});
+    void (async()=>{
+      this.#client??=(await import('../../web/src/live.js')).createLiveClient(API_ORIGIN,sessionTransport(this.#store));
+      await this.#client.startSession();
+      if(storedCredential(this.#store)?.sessionToken!==this.#sessionToken){this.#update(itemId,{status:'unknown',error:'session_ended'});return;}
+      const job=this.#jobs.find(row=>row.itemId===itemId);if(job&&!this.#disposed)await this.#run(job);
+    })().catch(()=>this.#update(itemId,{status:'unknown',error:'connection_error'})).finally(()=>{this.#active.delete(itemId);this.#changed();this.#pump();});
+  }
   enqueue(itemId: string): void {
     if (!/^[a-zA-Z0-9_-]{1,56}$/.test(itemId) || this.#jobs.some(job=>job.itemId===itemId) || this.#jobs.length>=120) return;
     this.#jobs.push({itemId,status:'queued',renderKey:null,photoId:null,error:null}); this.#persist(); this.#pump();
@@ -107,7 +122,7 @@ export class PreviewQueue {
       if (this.#active.size>=2) break;
       if (!['queued','processing'].includes(job.status)||this.#active.has(job.itemId)) continue;
       this.#active.add(job.itemId);
-      void this.#run(job).finally(()=>{this.#active.delete(job.itemId);this.#pump();});
+      void this.#run(job).finally(()=>{this.#active.delete(job.itemId);this.#changed();this.#pump();});
     }
   }
   async #run(job:PreviewJob):Promise<void> {
@@ -116,7 +131,7 @@ export class PreviewQueue {
       // Mark as submitting before the request. No automatic new attempt on an
       // uncertain outcome, and no rating is ever inferred from an API error.
       let record:LiveRenderResponse;
-      if(job.status==='processing'&&job.renderKey){record=await this.#client!.poll(job.renderKey);submitted=true;}
+      if(job.status==='processing'&&job.renderKey){submitted=true;record=await this.#client!.poll(job.renderKey);}
       else{
       this.#update(job.itemId,{status:'submitting',error:null});
       const garment=await this.#photos.input(job.itemId);

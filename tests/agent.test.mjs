@@ -89,6 +89,16 @@ test('a follow-up keeps verified photo-inspection provenance without resending a
  assert.ok(next.requests[0].messages[0].content.includes('Actual uploaded clothing image supplied'));assert.equal(JSON.stringify(next.requests).includes('PRIVATE_IMAGE'),false);
 });
 
+test('three accepted large photos are inspected across bounded turns without accumulating base64 or paid retries',async()=>{
+ const state=snapshot();for(const item of state.wardrobe.filter(i=>['topA','topB','bottomA'].includes(i.id)))item.photoId=item.id;
+ const inspect=id=>call('inspect_clothing_photo',{itemId:id},'photo_'+id);
+ const s=scripted([[call('get_profile'),call('get_wardrobe'),inspect('topA'),inspect('topB'),inspect('bottomA')],[inspect('topB')],[inspect('bottomA')],[call('submit_answer',answer)]]);
+ const result=await runStylist({snapshot:state,message:'Inspect my clothing photos',procedure:'occasion',apiKey:'key',now:()=>now,fetch:s.fetch,photo:async()=>({base64:Buffer.alloc(140000,65).toString('base64'),mediaType:'image/jpeg'})});
+ assert.equal(result.status,'completed');assert.equal(s.requests.length,4);
+ for(const request of s.requests){assert.ok(Buffer.byteLength(JSON.stringify(request))<524288);assert.ok((JSON.stringify(request).match(/"type":"image"/g)??[]).length<=1);}
+ assert.deepEqual(result.evidence.filter(e=>e.status==='known').map(e=>e.subject),['topA','topB','bottomA']);assert.equal(JSON.stringify(result).includes('QUFBQUFBQUFB'),false);
+});
+
 test('weather tools use actual dated responses and retain a sanitized external-failure reason',async()=>{
  for(const failed of [false,true]){
  const model=scripted([[call('get_profile'),call('get_wardrobe'),call('lookup_city',{query:'Warsaw'})],[call('get_weather',{cityId:'756135',date:'2026-10-23'})],[call('submit_answer',answer)]]),endpoints=[];

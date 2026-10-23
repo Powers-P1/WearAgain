@@ -120,7 +120,7 @@ function camera():string{
       '<div><strong>'+esc(item.title)+'</strong><p>'+esc(location(item))+'</p>'+
       '<small class="mall-status-'+esc(queueStatus(item)??'photo')+'">'+esc(statusLabel(item))+'</small></div>'+
       (item.source!=='recorded'?'<button type="button" class="mall-remove" data-mall-remove="'+esc(item.id)+
-        '" aria-label="'+esc(t('mallRemovePhoto'))+'">×</button>':'')+
+        '" aria-label="'+esc(t('mallRemovePhoto'))+'">Remove</button>':'')+
       '</article>').join('')+'</div>'+
     '<button class="button button-primary full-width" type="button" data-mall-view="coffee">'+esc(t('mallReviewNow'))+'</button></section>'+
     '<details class="mall-link-panel"><summary>'+esc(t('mallPasteLink'))+'</summary><form id="mall-link-form" class="mall-link-form">'+
@@ -179,6 +179,7 @@ function coffee():string{
     '<p class="mall-location">'+esc(location(selected))+'</p><h3>'+esc(selected.title)+'</h3>'+
     '<p>'+esc(t(isReady(selected)?'mallPreviewReadyNote':'mallPhotoOnlyDecision'))+'</p>'+
     (queueStatus(selected)&&queueStatus(selected)!=='ready'?'<p class="mall-job-state">'+esc(statusLabel(selected))+'</p>':'')+
+    (renderQueue?.canCheckExisting(selected.id)?'<button type="button" class="button button-outline" data-mall-check-existing="'+esc(selected.id)+'">Check existing preview</button><p class="mall-small">Checks the same task. No new render or unit reservation.</p>':'')+
     (selected.source==='photo'&&!queueStatus(selected)?'<button class="text-link" type="button" data-mall-generate="'+esc(selected.id)+'">'+esc(t('mallGeneratePreview'))+'</button>':'')+
     (exampleCoffeeVerdict(selected)?'<p class="mall-example-verdict">'+esc(exampleCoffeeVerdict(selected))+'</p>':'')+
     (isReady(selected)?'<p class="mall-small">'+esc(t('styleFitDisclaimer'))+'</p>':'')+
@@ -224,6 +225,7 @@ export function handleGalleryClick(control:HTMLElement,actions:Actions):boolean{
   if(control.hasAttribute('data-mall-camera-stop'))stopCamera();
   else if(control.hasAttribute('data-mall-live-pause'))renderQueue?.pause();
   else if(d.mallGenerate){renderQueue?.enqueue(d.mallGenerate);if(!renderQueue?.enabled){current='capture';liveFormOpen=true;}}
+  else if(d.mallCheckExisting){renderQueue?.checkExisting(d.mallCheckExisting);}
   else if(d.mallOpen){selectedId=d.mallOpen;reviewing=true;current='coffee';}
   else if(control.hasAttribute('data-mall-back'))reviewing=false;
   else if(control.hasAttribute('data-mall-review-ready')){selectedId=orderedItems().find(isReady)?.id??null;reviewing=!!selectedId;showReady=true;}

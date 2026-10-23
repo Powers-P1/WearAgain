@@ -21,3 +21,16 @@ test('photo changes and shifting pair indexes never attach a prior acceptance to
  const changed={...purchase,candidates:purchase.candidates.map(c=>c.id==='coatA'?{...c,photoId:'new_photo'}:c)};assert.equal(personal.personalDecision(changed,wardrobe).result.status,'incomplete');
  const removed={...purchase,candidates:purchase.candidates.filter(c=>c.id!=='coatA')};assert.equal(personal.personalDecision(removed,wardrobe).result.status,'incomplete');assert.ok(personal.personalScenario(removed,wardrobe).ratings.every(r=>r.status==='unrated'));
 });
+
+test('a replacement name or URL invalidates only that product, while a price correction preserves its rating',()=>{
+ let {wardrobe,purchase,candidate}=fixture();purchase={...purchase,requiresOuterwear:['own_top'],candidates:[...purchase.candidates,candidate('coatB',9000)]};
+ for(const id of ['coatA','coatB'])purchase=personal.ratePersonal(purchase,wardrobe,pair(purchase,wardrobe,id),'would_wear');
+ const edit=change=>({...purchase,candidates:purchase.candidates.map(c=>c.id==='coatA'?{...c,...change}:c)});
+ for(const change of [{label:'A different rain shell'},{url:'https://shop.example/rain-shell'}]){
+  const next=edit(change),scenario=personal.personalScenario(next,wardrobe);
+  assert.equal(scenario.ratings.find(r=>r.outfitId===pair(next,wardrobe,'coatA')).status,'unrated');
+  assert.equal(scenario.ratings.find(r=>r.outfitId===pair(next,wardrobe,'coatB')).status,'would_wear');
+  assert.equal(personal.personalDecision(next,wardrobe).result.certificate.priceOptimality,'provisional');
+ }
+ const priceOnly=edit({priceMinor:3000});assert.equal(personal.personalDecision(priceOnly,wardrobe).result.basket.costMinor,3000);assert.equal(personal.personalDecision(priceOnly,wardrobe).result.certificate.priceOptimality,'proven');
+});

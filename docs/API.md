@@ -1,4 +1,9 @@
-# Render API (PR3)
+# Worker API
+
+The current v2 agent endpoints, owner isolation, private asset retention, tool
+procedures and operator release authorization are documented in
+[AGENT_RUNTIME.md](AGENT_RUNTIME.md). The render contract below remains active;
+its PR3/PR4 labels describe its original implementation, not a deployment limit.
 
 This is the server boundary used by the PR4 frontend. PR3 implements the client, Worker and ledger; [FRONTEND.md](FRONTEND.md) documents the Pages UI and recording handoff. Tests exercise the full protocol with synthetic fixture responses and deny external network access. They are not a live provider measurement.
 
@@ -17,9 +22,9 @@ This is the server boundary used by the PR4 frontend. PR3 implements the client,
 | `GET /api/renders/{renderKey}/image` | Refreshes the provider result URL and returns image bytes with `Cache-Control: no-store`. |
 | `GET /api/ledger` | Total, UTC daily and session daily spent/reserved/remaining units. |
 
-The last four routes require `Authorization: Bearer <sessionToken>`. This is a WearAgain session token, never the YouCam key. Tokens last six hours and are bound to the requesting origin. They are signed using a domain-separated HMAC with the server secret; key rotation invalidates existing tokens. Keep the token in browser memory. Image loading uses authenticated `fetch`, then a temporary blob URL; release that URL when the preview is replaced or the session ends. No token in query strings.
+The last four routes require `Authorization: Bearer <sessionToken>`. This is a WearAgain session token, never the YouCam key. Tokens last six hours and are bound to the requesting origin. They are signed using a domain-separated HMAC with the server secret; key rotation invalidates existing tokens. v2 retains this capability in the active local profile for that lifetime so known jobs can resume; transfer excludes it. Image loading uses authenticated `fetch`, then a temporary blob URL; release that URL when the preview is replaced or the session ends. No token in query strings.
 
-Sessions are anonymous. A session cap applies to a token, not a verified person; issuing another token does not bypass global daily or total limits. The PR4b agent budget needs its own policy. A forged internal session header is discarded at the public Worker. There are no public reserve, settle or refund endpoints.
+Sessions are anonymous. A session cap applies to a token, not a verified person; issuing another token does not bypass global daily or total limits. Agent limits are now enforced separately (30 UTC-day sessions, three per capability, twelve tool calls and four renders per agent session). A forged internal session header is discarded at the public Worker. Session users cannot reserve, settle or override accounting directly. Operator hold listing/release requires its separate configured secret and evidence audit.
 
 ## Render request
 

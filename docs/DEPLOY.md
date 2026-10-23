@@ -1,6 +1,6 @@
 # Deploy (Cloudflare free tier)
 
-PR3 implements the Worker, YouCam client and SQLite ledger. PR4 adds the static Pages frontend, guided tour, avatar selection and demo PWA. This document is an operator handoff; code review/tests do not establish that the new version has been deployed.
+The production frontend is v2 (`web2/dist`), backed by the existing Worker and SQLite UnitLedger. PR21–23 are merged; the latest source/release evidence is in [validation](validation/agent-v2-2026-10-23.md) and [DEPLOY_SWITCH_WEB2.md](DEPLOY_SWITCH_WEB2.md). Older PR3/PR4 references below describe the render contract history. Build/test success alone does not establish deployment.
 
 ## URLs
 
@@ -11,7 +11,7 @@ PR3 implements the Worker, YouCam client and SQLite ledger. PR4 adds the static 
 
 Use Node 24, then `npm ci --ignore-scripts` and `npm run check`. Tests use synthetic responses and block external requests; they require no secret. The local workerd emulator binds a loopback port. `npx wrangler dev --config worker/wrangler.toml` is for manual local serving, not a deployment. Keep live disabled during fixture work.
 
-`npm run build:web` writes the complete Pages site to **`web/dist`**. `npm run dev:web` serves that build at `http://localhost:4173`; it does not build or deploy automatically. `npm run check` includes the web typecheck and production build. Runtime tests use bounded cleanup retries for transient Windows file locks, and CI runs on Ubuntu and Windows.
+`npm run build:web2` writes the production Pages site to **`web2/dist`**; `npm run dev:web2` serves it with local Wrangler. `npm run build:web` retains the legacy `web/dist` build. Neither deploys. `npm run check` covers both builds and strict types. Runtime tests use bounded cleanup retries for transient Windows file locks, and CI runs on Ubuntu and Windows.
 
 ### Public Pages build settings
 
@@ -22,7 +22,7 @@ Use Node 24, then `npm ci --ignore-scripts` and `npm run check`. Tests use synth
 
 These are public build inputs, never credentials. Do not put `YOUCAM_API_KEY`, `ANTHROPIC_API_KEY`, a session token or a signed URL into the Pages environment or source. Set the pilot address before the public submission, then rebuild. The contact button only copies this text; no form sends anything.
 
-The routes are `/`, `/app/` and `/retailers/`, with redirects from the extensionless directory names. The service worker precaches canonical paths, avoiding Pages' automatic `index.html` redirects. It registers only when the demo is opened, stores an explicit public-asset list and never caches live/API/authenticated requests or uploads. Publishing new recordings requires rebuilding the bundle and precache version; see [FRONTEND.md](FRONTEND.md).
+Current routes are `/`, `/app/`, `/retail/`, `/retail/demo/`, `/judges/` and `/judges/demo/`; `/retailers/` redirects to `/retail/`. The PWA registers with `/app/` scope and precaches an explicit public-asset list. Live/API/authenticated requests and uploads are excluded. Publishing recordings requires a rebuild. The root `/sw.js` retires the old root-scope cache without caching new traffic.
 
 ## Live configuration
 
@@ -40,7 +40,7 @@ Set these variables on the Worker (or edit the committed non-secret defaults bef
 
 The team must allocate the **actual remaining budget**, allowing for probes, saved scenarios, other key use and reserve. The original 1,000 units are not an available-balance assertion. The three configured limits must each allow at least 2 units for live mode. Values are safe, nonnegative integers. Limits can be lowered without erasing existing reservations or spend. Do not reset the DO name or database to reset a budget.
 
-Session tokens last six hours and use a domain-separated server-side HMAC. They are anonymous; a new token can get a new session allowance, but cannot bypass global daily/total caps. The browser receives no YouCam credential. No additional signing secret is required for PR3; rotating the YouCam key also invalidates sessions. AI Stylist quotas are separate future PR4b configuration.
+Session tokens last six hours and use a domain-separated server-side HMAC. They are anonymous; a new token can get a new session allowance, but cannot bypass global daily/total caps. The browser receives no YouCam credential. Rotating the YouCam key invalidates sessions. Current agent quotas and private-session retention are separate and documented in [AGENT_RUNTIME.md](AGENT_RUNTIME.md).
 
 ## Deploy commands (OK Agency)
 
@@ -51,8 +51,8 @@ Export `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in the shell; never co
 curl -X POST -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" \
   -d '{"name":"wearagain","production_branch":"main"}' \
   https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects
-npm run build:web
-npx wrangler pages deploy web/dist --project-name wearagain --branch main
+ npm run build:web2
+ npx wrangler pages deploy web2/dist --project-name wearagain --branch main
 npx wrangler deploy --config worker/wrangler.toml
 ```
 
@@ -75,7 +75,7 @@ Implemented: atomically reserve **2 units per render**, claim submission once, p
 
 The shared rolling gate permits at most 250 requests/300 seconds and 5/second, including signed upload/download requests. Other use of the same key/IP is outside this ledger and can still result in a provider 429. One large upload or download is admitted at a time; `render_busy` returns 429 with `Retry-After: 2` before any reservation.
 
-Do not reconcile an unknown reservation by age or by assuming every HTTP error was free. For a known task, inspect the provider outcome through the team's trusted operator tools and preserve the evidence. For lost task IDs or unprobed charge semantics, the charge remains UNKNOWN and the hold remains. PR3 deliberately exposes no public override/refund endpoint.
+Do not reconcile an unknown reservation by age or by assuming every HTTP error was free. Legacy and ambiguous holds remain reserved. Only new holds carrying positive durable pre-submission evidence can expire after ten minutes. Operator listing/release uses a distinct existing `OPERATOR_TOKEN`, explicit no-charge confirmation and a durable reason/evidence audit. It stays disabled if that secret is absent. No release of existing unknown holds is part of this rollout.
 
 ## Recorded demo assets
 

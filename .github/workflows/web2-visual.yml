@@ -40,7 +40,7 @@ jobs:
       - name: Capture actual built screens
         shell: bash
         run: |
-          python3 -m http.server 8788 --directory web2/dist >/tmp/wearagain-web2-http.log 2>&1 &
+          node node_modules/wrangler/bin/wrangler.js pages dev web2/dist --ip 127.0.0.1 --port 8788 --log-level error >/tmp/wearagain-web2-http.log 2>&1 &
           qa_server_pid=$!
           trap 'kill "$qa_server_pid" 2>/dev/null || true' EXIT
           for attempt in $(seq 1 30); do
@@ -49,6 +49,10 @@ jobs:
           done
           npm run qa:web2
           npm run qa:web2:states
+          node tests/browser/web2-agent-flows.mjs
+          node tests/browser/web2-final-review.mjs
+          node tests/browser/web2-production-fixes.mjs
+          node tests/browser/web2-pwa.mjs
           mkdir -p screenshots
           for viewport in '390 844' '1280 800'; do
             read -r width height <<<"$viewport"
@@ -136,5 +140,7 @@ jobs:
             screenshots/
             test-results/web2/
             test-results/web2-states/
+            test-results/agent-flows/
+            test-results/final-review/
           if-no-files-found: warn
           retention-days: 14
