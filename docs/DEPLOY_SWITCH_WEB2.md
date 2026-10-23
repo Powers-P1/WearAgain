@@ -74,6 +74,6 @@ Do not attempt to 'revert the Pages build output directory': none exists. Evalua
 
 - The v2 frontend self-hosts licensed DM Sans and Cormorant Garamond WOFF2 fonts. Static CSP uses `img-src blob:` for local photo thumbnails and `microphone=(self)` for explicit browser dictation.
 - The hosted `/judges/demo/` replays six genuine immutable *single-garment* YouCam recordings. **It does not submit fresh API tasks.** The separate Worker API contract is documented in `docs/API.md`; the guided UI does not point to a hardcoded old production live-client URL.
-- Real size fitting, multi-garment layering, personal photo sync, retailer checkout and measured pilot impact remain unimplemented. A real captioned 93-second walkthrough is shipped in `/video/` and linked from the jury hero.
+- Real size fitting, multi-garment layering, personal photo sync, retailer checkout and measured pilot impact remain unimplemented. The prepared build ships the approved captioned 74.5-second v7 film in `/video/`, copied from the canonical `docs/demo/final-v7` package, with correct MP4 MIME and poster. The legacy 93-second walkthrough is excluded from build output. Production changes only after a separately reviewed release.
 - Repository links point to the **private** source repository and require reviewer access. No code is presented as publicly accessible.
 - `_headers` is enforced by Cloudflare Pages, not ordinary local file servers. Validate CSP and Permissions-Policy on HTTPS Pages preview before any authorized production switch.

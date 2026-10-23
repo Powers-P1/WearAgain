@@ -1,0 +1,329 @@
+{
+  "fps": 60,
+  "duration": 74.5,
+  "parts": [
+    {
+      "name": "01-shop",
+      "duration": 5,
+      "start": 0
+    },
+    {
+      "name": "02-wardrobe",
+      "duration": 7,
+      "start": 5
+    },
+    {
+      "name": "03-style",
+      "duration": 3,
+      "start": 12
+    },
+    {
+      "name": "04-stylist",
+      "duration": 3.75,
+      "start": 15
+    },
+    {
+      "name": "05-photo",
+      "duration": 5.5,
+      "start": 18.75
+    },
+    {
+      "name": "06-review",
+      "duration": 4.25,
+      "start": 24.25
+    },
+    {
+      "name": "07-api-input",
+      "duration": 2,
+      "start": 28.5
+    },
+    {
+      "name": "08-api-result",
+      "duration": 5,
+      "start": 30.5
+    },
+    {
+      "name": "09-back-to-example",
+      "duration": 2.5,
+      "start": 35.5
+    },
+    {
+      "name": "10-ratings",
+      "duration": 10.5,
+      "start": 38.0
+    },
+    {
+      "name": "11-decision",
+      "duration": 6.5,
+      "start": 48.5
+    },
+    {
+      "name": "12-return",
+      "duration": 6.5,
+      "start": 55.0
+    },
+    {
+      "name": "13-buy-nothing",
+      "duration": 7.5,
+      "start": 61.5
+    },
+    {
+      "name": "14-brand",
+      "duration": 5.5,
+      "start": 69.0
+    }
+  ],
+  "motion": [
+    {
+      "capture": "01-wardrobe-take2",
+      "kind": "scroll",
+      "start": 0.933,
+      "duration": 0.64,
+      "sourceFrames": [
+        0,
+        14
+      ],
+      "deltaPixels": 164,
+      "logicalScrollDelta": 164,
+      "overlapMeanAbsolutePixelError": 4.2341,
+      "seamRow": 225
+    },
+    {
+      "capture": "01-wardrobe-take2",
+      "kind": "scroll",
+      "start": 2.37,
+      "duration": 0.68,
+      "sourceFrames": [
+        14,
+        39
+      ],
+      "deltaPixels": 304,
+      "logicalScrollDelta": 304,
+      "overlapMeanAbsolutePixelError": 1.0877,
+      "seamRow": 514
+    },
+    {
+      "capture": "01-wardrobe-take2",
+      "kind": "scroll",
+      "start": 3.781,
+      "duration": 0.7,
+      "sourceFrames": [
+        39,
+        62
+      ],
+      "deltaPixels": -304,
+      "logicalScrollDelta": -304,
+      "overlapMeanAbsolutePixelError": 2.2751,
+      "seamRow": 209
+    },
+    {
+      "capture": "02-style-take3",
+      "kind": "scroll",
+      "start": 1.206,
+      "duration": 0.6,
+      "sourceFrames": [
+        3,
+        6
+      ],
+      "deltaPixels": 263,
+      "logicalScrollDelta": 333,
+      "overlapMeanAbsolutePixelError": 1.3879,
+      "seamRow": 393
+    },
+    {
+      "capture": "03-stylist",
+      "kind": "push",
+      "start": 1.52,
+      "duration": 0.34,
+      "sourceFrames": [
+        2,
+        4
+      ],
+      "roi": null
+    },
+    {
+      "capture": "04-photo",
+      "kind": "scroll",
+      "start": 0.808,
+      "duration": 0.27,
+      "sourceFrames": [
+        0,
+        1
+      ],
+      "deltaPixels": -44,
+      "logicalScrollDelta": -44,
+      "overlapMeanAbsolutePixelError": 0.5817,
+      "seamRow": 310
+    },
+    {
+      "capture": "04-photo",
+      "kind": "fade",
+      "start": 1.108,
+      "duration": 0.2,
+      "sourceFrames": [
+        2,
+        3
+      ],
+      "roi": null
+    },
+    {
+      "capture": "04-photo",
+      "kind": "scroll",
+      "start": 2.335,
+      "duration": 0.62,
+      "sourceFrames": [
+        5,
+        29
+      ],
+      "deltaPixels": 198,
+      "logicalScrollDelta": 198,
+      "overlapMeanAbsolutePixelError": 0.5949,
+      "seamRow": 448
+    },
+    {
+      "capture": "05-review",
+      "kind": "push",
+      "start": 1.909,
+      "duration": 0.34,
+      "sourceFrames": [
+        2,
+        3
+      ],
+      "roi": null
+    },
+    {
+      "capture": "10-reentry",
+      "kind": "fade",
+      "start": 0.752,
+      "duration": 0.24,
+      "sourceFrames": [
+        0,
+        2
+      ],
+      "roi": null
+    },
+    {
+      "capture": "10-reentry",
+      "kind": "scroll",
+      "start": 1.35,
+      "duration": 0.68,
+      "sourceFrames": [
+        2,
+        17
+      ],
+      "deltaPixels": 280,
+      "logicalScrollDelta": 280,
+      "overlapMeanAbsolutePixelError": 0.6146,
+      "seamRow": 390
+    },
+    {
+      "capture": "06-ratings-stable",
+      "kind": "fade",
+      "start": 1.866,
+      "duration": 0.18,
+      "sourceFrames": [
+        1,
+        2
+      ],
+      "roi": [
+        218,
+        144,
+        410,
+        403
+      ]
+    },
+    {
+      "capture": "06-ratings-stable",
+      "kind": "fade",
+      "start": 3.933,
+      "duration": 0.18,
+      "sourceFrames": [
+        3,
+        4
+      ],
+      "roi": [
+        218,
+        144,
+        410,
+        403
+      ]
+    },
+    {
+      "capture": "06-ratings-stable",
+      "kind": "scroll",
+      "start": 5.941,
+      "duration": 0.72,
+      "sourceFrames": [
+        5,
+        21
+      ],
+      "deltaPixels": 408,
+      "logicalScrollDelta": 408,
+      "overlapMeanAbsolutePixelError": 0.535,
+      "seamRow": 541
+    },
+    {
+      "capture": "07-decision-paced",
+      "kind": "fade",
+      "start": 1.64,
+      "duration": 0.19,
+      "sourceFrames": [
+        10,
+        18
+      ],
+      "roi": null
+    },
+    {
+      "capture": "08-return-clear",
+      "kind": "scroll",
+      "start": 2.711,
+      "duration": 0.5,
+      "sourceFrames": [
+        11,
+        32
+      ],
+      "deltaPixels": 150,
+      "logicalScrollDelta": 150,
+      "overlapMeanAbsolutePixelError": 1.6143,
+      "seamRow": 455
+    },
+    {
+      "capture": "08-return-clear",
+      "kind": "fade",
+      "start": 3.385,
+      "duration": 0.24,
+      "sourceFrames": [
+        32,
+        33
+      ],
+      "roi": null
+    },
+    {
+      "capture": "09-buy-nothing-confirmed",
+      "kind": "fade",
+      "start": 0.899,
+      "duration": 0.24,
+      "sourceFrames": [
+        1,
+        2
+      ],
+      "roi": null
+    },
+    {
+      "capture": "09-buy-nothing-confirmed",
+      "kind": "scroll",
+      "start": 4.48,
+      "duration": 0.42,
+      "sourceFrames": [
+        13,
+        31
+      ],
+      "deltaPixels": 80,
+      "logicalScrollDelta": 80,
+      "overlapMeanAbsolutePixelError": 1.2693,
+      "seamRow": 405
+    }
+  ],
+  "method": "Editorial60fps rigid scroll/slide/fade composition from real recorded app pixels. Overlapping scroll frames geometrically aligned and checked for pixel consistency. Real input times/targets retained. Native navigation chrome stays fixed. No optical-flow morphing, generated screens, new provider calls, code changes, or claim that these animations were deployed in the app.",
+  "audio": "AAC copied unchanged from approved v5; schedule and74.5s duration retained."
+}

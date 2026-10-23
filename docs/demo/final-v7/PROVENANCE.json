@@ -1,0 +1,287 @@
+{
+  "status": "Private motion-polished film; not published or submitted",
+  "file": "WearAgain-smooth-final-v7.mp4",
+  "sha256": "0af4fbaca6bf98cf0463f4fcc68ff861338cbf61e8b1aeb416f074ced2331fe1",
+  "durationSeconds": 74.5,
+  "userRequest": "Smooth app switching and scrolling, inspired by polished iPhone applications.",
+  "scope": "Motion editing of the film, preserving actual app screens and results. No production UI changes.",
+  "rendering": "1080x1920 H264,60fps; native app content moves with eased rigid translations. Bottom navigation remains fixed.",
+  "scrolls": [
+    {
+      "capture": "01-wardrobe-take2",
+      "kind": "scroll",
+      "start": 0.933,
+      "duration": 0.64,
+      "sourceFrames": [
+        0,
+        14
+      ],
+      "deltaPixels": 164,
+      "logicalScrollDelta": 164,
+      "overlapMeanAbsolutePixelError": 4.2341,
+      "seamRow": 225
+    },
+    {
+      "capture": "01-wardrobe-take2",
+      "kind": "scroll",
+      "start": 2.37,
+      "duration": 0.68,
+      "sourceFrames": [
+        14,
+        39
+      ],
+      "deltaPixels": 304,
+      "logicalScrollDelta": 304,
+      "overlapMeanAbsolutePixelError": 1.0877,
+      "seamRow": 514
+    },
+    {
+      "capture": "01-wardrobe-take2",
+      "kind": "scroll",
+      "start": 3.781,
+      "duration": 0.7,
+      "sourceFrames": [
+        39,
+        62
+      ],
+      "deltaPixels": -304,
+      "logicalScrollDelta": -304,
+      "overlapMeanAbsolutePixelError": 2.2751,
+      "seamRow": 209
+    },
+    {
+      "capture": "02-style-take3",
+      "kind": "scroll",
+      "start": 1.206,
+      "duration": 0.6,
+      "sourceFrames": [
+        3,
+        6
+      ],
+      "deltaPixels": 263,
+      "logicalScrollDelta": 333,
+      "overlapMeanAbsolutePixelError": 1.3879,
+      "seamRow": 393
+    },
+    {
+      "capture": "03-stylist",
+      "kind": "push",
+      "start": 1.52,
+      "duration": 0.34,
+      "sourceFrames": [
+        2,
+        4
+      ],
+      "roi": null
+    },
+    {
+      "capture": "04-photo",
+      "kind": "scroll",
+      "start": 0.808,
+      "duration": 0.27,
+      "sourceFrames": [
+        0,
+        1
+      ],
+      "deltaPixels": -44,
+      "logicalScrollDelta": -44,
+      "overlapMeanAbsolutePixelError": 0.5817,
+      "seamRow": 310
+    },
+    {
+      "capture": "04-photo",
+      "kind": "fade",
+      "start": 1.108,
+      "duration": 0.2,
+      "sourceFrames": [
+        2,
+        3
+      ],
+      "roi": null
+    },
+    {
+      "capture": "04-photo",
+      "kind": "scroll",
+      "start": 2.335,
+      "duration": 0.62,
+      "sourceFrames": [
+        5,
+        29
+      ],
+      "deltaPixels": 198,
+      "logicalScrollDelta": 198,
+      "overlapMeanAbsolutePixelError": 0.5949,
+      "seamRow": 448
+    },
+    {
+      "capture": "05-review",
+      "kind": "push",
+      "start": 1.909,
+      "duration": 0.34,
+      "sourceFrames": [
+        2,
+        3
+      ],
+      "roi": null
+    },
+    {
+      "capture": "10-reentry",
+      "kind": "fade",
+      "start": 0.752,
+      "duration": 0.24,
+      "sourceFrames": [
+        0,
+        2
+      ],
+      "roi": null
+    },
+    {
+      "capture": "10-reentry",
+      "kind": "scroll",
+      "start": 1.35,
+      "duration": 0.68,
+      "sourceFrames": [
+        2,
+        17
+      ],
+      "deltaPixels": 280,
+      "logicalScrollDelta": 280,
+      "overlapMeanAbsolutePixelError": 0.6146,
+      "seamRow": 390
+    },
+    {
+      "capture": "06-ratings-stable",
+      "kind": "fade",
+      "start": 1.866,
+      "duration": 0.18,
+      "sourceFrames": [
+        1,
+        2
+      ],
+      "roi": [
+        218,
+        144,
+        410,
+        403
+      ]
+    },
+    {
+      "capture": "06-ratings-stable",
+      "kind": "fade",
+      "start": 3.933,
+      "duration": 0.18,
+      "sourceFrames": [
+        3,
+        4
+      ],
+      "roi": [
+        218,
+        144,
+        410,
+        403
+      ]
+    },
+    {
+      "capture": "06-ratings-stable",
+      "kind": "scroll",
+      "start": 5.941,
+      "duration": 0.72,
+      "sourceFrames": [
+        5,
+        21
+      ],
+      "deltaPixels": 408,
+      "logicalScrollDelta": 408,
+      "overlapMeanAbsolutePixelError": 0.535,
+      "seamRow": 541
+    },
+    {
+      "capture": "07-decision-paced",
+      "kind": "fade",
+      "start": 1.64,
+      "duration": 0.19,
+      "sourceFrames": [
+        10,
+        18
+      ],
+      "roi": null
+    },
+    {
+      "capture": "08-return-clear",
+      "kind": "scroll",
+      "start": 2.711,
+      "duration": 0.5,
+      "sourceFrames": [
+        11,
+        32
+      ],
+      "deltaPixels": 150,
+      "logicalScrollDelta": 150,
+      "overlapMeanAbsolutePixelError": 1.6143,
+      "seamRow": 455
+    },
+    {
+      "capture": "08-return-clear",
+      "kind": "fade",
+      "start": 3.385,
+      "duration": 0.24,
+      "sourceFrames": [
+        32,
+        33
+      ],
+      "roi": null
+    },
+    {
+      "capture": "09-buy-nothing-confirmed",
+      "kind": "fade",
+      "start": 0.899,
+      "duration": 0.24,
+      "sourceFrames": [
+        1,
+        2
+      ],
+      "roi": null
+    },
+    {
+      "capture": "09-buy-nothing-confirmed",
+      "kind": "scroll",
+      "start": 4.48,
+      "duration": 0.42,
+      "sourceFrames": [
+        13,
+        31
+      ],
+      "deltaPixels": 80,
+      "logicalScrollDelta": 80,
+      "overlapMeanAbsolutePixelError": 1.2693,
+      "seamRow": 405
+    }
+  ],
+  "transitions": "300ms crossfades for main sections, short forward pushes for detail views,240ms Return list crossfade, match cuts for continuous comparison/verdict scenes.",
+  "touchCues": "Small fading circles anchored to actual input timestamps and measured real DOM target centers. Missing earlier input logs are not invented.",
+  "pixelIntegrity": "Each intermediate scroll crop comes from true overlapping capture regions; overlap error checked. No optical flow, text regeneration, generated app state or image morphing.",
+  "audio": "Original approved Jessica narration and music mix copied from v5 without re-encoding; decoded PCM SHA256 matches exactly.",
+  "approvedVisualsRetained": "Same opening and closing-card source segments, converted to60fps by frame repetition.",
+  "sourceManifests": [
+    "../film-final-v5/PROVENANCE.json",
+    "../film-final-v5/timeline.json",
+    "../film-smooth-v6/motion-ledger.json"
+  ],
+  "qa": "QA.json",
+  "costThisRevision": {
+    "newProviderJobs": 0,
+    "newYouCamCredits": 0
+  },
+  "cleanup": "All task-local rendering and verification processes exited. No browser tab or development server started.",
+  "limitations": [
+    "Motion between captured states is edited for the film; these transitions were not deployed to the real app.",
+    "Actual original app pixels were captured in responsive mobile/touch browser emulation, not an installed physical iPhone PWA.",
+    "The lifestyle opening retains its original24fps frames; the60fps export duplicates those frames, without invented video frames.",
+    "Independent visual frame review and signal checks are not full perceptual listening approval."
+  ],
+  "independentReview": {
+    "report": "motion-review.json",
+    "status": "PASS for v7; no material motion or stitching defect observed",
+    "scope": "Actual intermediate frames, scroll geometry, state readability, retained audio and final changes inspected."
+  }
+}

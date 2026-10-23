@@ -1,0 +1,64 @@
+{
+  "decision": "PASS",
+  "preferredFinalExport": "C:/Projekty/2026-10-21/t/outputs/film-smooth-final-v7/WearAgain-smooth-final-v7.mp4",
+  "preferredFinalSha256": "0af4fbaca6bf98cf0463f4fcc68ff861338cbf61e8b1aeb416f074ced2331fe1",
+  "v6Sha256": "32ef21db9ae0c8a47e4b515deef275e485e6729c68ba58f93c3bb6a759ea4e40",
+  "materialRemainingDefects": [],
+  "reviewScope": "Targeted inspection of actual intermediate encoded-video frames, source capture endpoints, motion ledgers and rendering operations. No browser or application changes, publication or provider jobs.",
+  "criticalOperations": [
+    {
+      "window": "5.93-6.57; 7.37-8.05; 8.78-9.48",
+      "operation": "Wardrobe scrolling",
+      "result": "PASS: garments, captions and dividers translate together. No visible holes, split geometry or warped letters in inspected intermediate positions. The existing More pieces state change is retained."
+    },
+    {
+      "window": "36.85-37.53",
+      "operation": "Shopping comparison re-entry",
+      "result": "PASS: images, controls and text stay registered during the vertical movement; the view settles before the rating narration and first choice."
+    },
+    {
+      "window": "43.941-44.661",
+      "operation": "Ratings to verdict scroll",
+      "result": "PASS: negative rating, verdict and price remain unchanged and coherent. Intermediate positions are clean, with fixed bottom navigation and a readable settled result."
+    },
+    {
+      "window": "57.711-58.211; 58.385-58.625",
+      "operation": "Nova return scroll and list transition",
+      "result": "PASS: no visible seam or missing content during the scroll. The short intentional crossfade preserves the Nova selection and resolves to the same Nova return-list row."
+    },
+    {
+      "window": "65.98-66.40",
+      "operation": "Keep confirmation reveal",
+      "result": "PASS: the small movement reveals the confirmation cleanly. The zero-cost result remains visible and the unrelated PLN 80 card stays out of view."
+    },
+    {
+      "window": "16.55-16.86; 18.75-19.08; 26.20-26.49; 55.0-55.31",
+      "operation": "Screen pushes and transitions",
+      "result": "PASS: inspected intermediate panes retain rigid, readable geometry and stable navigation. No material transition defect requires another edit."
+    }
+  ],
+  "v7Changes": [
+    {
+      "segment": "03-style.mp4",
+      "window": "13.206-13.806",
+      "result": "PASS: the registered 263 px visual scroll replaces v6's double-exposure dissolve. Text, model tiles and Save button remain intact throughout; the ending joins the actual saved state cleanly.",
+      "evidenceTimes": [13.2, 13.35, 13.5, 13.65, 13.8, 13.82]
+    },
+    {
+      "segment": "11-decision.mp4",
+      "window": "54.70-55.0",
+      "result": "PASS: the factual recommendation banner fades away before the next screen. The Nova result, price and saved confirmation remain readable and unchanged.",
+      "evidenceTimes": [54.3, 54.7, 54.85, 54.98]
+    }
+  ],
+  "integrityChecks": {
+    "changedSegmentsV6ToV7": ["03-style.mp4", "11-decision.mp4"],
+    "otherTwelveSegments": "Byte-identical by SHA-256 comparison.",
+    "video": "1080 x 1920, 60 fps, 4470 frames, 74.5 seconds, verified with ffprobe.",
+    "audio": "Copied AAC packet payload hash matches approved v5 exactly; narration and music timing remain unchanged.",
+    "audioPacketSha256": "5729721f6a239c959624c25769476f7479e4c5149343b95bda20bf644cfacd09"
+  },
+  "provenanceLimit": "Movement is editorial composition of actual app pixels. This review does not claim deployed native animations or installed-phone/PWA capture.",
+  "cleanup": "All reviewer inspection FFmpeg processes completed successfully. No persistent helper was started.",
+  "recommendation": "Finalize v7. No further required visual change in this targeted review."
+}

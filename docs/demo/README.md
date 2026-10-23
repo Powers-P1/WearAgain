@@ -1,6 +1,20 @@
-# Mobile demonstration — unapproved draft
+# WearAgain demonstration films
 
-User review rejected these films on 23 October. Keep them as working drafts for tomorrow; do not publish or submit them. The runtime test receipt remains valid independently of the film quality.
+## Approved final: v7
+
+Damian approved [WearAgain-smooth-final-v7.mp4](final-v7/WearAgain-smooth-final-v7.mp4) for handoff on 23 October 2026. This is the only approved final: 74.5 seconds, portrait 1080x1920, H.264/AAC, 60 fps, 16,691,255 bytes. SHA-256: `0af4fbaca6bf98cf0463f4fcc68ff861338cbf61e8b1aeb416f074ced2331fe1`.
+
+[English transcript](final-v7/transcript.en.md), [WebVTT](final-v7/captions.en.vtt), [SRT](final-v7/captions.en.srt), [poster](final-v7/poster.jpg), [manifest](final-v7/manifest.json), [QA](final-v7/QA.json), [provenance](final-v7/PROVENANCE.json) and [motion review](final-v7/motion-review.json) accompany the film.
+
+The film retains the approved Jessica narration and generated instrumental. It shows actual app states, separate labelled API/saved examples and an explicit alternative buy-nothing outcome. Motion between responsive mobile/touch captures is editorial film polish, not deployed native-device animation. The generated opening is illustrative; preview people are synthetic models. No physical size-fit or real consumer-trial claim is made.
+
+The v7 QA records a clean full decode, exact decoded-audio equality with the approved v5 mix, and independent motion-frame review. No new model/render job was started for these revisions. This is not a claim of full independent perceptual listening approval or physical-phone installation testing.
+
+**Public YouTube/Vimeo URL remains pending.** The prepared jury player now uses v7, with poster and English captions, copied at build time from this canonical package. The rejected 93-second film is excluded from build output. Production is unchanged until the separately reviewed site release; no film, site or Devpost entry was published by this preparation. See [handoff](../HACKATHON_HANDOFF.md) and [copy-ready package](../SUBMISSION_PACKAGE.md).
+
+## Historical runtime recording - not the approved final
+
+User review rejected the following 121-second film on 23 October. Keep it as historical runtime evidence; do not publish or submit it as the final. Its implementation receipt remains valid independently of film quality.
 
 - [121-second MP4](wearagain-mobile.mp4), 1920×1080 H.264/AAC, 6.8 MB.
 - [English transcript](wearagain-mobile-transcript.md), [WebVTT captions](wearagain-mobile.vtt) and [poster](wearagain-mobile-poster.png).

@@ -47,7 +47,9 @@ jobs:
             if curl --fail --silent http://127.0.0.1:8788/ >/dev/null; then break; fi
             sleep 1
           done
-          npm run qa:web2
+          # Bound the smoke process independently of the screenshot job. Its
+          # results.json checkpoints survive a stalled media/browser promise.
+          timeout --signal=TERM --kill-after=5s 120s npm run qa:web2
           npm run qa:web2:states
           node tests/browser/web2-agent-flows.mjs
           node tests/browser/web2-final-review.mjs
@@ -142,5 +144,6 @@ jobs:
             test-results/web2-states/
             test-results/agent-flows/
             test-results/final-review/
+            test-results/production-fixes/
           if-no-files-found: warn
           retention-days: 14

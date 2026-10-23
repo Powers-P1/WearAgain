@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test,{before} from 'node:test';
-import {readFile} from 'node:fs/promises';
+import {readFile,readdir} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
+import {createHash} from 'node:crypto';
 import {build} from 'esbuild';
 let model,marketing;
 const read=path=>readFile(new URL(path,import.meta.url),'utf8');
@@ -71,12 +74,35 @@ test('public routes render English links with no invented task identifiers or re
   assert.match(judges,/Try it on/);
   assert.match(judges,/in your pocket/);
   assert.match(judges,/<video controls playsinline/);
-  assert.match(judges,/src="\/video\/wearagain-demo.webm"/);
-  assert.match(judges,/kind="captions"/);
+  assert.match(judges,/preload="metadata" poster="\/video\/wearagain-final-v7-poster\.jpg"/);
+  assert.match(judges,/src="\/video\/wearagain-final-v7\.mp4" type="video\/mp4"/);
+  assert.match(judges,/kind="captions" src="\/video\/wearagain-final-v7\.en\.vtt"/);
+  assert.doesNotMatch(judges,/wearagain-demo\.webm|90-second walkthrough/);
   assert.match(judges,/reviewer access required/);
   assert.match(marketing.marketingPage('/retail'),/Pilot measurement plan only/);
   assert.match(marketing.marketingPage('/retail/demo'),/Fictional retailer/);
   assert.match(marketing.marketingPage('/judges/demo'),/No account needed/);
+});
+test('built jury media matches approved v7 and excludes the rejected walkthrough and PWA cache',async()=>{
+  const root=fileURLToPath(new URL('../',import.meta.url));
+  await promisify(execFile)(process.execPath,['scripts/build-web2.mjs'],{cwd:root});
+  const manifest=JSON.parse(await read('../docs/demo/final-v7/manifest.json'));
+  const bytes=await readFile(new URL('../web2/dist/video/wearagain-final-v7.mp4',import.meta.url));
+  assert.equal(createHash('sha256').update(bytes).digest('hex'),manifest.sha256);
+  assert.deepEqual((await readdir(new URL('../web2/dist/video/',import.meta.url))).sort(),[
+    'transcript.txt','wearagain-final-v7-poster.jpg','wearagain-final-v7.en.vtt','wearagain-final-v7.mp4',
+  ]);
+  for(const [published,canonical] of [
+    ['wearagain-final-v7.en.vtt','captions.en.vtt'],
+    ['wearagain-final-v7-poster.jpg','poster.jpg'],
+    ['transcript.txt','transcript.en.md'],
+  ]){
+    const actual=await readFile(new URL('../web2/dist/video/'+published,import.meta.url));
+    const expected=await readFile(new URL('../docs/demo/final-v7/'+canonical,import.meta.url));
+    assert.deepEqual(actual,expected,published);
+  }
+  assert.match(await read('../web2/dist/video/wearagain-final-v7.en.vtt'),/^WEBVTT/);
+  assert.doesNotMatch(await read('../web2/dist/app/sw.js'),/\/video\//);
 });
 test('web2 headers restrict external connections while allowing local fonts, blob images, microphone',async()=>{
   const headers=await read('../web2/_headers');
