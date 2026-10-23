@@ -26,7 +26,7 @@ export function createWardrobeWalkthrough(options:{facts:()=>WalkthroughFacts;na
   document.body.style.setProperty('--wear-guide-space',(card.getBoundingClientRect().height+30)+'px');
  }
  function refresh(){if(active&&!frame)frame=requestAnimationFrame(paint);}
- function enter(index:number){step=index;before=options.facts();persist();options.navigate(WALKTHROUGH_STEPS[step]!.route);refresh();}
+ function enter(index:number){step=index;before=options.facts();control('next').disabled=true;persist();options.navigate(WALKTHROUGH_STEPS[step]!.route);refresh();}
  layer.addEventListener('click',event=>{const action=(event.target as Element).closest<HTMLElement>('[data-coach]')?.dataset.coach;
   if(action==='close')close();
   if(action==='compact'){compact=!compact;card.classList.toggle('compact',compact);control('compact').textContent=compact?'+':'−';control('compact').setAttribute('aria-label',compact?'Expand walkthrough':'Minimize walkthrough');refresh();}
