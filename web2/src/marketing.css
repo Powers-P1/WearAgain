@@ -181,6 +181,7 @@
 /* Independent judges' entry and three-step evidence path. */
 .mkt-judges-band{background:var(--mkt-ink);color:var(--mkt-bg);text-align:center;padding:8px 17px;font-size:11px;letter-spacing:.08em;}
 .mkt-judges-hero h1{font-size:clamp(74px,7.2vw,118px);}
+.mkt-judges-hero .mkt-photo-img{object-fit:contain;object-position:center}
 .mkt-judges-role{font-weight:600;color:var(--mkt-ink)!important;font-size:14px!important;}
 .mkt-evidence-links{display:flex;flex-wrap:wrap;gap:16px;margin:18px 0;}
 .mkt-evidence-links a{font-size:12px;}
@@ -225,7 +226,8 @@
 .mkt-guided main{padding-bottom:60px;}
 .mkt-guide-heading{display:flex;justify-content:space-between;align-items:end;gap:30px;padding:25px clamp(20px,5vw,80px) 28px;}
 .mkt-guide-heading h1{font-size:clamp(46px,5.2vw,79px);line-height:.98;}
-.mkt-guide-heading p:last-child{font-size:13px;color:var(--muted);margin-top:13px;}
+.mkt-guide-heading h1+p,.mkt-guide-heading .mkt-selected-candidate{font-size:13px;color:var(--muted);margin-top:13px;}
+.mkt-guide-heading .mkt-selected-candidate{font-weight:500;color:var(--mkt-ink)}
 .mkt-guide-heading>a{border-bottom:1px solid var(--mkt-ink);padding-bottom:5px;font-size:12px;white-space:nowrap;}
 .mkt-judge-workflow-grid,.mkt-verdict{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(245px,.78fr);
   gap:clamp(25px,4vw,65px);padding:17px clamp(20px,5vw,80px) 0;}

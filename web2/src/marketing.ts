@@ -1,9 +1,9 @@
 import { renderLanding } from './landing-v1.js';
 import './landing-v1.css';
 import { t, type TranslationKey } from './i18n.js';
-import { coreDecision, demoEvidence, demoStep, money, retailExample, sampleWardrobe,
+import { coreDecision, demoEvidence, demoStep, money, sampleWardrobe,
   type DemoStep, type MarketingRoute } from './marketing-model.js';
-import { scenarioForDemo, type PurchaseDemo } from './purchase.js';
+import { recordingFor, scenarioForDemo, type PurchaseDemo } from './purchase.js';
 import './marketing.css';
 import {phoneHandoff} from './pwa.js';
 
@@ -128,17 +128,18 @@ function judgeDisclosures():string{
     '</div></section>';
 }
 function judgesLanding():string{
+  const evidence=demoEvidence();
   const segments=[
-    ['01','mktJudgesMoment1','mktJudgesMoment1Note','/app/#wardrobe','cashmere'],
-    ['02','mktJudgesMoment2','mktJudgesMoment2Note','/judges/demo/','coat'],
-    ['03','mktJudgesMoment3','mktJudgesMoment3Note','/judges/demo/','blazer'],
+    ['01','mktJudgesMoment1','mktJudgesMoment1Note','/judges/demo/','cashmere'],
+    ['02','mktJudgesMoment2','mktJudgesMoment2Note','/judges/demo/?step=preview','coat'],
+    ['03','mktJudgesMoment3','mktJudgesMoment3Note','/judges/demo/?step=verdict','blazer'],
   ] as const;
   return '<div class="mkt-site mkt-judges"><div class="mkt-judges-band">'+h('mktJudgesOverline')+'</div>'+
     siteHeader('judges')+'<main id="main-content" tabindex="-1">'+
     '<section class="mkt-hero mkt-judges-hero"><div class="mkt-hero-copy">'+
     '<p class="mkt-eyebrow">MOBILE FIRST · INSTALLABLE APP · NO SIGN-IN</p>'+
-    '<h1>Your wardrobe<em>in your pocket.</em></h1>'+
-    '<p>AI styling and smarter shopping on your phone. Your wardrobe dashboard on desktop.</p><p class="mkt-judges-role">'+h('mktJudgesHeroRoles')+'</p>'+
+    '<h1>'+h('mktJudgesHero1')+'<em>'+h('mktJudgesHero2')+'</em></h1>'+
+    '<p>'+h('mktJudgesHeroBody')+'</p><p class="mkt-judges-role">'+h('mktJudgesHeroRoles')+'</p>'+
     link('/judges/demo/',h('mktJudgesPrimary'),'mkt-button mkt-button-dark')+
     link('#walkthrough',h('mktJudgesWatch'),'mkt-secondary-action')+
     link('/app/?guide=start#wardrobe','Learn the app step by step','mkt-secondary-action')+
@@ -146,9 +147,8 @@ function judgesLanding():string{
     '<div class="mkt-evidence-links">'+link(CODE,h('mktJudgesCode'))+
     link(SETUP,h('mktJudgesTests'))+'</div>'+
     '<small>'+h('mktJudgesSample')+'</small></div>'+
-    '<div class="mkt-hero-art">'+artwork('/assets/editorial-judges.webp',h('mktIllustration'))+
-    '<div class="mkt-judges-mini-wardrobe">'+wardrobePhoto('coat','Camel coat')+wardrobePhoto('cashmere','Cashmere sweater')+
-    wardrobePhoto('trousers','Wool trousers')+wardrobePhoto('loafers','Leather loafers')+'</div></div></section>'+
+    '<div class="mkt-hero-art"><figure class="mkt-photo">'+modelImage(evidence.product.imagePath,evidence.product.label,'mkt-photo-img')+
+    '<figcaption>'+escapeHtml(evidence.product.label)+' · '+h('purchaseSingleModel')+' · '+h('styleFitDisclaimer')+'</figcaption></figure></div></section>'+
     '<section class="mkt-moments"><h2>'+h('mktJudgesMoments')+'</h2><div>'+segments.map(([n,title,desc,url,img])=>
       '<a href="'+url+'" class="mkt-moment"><span>'+n+' / '+h(title)+'</span>'+
       wardrobePhoto(img,h(title))+'<p>'+h(desc)+'</p><b aria-hidden="true">↗</b></a>').join('')+'</div></section>'+
@@ -181,19 +181,21 @@ function stepper():string{
         '<span>'+String(i+1).padStart(2,'0')+'</span>'+h(label)+'</button>').join('')+'</nav>';
 }
 function wardrobeStep():string{
-  const sample=sampleWardrobe();
+  const scenario=scenarioForDemo(mode);
   return '<div class="mkt-judge-workflow-grid"><section class="mkt-judge-showcase">'+
     '<h2>'+h('mktJudgeStep1Heading')+'</h2><p>'+h('mktJudgeStep1Body')+'</p>'+
-    '<div class="mkt-demo-items">'+sample.map(item=>'<figure>'+
-      modelImage(item.photo?'/assets/items/'+item.photo+'.webp':
-        item.id==='recorded-work'?'/demo/renders/top-work-woman-neutral-01.jpg':'/assets/demo-portrait.webp',item.name)+
-      '<figcaption>'+escapeHtml(item.name)+'</figcaption></figure>').join('')+'</div>'+
+    (mode==='zero'?'<p>'+h('purchaseZeroPreviewNote')+'</p><ul>'+[...scenario.tops,...scenario.outerwear.filter(item=>item.kind==='owned')].map(item=>'<li>'+escapeHtml(item.label)+'</li>').join('')+'</ul>':
+      '<div class="mkt-demo-items">'+scenario.tops.map(item=>{
+        const record=recordingFor('top',item.id);
+        return '<figure>'+(record?modelImage(record.imagePath,item.label):'')+'<figcaption>'+escapeHtml(item.label)+'</figcaption></figure>';
+      }).join('')+'</div><p class="mkt-small-muted">'+h('purchaseSingleModel')+' · '+h('styleFitDisclaimer')+'</p>')+
     '</section><aside class="mkt-judge-context"><h3>'+h('mktJudgeEvidenceTitle')+'</h3>'+
-    '<p>'+h('mktJudgesMoment1Note')+'</p><p>'+h('overviewNoHistory')+'</p>'+
+    '<p>'+h('mktJudgesMoment1Note')+'</p><p>'+h('mktJudgePresetRatings')+'</p>'+
     '<p class="mkt-small-muted">'+h('mktJudgesNotComposited')+'</p></aside></div>';
 }
 function previewStep():string{
-  const evidence=demoEvidence(),product=retailExample();
+  if(mode==='zero')return wardrobeStep();
+  const evidence=demoEvidence(),product=evidence.product;
   return '<div class="mkt-judge-workflow-grid"><section class="mkt-judge-preview-grid">'+
     '<figure><span class="mkt-eyebrow">'+h('mktRecordedShopPiece')+'</span>'+
     modelImage(product.imagePath,product.label)+
@@ -201,7 +203,9 @@ function previewStep():string{
     '<figure><span class="mkt-eyebrow">'+h('mktRecordedOwnedPiece')+'</span>'+
     modelImage(evidence.top.imagePath,h('mktJudgeSavedBody'))+
     '<figcaption>'+h('mktJudgeOwnLabel')+' · '+h('purchaseWorkTop')+'</figcaption></figure>'+
-    '</section><aside class="mkt-judge-context"><h3>'+h('mktGuideSimpleTitle')+'</h3><p>'+h('mktGuideSimpleBody')+'</p><details class="mkt-api-evidence"><summary>'+h('mktEvidenceDetails')+'</summary>'+
+    '</section><aside class="mkt-judge-context"><h3>'+h('mktGuideSimpleTitle')+'</h3><p>'+h('mktGuideSimpleBody')+'</p>'+
+    '<p>'+h('purchaseSingleModel')+' · '+h('styleFitDisclaimer')+'</p><p>'+h('mktJudgePresetRatings')+'</p>'+
+    link('/app/?scenario=minimum#check',h('mktJudgeGiveRating'))+'<details class="mkt-api-evidence"><summary>'+h('mktEvidenceDetails')+'</summary>'+
     '<dl><div><dt>'+h('mktJudgeInputReference')+'</dt><dd>'+
     escapeHtml(evidence.candidateElement.kind+':'+evidence.candidateElement.id)+'</dd></div>'+
     '<div><dt>'+h('mktJudgeAvatarReference')+'</dt><dd>'+
@@ -220,13 +224,13 @@ function verdictStep():string{
   return '<div class="mkt-verdict"><div class="mkt-verdict-main"><div class="mkt-verdict-tabs" role="group">'+
     (['minimum','zero'] as const).map(key=>'<button type="button" data-judge-mode="'+key+
       '" aria-pressed="'+(mode===key)+'">'+h(key==='minimum'?'mktJudgeDemoMinimum':'mktJudgeDemoZero')+'</button>').join('')+'</div>'+
-    '<h2>'+h('mktJudgeStep3Heading')+'</h2><p>'+h('mktJudgeStep3Body')+'</p>'+
+    '<h2>'+h('mktJudgeStep3Heading')+'</h2><p>'+h('mktJudgeStep3Body')+'</p><p>'+h('mktJudgePresetRatings')+'</p>'+
     '<div class="mkt-verdict-amount">'+(result.status==='solved'?
       '<strong>'+escapeHtml(basket.length?basket.join(' + '):t('purchaseBuyNothing'))+'</strong>'+
       '<span>'+escapeHtml(money(result.basket.costMinor,result.basket.currency))+'</span>':
       '<strong>'+h(result.status==='incomplete'?'mktJudgeVerdictIncomplete':'mktJudgeVerdictInfeasible')+'</strong>')+'</div>'+
     (result.status==='solved'&&basket.length===0?'<p>'+h('mktJudgeVerdictZero')+'</p>':'')+
-    '<p class="mkt-small-muted">'+h('mktJudgeCurrencyNote')+' '+h('mktJudgeVerdictNotDuplicate')+'</p></div>'+
+    '<p class="mkt-small-muted">'+h('purchaseDecisionScope')+'</p><p class="mkt-small-muted">'+h('mktJudgeCurrencyNote')+' '+h('mktJudgeVerdictNotDuplicate')+'</p></div>'+
     '<aside class="mkt-judge-context"><h3>'+h('mktJudgeVerdictWhy')+'</h3>'+
     '<p>'+h('mktJudgeVerdictStatus')+'</p><p>'+
     (result.status==='solved'?h(result.certificate.priceOptimality==='proven'?'mktJudgeVerdictProven':'mktJudgeVerdictProvisional'):
@@ -252,10 +256,14 @@ function guidedDemo():string{
   const pageIndex=1+(['wardrobe','preview','verdict'] as readonly DemoStep[]).indexOf(step);
   const next=pageIndex<3?(['wardrobe','preview','verdict'] as const)[pageIndex]:null;
   const prev=pageIndex>1?(['wardrobe','preview','verdict'] as const)[pageIndex-2]:null;
+  const product=mode==='minimum'?demoEvidence().product:null;
   return '<div class="mkt-site mkt-guided">'+siteHeader('judges')+
     '<main id="main-content" tabindex="-1">'+stepper()+
     '<header class="mkt-guide-heading"><div><p class="mkt-eyebrow">'+h('mktJudgeProgress',{index:pageIndex})+'</p>'+
-    '<h1>'+h('mktJudgeDemoTitle')+'</h1><p>'+h('mktJudgeDemoSubtitle')+'</p></div>'+
+    '<h1>'+h('mktJudgeDemoTitle')+'</h1><p>'+h('mktJudgeDemoSubtitle')+'</p>'+
+    (product?'<p class="mkt-selected-candidate" data-judge-candidate="'+escapeHtml(product.id)+'">'+
+      h('purchaseForItem',{item:product.label})+' · '+escapeHtml(money(product.priceMinor,product.currency))+'</p>':
+      '<p class="mkt-selected-candidate">'+h('mktJudgeSeparateZero')+'</p>')+'</div>'+
     link('/judges/',h('mktJudgesNav'))+'</header>'+
     (step==='wardrobe'?wardrobeStep():step==='preview'?previewStep():verdictStep())+
     '<div class="mkt-guide-actions">'+(prev?'<button type="button" data-guide-step="'+prev+

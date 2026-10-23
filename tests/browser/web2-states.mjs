@@ -93,6 +93,8 @@ try{
   await click('[data-mall-decision=return]');await click('[data-mall-view=returns]');await capture('gallery-returns','[data-mall-open]');
   await click('[data-mall-open]');await capture('gallery-return-photo');
   await go('check');await capture('purchase-minimum','[data-purchase-rating=would_wear]',true);
+  assert.equal(await page.locator('[data-purchase-candidate=all-round]').getAttribute('aria-pressed'),'true');
+  await click('[data-purchase-candidate=cheap-a]');await capture('purchase-other-candidate');
   await click('.purchase-actions [data-purchase-candidate=all-round]');await capture('purchase-recommendation');
   await click('.purchase-compare summary');await capture('purchase-compare-own');await click('[data-purchase-equivalent]');await capture('purchase-own-equivalent');
   await click('.purchase-demo-settings summary');await click('[data-purchase-clear]');await capture('purchase-incomplete');

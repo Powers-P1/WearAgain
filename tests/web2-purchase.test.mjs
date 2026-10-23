@@ -50,8 +50,9 @@ test('core solver returns the tested minimum-basket result with a complete certi
   assert.equal(answer.certificate.selectionStability,'stable');
   assert.equal(answer.certificate.cheaperBaskets.length,3);
   assert.equal(answer.evaluatedBasketCount,8);
-  assert.equal(purchase.candidatePosition(session),'not_required');
-  assert.equal(purchase.candidatePosition(purchase.selectCandidate(session,'all-round')),'recommended');
+  assert.equal(session.candidateId,'all-round');
+  assert.equal(purchase.candidatePosition(session),'recommended');
+  assert.equal(purchase.candidatePosition(purchase.selectCandidate(session,'cheap-a')),'not_required');
 });
 
 test('switching to a recorded candidate and owned top selects the exact core pair', () => {
@@ -121,11 +122,59 @@ test('recording a skip or later decision never adds candidates to the owned ward
 });
 
 test('purchase checker does not treat a nonchosen candidate as a proven duplicate of an owned piece', () => {
-  const first=purchase.initialPurchase();
+  const first=purchase.selectCandidate(purchase.initialPurchase(),'cheap-a');
   assert.equal(purchase.candidatePosition(first),'not_required');
   assert.equal(first.scenario.outerwear.some(item=>item.kind==='owned'),false);
   // All required ratings and prices come from the existing synthetic fixture.
   assert.equal(first.scenario.ratings.filter(r=>r.status==='would_wear').length,6);
+});
+
+test('rejecting Nova for evenings changes the actual basket from 90 to 100 PLN while keeping Nova selected',()=>{
+  const before=purchase.selectTop(purchase.initialPurchase(),'evening');
+  const after=purchase.rateSelected(before,'would_not_wear');
+  assert.equal(before.candidateId,'all-round');
+  assert.equal(after.candidateId,before.candidateId);
+  assert.equal(after.topId,'evening');
+  assert.deepEqual(after.editedOutfitIds,['evening-all-round']);
+  assert.deepEqual(purchase.computeDecision(before).basket.candidateIds,['all-round']);
+  assert.equal(purchase.computeDecision(before).basket.costMinor,9000);
+  const result=purchase.computeDecision(after);
+  assert.equal(result.status,'solved');
+  assert.deepEqual(result.basket.candidateIds,['cheap-a','cheap-b']);
+  assert.equal(result.basket.costMinor,10000);
+  assert.equal(result.certificate.priceOptimality,'proven');
+  assert.equal(purchase.candidatePosition(after),'not_required');
+  assert.equal(after.lastRatingChange.outfitId,'evening-all-round');
+  assert.deepEqual(after.lastRatingChange.before,purchase.computeDecision(before));
+  assert.deepEqual(after.scenario.ratings.filter(r=>r.outfitId!=='evening-all-round'),before.scenario.ratings.filter(r=>r.outfitId!=='evening-all-round'));
+  const restored=purchase.rateSelected(after,'would_wear');
+  assert.equal(restored.candidateId,'all-round');
+  assert.equal(purchase.computeDecision(restored).basket.costMinor,9000);
+});
+
+test('browsing a nonrecommended candidate survives a rating that leaves the basket unchanged',()=>{
+  const before=purchase.selectCandidate(purchase.initialPurchase(),'cheap-b');
+  const after=purchase.rateSelected(before,'would_wear');
+  assert.equal(after.candidateId,'cheap-b');
+  assert.equal(after.topId,'work');
+  assert.deepEqual(purchase.computeDecision(after).basket.candidateIds,['all-round']);
+  assert.equal(purchase.computeDecision(after).basket.costMinor,9000);
+  assert.deepEqual(after.editedOutfitIds,['work-cheap-b']);
+});
+
+test('an unsure or errored Nova pairing keeps its identity and a provisional alternative, never a rejection',()=>{
+  for(const status of ['unrated','render_error']){
+    const before=purchase.selectTop(purchase.initialPurchase(),'evening');
+    const after=purchase.rateSelected(before,status);
+    assert.equal(after.candidateId,'all-round');
+    assert.equal(purchase.selectedRating(after).status,status);
+    const result=purchase.computeDecision(after);
+    assert.equal(result.status,'solved');
+    assert.equal(result.basket.costMinor,10000);
+    assert.equal(result.certificate.priceOptimality,'provisional');
+    assert.equal(purchase.candidatePosition(after),'unresolved');
+    assert.ok(result.certificate.cheaperBaskets.some(b=>b.basket.candidateIds.includes('all-round')&&b.couldBecomeFeasible));
+  }
 });
 
 

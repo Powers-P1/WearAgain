@@ -27,6 +27,8 @@ try{
  await progress('Pair rating / recommendation / incomplete result');
  await go('check');
  const ratings=await page.locator('.purchase-rating-buttons').boundingBox();assert.ok(ratings.y+ratings.height<775);
+ assert.equal(await page.locator('[data-purchase-candidate="all-round"]').getAttribute('aria-pressed'),'true');
+ await click('[data-purchase-candidate="cheap-a"]');
  await click('.purchase-actions [data-purchase-candidate="all-round"]');assert.match(await page.locator('.purchase-verdict').innerText(),/worth|Worth/i);
  await click('.purchase-demo-settings summary');await click('[data-purchase-clear]');assert.equal(await page.locator('[data-purchase-review]').count(),1);
  await click('[data-purchase-replay]');await passed('Pair rating / recommendation / incomplete result');

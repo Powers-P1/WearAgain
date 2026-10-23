@@ -47,6 +47,7 @@ test('all visible saved previews retain their exact manifest garment identity',(
 
 test('a nonchosen candidate offers Skip and the actual recommendation, never Keep my own',()=>{
  click({purchaseDemo:'minimum'});
+ click({purchaseCandidate:'cheap-a'});
  let html=ui.purchasePage();
  assert.match(html,/>Skip this piece<\/button>/);
  assert.match(html,/data-purchase-candidate="all-round">See the recommended piece/);
@@ -55,6 +56,64 @@ test('a nonchosen candidate offers Skip and the actual recommendation, never Kee
  html=ui.purchasePage();
  assert.match(html,/data-purchase-choice="save"/);
  assert.doesNotMatch(html,/>Skip this piece<\/button>/);
+ click({purchaseDemo:'minimum'});
+});
+
+test('the initial purchase preview, rating and verdict refer to Nova and disclose their actual scope',()=>{
+ click({purchaseDemo:'minimum'});
+ const html=ui.purchasePage();
+ assert.match(html,/data-purchase-selected="all-round">Selected candidate: Nova jacket/);
+ assert.match(html,/For the selected clothes, needs and your ratings/);
+ assert.match(html,/Demo model · one garment at a time/);
+ assert.match(html,/Style preview, not size fit/);
+ assert.match(html,/Preset example rating for this pair/);
+ assert.match(html,/data-purchase-candidate="all-round" aria-pressed="true"/);
+ const pair=html.slice(html.indexOf('purchase-preview-pair'),html.indexOf('purchase-rating"'));
+ assert.match(pair,/data-recorded-garment="outerwear:all-round"/);
+ assert.match(pair,/Nova jacket/);
+ assert.equal(ui.purchaseWalkthroughFacts().humanRating,false);
+});
+
+test('a human evening rating explains the 90 to 100 basket change without replacing the selected candidate',()=>{
+ click({purchaseDemo:'minimum'});
+ click({purchaseTop:'evening'});
+ click({purchaseRating:'would_wear'});
+ let html=ui.purchasePage();
+ assert.match(html,/Basket unchanged: Nova jacket · PLN\s*90\.00/);
+ assert.equal(ui.purchaseWalkthroughFacts().humanRating,true);
+ click({purchaseRating:'would_not_wear'});
+ html=ui.purchasePage();
+ assert.match(html,/Before: Nova jacket · PLN\s*90\.00\. Now: Aster trench \+ Mila coat · PLN\s*100\.00/);
+ assert.match(html,/This pair does not count toward For evenings/);
+ assert.match(html,/data-purchase-selected="all-round">Selected candidate: Nova jacket/);
+ assert.match(html,/data-purchase-candidate="all-round" aria-pressed="true"/);
+ assert.match(html,/data-purchase-top="evening" aria-pressed="true"/);
+ assert.match(html,/Your rating for this pair/);
+ click({purchaseTop:'work'});
+ html=ui.purchasePage();
+ assert.match(html,/Preset example rating for this pair/);
+ assert.doesNotMatch(html,/Recalculated from your rating/,'do not attach a prior pairing explanation to a different pair');
+ click({purchaseDemo:'minimum'});
+});
+
+test('unsure, error and cleared ratings stay unresolved without borrowing preset ratings as human actions',()=>{
+ for(const status of ['unrated','render_error']){
+  click({purchaseDemo:'minimum'});
+  click({purchaseTop:'evening'});
+  click({purchaseRating:status});
+  let html=ui.purchasePage();
+  assert.match(html,/Best confirmed basket so far: PLN\s*100\.00/);
+  assert.match(html,/90\.00 may still be possible/);
+  assert.match(html,/This pair is unresolved, not rejected/);
+  assert.doesNotMatch(html,/This pair does not count toward/);
+  assert.match(html,/data-purchase-selected="all-round"/);
+  assert.equal(ui.purchaseWalkthroughFacts().humanRating,false);
+  click({},'data-purchase-clear');
+  html=ui.purchasePage();
+  assert.match(html,/No rating for this pair yet/);
+  assert.doesNotMatch(html,/Recalculated from your rating/);
+  assert.equal(ui.purchaseWalkthroughFacts().humanRating,false);
+ }
  click({purchaseDemo:'minimum'});
 });
 
