@@ -13,7 +13,7 @@ The rules require a publicly visible 1–3 minute YouTube or Vimeo demonstration
 
 The app pixels are actual responsive mobile/touch browser captures. Eased scrolling and transitions were edited for the film; these animations were not deployed to the app. The film is not an installed physical iPhone PWA recording. The separate brown-coat API test, saved examples and illustrative generated lifestyle opening remain identified.
 
-The prepared jury player uses approved v7 with MP4 MIME, poster and English VTT captions. The build copies the canonical files above into ignored `web2/dist/video`; it excludes the rejected legacy walkthrough. Production may still show the older player until the separately reviewed preview/production release. No deployment is performed by this preparation. See [copy-ready submission package](SUBMISSION_PACKAGE.md).
+The jury player uses approved v7 with MP4 MIME, poster and default English VTT captions. The build copies the canonical files above into ignored `web2/dist/video`; it excludes the rejected legacy walkthrough. The film is a capture of the earlier working UI; the final focused replay now starts with Nova consistently, without claiming that the film was recaptured. See [copy-ready submission package](SUBMISSION_PACKAGE.md) and the final release report for deployment status.
 
 ## Links and short judge journey
 
@@ -23,7 +23,7 @@ The prepared jury player uses approved v7 with MP4 MIME, poster and English VTT 
 - Kept-wardrobe example: https://wearagain.pages.dev/app/?scenario=zero#check
 - Repository: https://github.com/Powers-P1/WearAgain
 
-The jury page leads into a small saved example without a paid call. The app also starts an empty local profile, accepts garment photos and availability, keeps editable preferences, and offers real AI styling with explicit optional photo/render consent. Use a built-in model for live YouCam previews. Photos with people are not accepted as garment inputs.
+The jury page leads with one considered purchase. Its replay keeps the same Nova jacket through the genuine recorded single-garment preview and scoped verdict. In the app, rejecting Nova/evening changes the preset basket from Nova at PLN 90 to Aster + Mila at PLN 100; the inspected Nova stays selected. That change comes from the user's rating, not an inferred image preference. The separate buy-nothing example starts no paid call. The app also starts an empty local profile, accepts garment photos and availability, keeps editable preferences, and offers real AI styling with explicit optional photo/render consent. Use a built-in model for live YouCam previews. Photos with people are not accepted as garment inputs.
 
 ## Submission description draft
 
@@ -37,11 +37,11 @@ YouCam renders individual garments on built-in models through the existing Worke
 
 The single authorized production YouCam task completed through the actual frontend and Worker and charged two credits. Its [receipt](validation/production-live-2026-10-22.json) includes read-only recovery of that same result. No second test render was started. Separate [live Sonnet](validation/live-agent-2026-10-23.json) and [dated weather](validation/live-weather-2026-10-23.json) receipts establish actual tool use, reload, feedback, preference and outfit save. The [historical 121-second recording](demo/README.md#historical-runtime-recording---not-the-approved-final) adds one real final-production Sonnet session and no new YouCam task. Its runtime evidence remains valid independently of the superseded film. These are demonstration checks, not measured consumer outcomes.
 
-334 tests, strict types, both builds, Worker dry-run and Windows/Linux/Chromium CI passed. Browser checks include ten complete existing flows, 198 states, own-data flows at 390/1280, profile/photo transfer, PWA/offline/update, substitution versus price edits, current AI plan/list saves and known-preview GET recovery. See [verification](validation/agent-v2-2026-10-23.md) and [review closure](validation/final-review-2026-10-23.md).
+The final release report records the exact revision, test count, builds, CI and final jury decisions. Earlier browser evidence includes ten complete flows, 198 states, own-data flows at 390/1280, profile/photo transfer, PWA/offline/update, substitution versus price edits, current AI plan/list saves and known-preview GET recovery. See [verification](validation/agent-v2-2026-10-23.md) and [earlier review closure](validation/final-review-2026-10-23.md); historical counts in those reports belong to their stated revisions.
 
 Physical Android/iPhone installation and real garment-fitting trials remain manual; their worksheet is in verification. The demo does not claim authenticated cloud sync, personal-photo try-on, merchant checkout, recurring payments or physical size validation. The agent inspects enabled clothing input photos, not the resulting YouCam image.
 
-The offline readiness check on 23 October repeated `npm run check` at base `499f9fb`: strict types, 334/334 tests, core and both frontend builds passed. The prepared final-player revision adds an approved-asset regression and passes **335/335 tests** with both builds. Workerd tests intercept external traffic; this check opened no browser and made no provider call. It did not repeat earlier browser/physical-device testing.
+Workerd tests intercept external traffic. The final focus changes add direct regression for candidate identity, human-rating provenance and the changed basket; they require no new paid render. Automated browser results do not certify physical-device installation.
 
 ## Remaining owner actions
 
