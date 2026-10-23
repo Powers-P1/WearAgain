@@ -93,8 +93,27 @@ for (const avatar of AVATARS) {
   if(blobHash!==avatar.baseRevision)throw new Error('Approved avatar hash mismatch: '+avatar.id);
   await writeFile(join(dest,'demo/avatars',avatar.baseRevision+'-'+avatar.file),bytes);
 }
-// A real screen recording and captions, deliberately outside the PWA precache.
-await cp(join(root,'web2/public/video'),join(dest,'video'),{recursive:true});
+// One canonical approved film in docs; publish a copy only in ignored build
+// output. Do not copy the superseded web2/public/video walkthrough.
+const filmRoot = join(root, 'docs/demo/final-v7');
+const filmManifest = JSON.parse(await readFile(join(filmRoot, 'manifest.json'), 'utf8'));
+if (filmManifest.approvedRevision !== 'v7' || filmManifest.film !== 'WearAgain-smooth-final-v7.mp4') {
+  throw new Error('Approved v7 film manifest is required.');
+}
+await mkdir(join(dest, 'video'), { recursive: true });
+for (const [source, target] of [
+  ['WearAgain-smooth-final-v7.mp4', 'wearagain-final-v7.mp4'],
+  ['poster.jpg', 'wearagain-final-v7-poster.jpg'],
+  ['captions.en.vtt', 'wearagain-final-v7.en.vtt'],
+  ['transcript.en.md', 'transcript.txt'],
+]) {
+  const bytes = await readFile(join(filmRoot, source));
+  const expected = filmManifest.files.find(file => file.name === source);
+  if (!expected || expected.sha256 !== createHash('sha256').update(bytes).digest('hex')) {
+    throw new Error('Approved film asset hash mismatch: ' + source);
+  }
+  await writeFile(join(dest, 'video', target), bytes);
+}
 
 const output = await build({
   entryPoints: [join(root, 'web2/src/main.ts')],

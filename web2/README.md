@@ -43,7 +43,7 @@ CI also captures mobile and desktop views as downloadable artifacts.
 | `/app/#trip` | Occasion planning, saved outfits, deduplicated packing checklist; optional companion wardrobe on this device. |
 | `/app/#surprise` | Budget/need preferences and skip-month control. No payment or order. |
 | `/retail/`, `/retail/demo/` | Editorial retailer story, pilot plan and fictional product/wardrobe panel. |
-| `/judges/`, `/judges/demo/` | Guided evidence, certificate, private source/setup links and captioned 93-second walkthrough. |
+| `/judges/`, `/judges/demo/` | Guided evidence, certificate, private source/setup links and approved captioned 74.5-second v7 film. |
 
 `state`, `plans`, `shopping`, `daily` and `stylist` own schema-validated local
 models; feature UI/CSS files own their screens. `ui.ts` shares actual garment

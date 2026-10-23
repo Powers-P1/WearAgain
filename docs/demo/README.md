@@ -10,7 +10,7 @@ The film retains the approved Jessica narration and generated instrumental. It s
 
 The v7 QA records a clean full decode, exact decoded-audio equality with the approved v5 mix, and independent motion-frame review. No new model/render job was started for these revisions. This is not a claim of full independent perceptual listening approval or physical-phone installation testing.
 
-**Public YouTube/Vimeo URL remains pending.** The jury page's `/video/wearagain-demo.webm` still points to an older film and needs a separately reviewed release update. No film, site or Devpost entry was published by this preparation. See [handoff](../HACKATHON_HANDOFF.md) and [copy-ready package](../SUBMISSION_PACKAGE.md).
+**Public YouTube/Vimeo URL remains pending.** The prepared jury player now uses v7, with poster and English captions, copied at build time from this canonical package. The rejected 93-second film is excluded from build output. Production is unchanged until the separately reviewed site release; no film, site or Devpost entry was published by this preparation. See [handoff](../HACKATHON_HANDOFF.md) and [copy-ready package](../SUBMISSION_PACKAGE.md).
 
 ## Historical runtime recording - not the approved final
 

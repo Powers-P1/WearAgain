@@ -389,7 +389,7 @@
 }
 .mkt-walkthrough{padding-top:36px;margin-top:24px;border-top:1px solid var(--mkt-line);scroll-margin-top:30px}
 .mkt-walkthrough>p{margin:15px 0!important;max-width:70ch}
-.mkt-walkthrough video{display:block;width:100%;max-width:960px;aspect-ratio:1.6;object-fit:contain;background:#eeeae3;margin-top:22px}
+.mkt-walkthrough video{display:block;width:min(100%,430px);aspect-ratio:9/16;object-fit:contain;background:#eeeae3;margin:22px auto 0}
 @media(max-width:390px){
  .mkt-judge-link{font-size:9px;padding:7px;}
  .mkt-site h1{font-size:57px;}

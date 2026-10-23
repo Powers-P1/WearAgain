@@ -42,7 +42,7 @@ No sign-in is needed for the public demo. The private source needs the judging a
 4. In Check purchase -> Use my wardrobe, declare needs, shop candidates, prices and human ratings. Changing inputs recomputes the certificate; unresolved cheaper pairings leave it provisional.
 5. Explore Stylist, saved looks, trip packing and return lists in saved-example mode. Live AI/YouCam are separately opt-in and consume a limited team allowance; the initial safe journey does not need them.
 
-For a local check use Node 24, `npm ci --ignore-scripts`, then `npm run check`. All 334 offline tests, strict types and both frontend builds passed on 23 October at base `499f9fb`. Workerd tests intercept network traffic; no production key is required.
+For a local check use Node 24, `npm ci --ignore-scripts`, then `npm run check`. All **335 offline tests**, strict types and both frontend builds passed on 23 October for the prepared final-player revision. Workerd tests intercept network traffic; no production key is required.
 
 PWA hooks/offline behavior have earlier automated browser evidence. Physical Android/iPhone installation remains a manual check. The film used responsive mobile/touch browser emulation, not an installed physical iPhone.
 
@@ -52,7 +52,7 @@ The [official rules, section 4](https://youcam-api-skin-ai-ecommerce.devpost.com
 
 Upload the exact approved v7 with English captions, make it publicly visible on YouTube or Vimeo, and copy the resulting URL into Devpost. Keep the project free for judging through 20 November. Confirm eligibility/team representation and submit before **2 November 2026, 11:45 EST / 17:45 Warsaw**. Retain the confirmation receipt. Optional special-award eligibility must be declared truthfully by the entrant.
 
-The audit computer's current Devpost account belongs to Damian; the WearAgain representative is Oliwia. This package neither switches accounts nor accepts terms for her. The jury page's legacy video should be replaced/linked in a separately reviewed site release. Merging this package does not deploy the direct-upload Pages project.
+The audit computer's current Devpost account belongs to Damian; the WearAgain representative is Oliwia. This package neither switches accounts nor accepts terms for her. The prepared jury player references approved v7, copied from the canonical documentation package at build time. A separately reviewed preview/production release is still required; merging this package does not deploy the direct-upload Pages project.
 
 ## Rights and source notes
 

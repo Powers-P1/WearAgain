@@ -13,7 +13,7 @@ The rules require a publicly visible 1–3 minute YouTube or Vimeo demonstration
 
 The app pixels are actual responsive mobile/touch browser captures. Eased scrolling and transitions were edited for the film; these animations were not deployed to the app. The film is not an installed physical iPhone PWA recording. The separate brown-coat API test, saved examples and illustrative generated lifestyle opening remain identified.
 
-The current jury player still embeds legacy `/video/wearagain-demo.webm`, not approved v7. A separately reviewed release should replace it or link to the approved public host. This documentation/media preparation performs no deployment. See [copy-ready submission package](SUBMISSION_PACKAGE.md).
+The prepared jury player uses approved v7 with MP4 MIME, poster and English VTT captions. The build copies the canonical files above into ignored `web2/dist/video`; it excludes the rejected legacy walkthrough. Production may still show the older player until the separately reviewed preview/production release. No deployment is performed by this preparation. See [copy-ready submission package](SUBMISSION_PACKAGE.md).
 
 ## Links and short judge journey
 
@@ -41,7 +41,7 @@ The single authorized production YouCam task completed through the actual fronte
 
 Physical Android/iPhone installation and real garment-fitting trials remain manual; their worksheet is in verification. The demo does not claim authenticated cloud sync, personal-photo try-on, merchant checkout, recurring payments or physical size validation. The agent inspects enabled clothing input photos, not the resulting YouCam image.
 
-The offline readiness check on 23 October repeated `npm run check` at base `499f9fb`: strict types, 334/334 tests, core and both frontend builds passed. Workerd tests intercept external traffic; this check opened no browser and made no provider call. It did not repeat earlier browser/physical-device testing.
+The offline readiness check on 23 October repeated `npm run check` at base `499f9fb`: strict types, 334/334 tests, core and both frontend builds passed. The prepared final-player revision adds an approved-asset regression and passes **335/335 tests** with both builds. Workerd tests intercept external traffic; this check opened no browser and made no provider call. It did not repeat earlier browser/physical-device testing.
 
 ## Remaining owner actions
 
