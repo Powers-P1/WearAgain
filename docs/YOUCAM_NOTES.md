@@ -16,7 +16,13 @@ This section and the team's live-probe section below supersede the older reporte
 - Layering is confirmed unsupported by the team's follow-up probe: a second garment replaces the first. Three tops and three outerwear items produce six independent previews, costing 12 units for successful outputs, reused in nine pair cards.
 - 2026-10-21: six saved cloth-v4 outputs (12 units) were recorded on `woman_neutral_01` for the demo scenario and listed in `demo-manifest.json`. Garment references were clean 2.5x re-crops of the garment artwork in `docs/mockups/01-start.png` and `02-kandydaci.png` (AI-generated product-style artwork, no person). Flat-colour PNGs in offline tests are transport fixtures, not demo assets.
 
-Implementation/API/accounting details: [API.md](API.md). Remaining UNKNOWN: output-publication rights, DPA/region and backup deletion, unprobed error charging, exact available balance, provider concurrency guarantees, new live latency measurements, and any newly observed response or signed-host variants.
+Implementation/API/accounting details: [API.md](API.md). Remaining UNKNOWN: DPA/region and backup deletion, unprobed error charging, exact available balance, provider concurrency guarantees, new live latency measurements, and any newly observed response or signed-host variants. The output-use issue is updated below; historical UNKNOWN entries are retained as dated observations.
+
+## Current terms check - 23 October 2026
+
+The official [YouCam API Terms](https://www.perfectcorp.com/perfectbeauty/youcam/terms-of-service-api), last updated September 2026 and linked from the hackathon rules, state in sections 3.5.3/11.3 that Perfect does not claim ownership of generated content and does not restrict its commercial use. Lawful inputs/outputs and third-party rights remain the user's responsibility. This resolves the blanket output-publication UNKNOWN; it does not publish raw provider responses, credentials or personal photos, or certify each project's media rights.
+
+Section 12.4 describes general 30-day provider retention; section 1.3 refers to service-specific rules. The earlier 24-hour integration observations concern upload/result availability, not independently verified backup deletion. Keep that distinction separate from the Worker's implemented six-hour private asset and 24-hour agent-session expiry. No provider storage/deletion test was performed for this terms check.
 
 ## Historical notes (superseded where marked above)
 

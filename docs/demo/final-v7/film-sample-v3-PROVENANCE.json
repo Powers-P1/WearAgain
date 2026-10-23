@@ -1,0 +1,63 @@
+{
+  "status": "Private production-direction sample for Damian; not published or submitted",
+  "durationSeconds": 70,
+  "format": "1080x1920 /24fps /H264 /AAC stereo",
+  "concept": "A warm store hook, wardrobe and style, opt-in preview review, actual YouCam proof, human comparison and buy-nothing outcome, return shortlist",
+  "sources": {
+    "firstFrame": "Built-in ImageGen; exact first-frame input saved as shop-first-frame.png",
+    "lifestyle": "Google Flow project73dd6844-527c-4261-b5dc-05704d0c8b24; new successful8s renderd53d238b-1ae0-4fc8-9bd7-9ac254654a11. The previous sombre shot is not used.",
+    "flowRequestedModel": "UI proposal: Veo3.1Fast. One audio-generation failure was refunded, then retried with return-videos-without-audio enabled. Original global setting restored after download.",
+    "screenshots": "Actual production app captured via CUA, mobile viewport430x932; sample wardrobe/style/saved stylist/purchase example. No generated UI or substituted state.",
+    "motionUI": "Existing actual production raw.webm, own-profile buy-nothing test and saved-demo return shortlist. Editorial cuts and speed adjustment; no new provider call.",
+    "youcam": "Earlier authorised production test22Oct2026, exact garment-probe.jpg input, exact live-result.jpg output and live-result-screen.png. One completed task,2units. Brown-coat API example explicitly separate from beige-trench lifestyle and saved examples.",
+    "voice": "vidIQ Jessica preset; job_f40bb6df-749f-4b48-9e3f-def29a31a97f; voiceover30c10059-4a8c-44bb-82e8-00355630c9e8;142words/832chars",
+    "music": "Original generated instrumental; job_19c67094-1c0e-447b-ad2b-1abd0ea1bbf1; music700c1a71-d460-45ec-a348-a674a281a1e6; no reference music reused",
+    "references": [
+      "https://www.youtube.com/watch?v=IM4-pPmZyHA",
+      "https://www.youtube.com/watch?v=pXPA163SOPA"
+    ],
+    "referenceMethod": "Two completed vidIQ video_watch analyses. No reference video/music downloaded or reused.",
+    "rules": "https://youcam-api-skin-ai-ecommerce.devpost.com/rules"
+  },
+  "costsThisFilmRevision": {
+    "vidIQ": {
+      "referenceAnalyses": 50,
+      "music": 25,
+      "narration": 14,
+      "total": 89
+    },
+    "flowObservedBalance": {
+      "before": 30,
+      "after": 10,
+      "netUsed": 20
+    },
+    "newYouCamTasks": 0,
+    "newYouCamCredits": 0,
+    "newSonnetCalls": 0,
+    "imagegen": "No separate unit cost was reported by the built-in tool; not asserted to be zero"
+  },
+  "juryChecks": {
+    "duration1to3Minutes": true,
+    "englishNarration": true,
+    "apiNamedAndExplained": true,
+    "actualIntendedPlatform": "Real mobile web UI, including actual recorded interactions and recorded live production integration proof",
+    "originalityAndSources": "Original first frame/video/music/VO; real app media and exact earlier integration evidence",
+    "publicYouTubeOrVimeo": "Not uploaded; this is a private sample, not a completed public submission"
+  },
+  "limitations": [
+    "Lifestyle is generated and illustrative, not a customer trial.",
+    "The built-in preview model is not the boutique shopper.",
+    "Saved stylist example is not a new live Sonnet response.",
+    "Saved demo previews and earlier brown-coat production test are separate examples.",
+    "Preview shows style, not physical size fit. No personal-photo try-on, stock, checkout or measured ROI claims.",
+    "Capturing photos alone does not automatically start paid previews.",
+    "ChatGPT Extra High consultation had repeated final-response load failures. Argon High public answer was actually received; see consultation.json."
+  ],
+  "sha256": {
+    "shop-first-frame.png": "17d7cab2b342ff08172d9a6bba47e2211919c79f296bae7e8388bad79584d828",
+    "shop-veo.mp4": "ef905798316dce0181210d725d81c442cb1d7804dd55350022703c277e7b80e9",
+    "music-original.audio": "f93775b6420bbcc4cf54c305a1f0549128e49190f678d13c6c4cf7ca29ae5c0e",
+    "narration.mp3": "bb3ceea9acad4c9c98a790802abc271909189a9868b763fcaefd0aa51f009ab9",
+    "WearAgain-sample-v3.mp4": "7c9fd8781446ad8e4b240372ea5978230fe86fa4a367cdfe00bd60f3c26d5f38"
+  }
+}

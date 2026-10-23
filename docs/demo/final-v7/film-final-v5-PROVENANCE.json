@@ -1,0 +1,99 @@
+{
+  "status": "Final private film revision after independent critique, candidate revision, second critique and targeted final verification. Not uploaded or submitted.",
+  "file": "WearAgain-final-v5.mp4",
+  "durationSeconds": 74.5,
+  "format": "1080x1920, 24 fps, H264 video, AAC stereo",
+  "sha256": "cef4936055a3754bb60855d652af4781a969d6dd957ad54a899929097a892de6",
+  "narrative": "Shop hook → wardrobe → style → saved stylist example → add garment photo → review → separate recorded YouCam proof → real pair ratings → skip Aster → recommend/save Nova90 → gallery Nova return list → explicitly alternative buy-nothing result → approved brand close.",
+  "approvedElementsPreserved": {
+    "narrator": "Same Jessica take, sentence cuts at silence boundaries; no regenerated words.",
+    "music": "Same original instrumental, recut and ducked under speech.",
+    "outro": "Exact v3 14-brand.mp4 bytes."
+  },
+  "sourceLineage": {
+    "approvedMediaManifest": "../film-sample-v3/PROVENANCE.json",
+    "sourceMedia": {
+      "firstFrame": "Built-in ImageGen; exact first-frame input saved as shop-first-frame.png",
+      "lifestyle": "Google Flow project73dd6844-527c-4261-b5dc-05704d0c8b24; new successful8s renderd53d238b-1ae0-4fc8-9bd7-9ac254654a11. The previous sombre shot is not used.",
+      "voice": "vidIQ Jessica preset; job_f40bb6df-749f-4b48-9e3f-def29a31a97f; voiceover30c10059-4a8c-44bb-82e8-00355630c9e8;142words/832chars",
+      "music": "Original generated instrumental; job_19c67094-1c0e-447b-ad2b-1abd0ea1bbf1; music700c1a71-d460-45ec-a348-a674a281a1e6; no reference music reused",
+      "references": [
+        "https://www.youtube.com/watch?v=IM4-pPmZyHA",
+        "https://www.youtube.com/watch?v=pXPA163SOPA"
+      ]
+    },
+    "originalMediaHashes": {
+      "shop-first-frame.png": "17d7cab2b342ff08172d9a6bba47e2211919c79f296bae7e8388bad79584d828",
+      "shop-veo.mp4": "ef905798316dce0181210d725d81c442cb1d7804dd55350022703c277e7b80e9",
+      "music-original.audio": "f93775b6420bbcc4cf54c305a1f0549128e49190f678d13c6c4cf7ca29ae5c0e",
+      "narration.mp3": "bb3ceea9acad4c9c98a790802abc271909189a9868b763fcaefd0aa51f009ab9",
+      "WearAgain-sample-v3.mp4": "7c9fd8781446ad8e4b240372ea5978230fe86fa4a367cdfe00bd60f3c26d5f38"
+    },
+    "v4Candidate": "../film-sample-v4/WearAgain-candidate-v4.mp4",
+    "v4CandidateSha256": "fb668d2554f4bee90feae2a934b3b9475590ecee6f977d242beac1c14c588349",
+    "youcamInput": "../production-fixes-2026-10-22/garment-probe.jpg",
+    "youcamInputSha256": "160fdc08f47afb59250762d72f629ad2063d687b031414d065349ec85b80d541",
+    "youcamResult": "../production-fixes-2026-10-22/live-result.jpg",
+    "youcamResultSha256": "f7489afb73a068fd0aebacebc71d006e14f209dd8b289380a1b5b79d41316d2b",
+    "youcamOriginalTest": "22 Oct 2026, one successful live task, charged2 credits; this film reuses its actual result."
+  },
+  "capture": {
+    "site": "https://wearagain.pages.dev/app/",
+    "method": "Actual production mobile web via CUA/CDP screencast, 430x800 mobile/touch emulation. Not a recording of a physically installed PWA.",
+    "appStates": "Native UI and transitions, no generated or fabricated app states.",
+    "editorialAdditions": "Tap rings from real logged target centers/times; recommendation/disclosure labels; limited waiting holds extended for narration.",
+    "criticalFreshCaptures": [
+      "06-ratings-stable",
+      "07-decision-paced",
+      "08-return-clear",
+      "09-buy-nothing-confirmed"
+    ],
+    "noPaidApiCalls": true,
+    "networkEvidence": "capture/network-check.json"
+  },
+  "reviewProcess": {
+    "delegatedReviewers": "Two independent Sol specialists, product/story and narration/synchronization.",
+    "round1": "Replaced screenshot-heavy app section, corrected garment identity and sequence, recorded actual actions, reordered alternate ending.",
+    "round2": "Corrected missing tap evidence, stationary ratings, separate unsaved/recommended/saved states, persistent API disclosure, shorter zero-result confirmation scroll.",
+    "final": "Both reviewers verified targeted corrections against encoded v5 frames; no remaining material defect within that scope.",
+    "reports": [
+      {
+        "role": "product",
+        "report": "product-round2.json",
+        "sha256": "0e597718a623447185a546f40a9e8689df5f23b3a899845acdec0797db3257c9"
+      },
+      {
+        "role": "product",
+        "report": "product-final-verification.json",
+        "sha256": "9419bf05fe1686d956663afe0184090bcff0fcd109ef83c0b6f89dbaae9c0d81"
+      },
+      {
+        "role": "narration",
+        "report": "narration-round2.json",
+        "sha256": "c17ec21facc4406baf140a475679f9847f8a381111c92341227713cc2157a0b4"
+      },
+      {
+        "role": "narration",
+        "report": "narration-final-verification.json",
+        "sha256": "f580e167bbd8d9677a04b3c3a22ad023f28bc4f993ca57387d2746302b809c10"
+      }
+    ]
+  },
+  "newPaidProviderJobsThisIteration": {
+    "YouCam": 0,
+    "Sonnet": 0,
+    "Veo": 0,
+    "voice": 0,
+    "music": 0,
+    "ImageGen": 0
+  },
+  "repositoryChanges": "None. Film artifacts are outside both application repositories; both working trees checked clean.",
+  "qa": "QA.json",
+  "limitations": [
+    "Saved example stylist footage is illustrative and labelled; no fresh model call in this edit.",
+    "YouCam proof is one separate recorded live test from 22 Oct 2026, charged 2 credits; no new render generated.",
+    "No physical phone/PWA install capture; the film records the real mobile web UI.",
+    "The promotional opening is an AI-generated illustrative scene; app UI is real.",
+    "Frame sampling, ASR and signal checks are not a claim of independent complete human listening approval."
+  ]
+}

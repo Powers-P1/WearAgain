@@ -1,0 +1,68 @@
+{
+  "timestamp": "2026-10-23T15:38:14.045766+00:00",
+  "file": "C:\\Projekty\\2026-10-21\\t\\outputs\\film-smooth-final-v7\\WearAgain-smooth-final-v7.mp4",
+  "sha256": "0af4fbaca6bf98cf0463f4fcc68ff861338cbf61e8b1aeb416f074ced2331fe1",
+  "bytes": 16691255,
+  "duration": 74.5,
+  "video": {
+    "codec_name": "h264",
+    "width": 1080,
+    "height": 1920,
+    "r_frame_rate": "60/1",
+    "nb_frames": "4470",
+    "pix_fmt": "yuv420p"
+  },
+  "fullDecode": "passed, no errors",
+  "unchangedDecodedAudio": true,
+  "audioPCMHashes": {
+    "v5": "SHA256=948076e52745ddf05238f091d6e8716081dbc0427de3ae2070c4751738b07925",
+    "v7": "SHA256=948076e52745ddf05238f091d6e8716081dbc0427de3ae2070c4751738b07925"
+  },
+  "audioMetricsRetained": {
+    "integratedLUFS": -16.5,
+    "truePeakDBFS": -4.5,
+    "evidence": "Complete decoded final audio hash equals previously measured v5."
+  },
+  "unmodifiedMotionSegmentsComparedWithV6": {
+    "01-shop.mp4": true,
+    "02-wardrobe.mp4": true,
+    "03-style.mp4": false,
+    "04-stylist.mp4": true,
+    "05-photo.mp4": true,
+    "06-review.mp4": true,
+    "07-api-input.mp4": true,
+    "08-api-result.mp4": true,
+    "09-back-to-example.mp4": true,
+    "10-ratings.mp4": true,
+    "11-decision.mp4": false,
+    "12-return.mp4": true,
+    "13-buy-nothing.mp4": true,
+    "14-brand.mp4": true
+  },
+  "motion": {
+    "rigidScrollCount": 10,
+    "sourcePixelOverlapMAE": [
+      4.2341,
+      1.0877,
+      2.2751,
+      1.3879,
+      0.5817,
+      0.5949,
+      0.6146,
+      0.535,
+      1.6143,
+      1.2693
+    ],
+    "rendering": "60fps rigid geometric easing from overlapping actual UI captures; fixed bottom navigation. Short slide/fade navigation transitions and smaller fading touch cues.",
+    "opticalFlowOrGeneratedUI": false
+  },
+  "verificationFrames": 62,
+  "scope": "Film polish only. No app/repository modifications, production deployments, browser input, provider jobs or new model/render credits in this iteration.",
+  "limitations": [
+    "Motion between captured states is edited for the film; these transitions were not deployed to the real app.",
+    "Actual original app pixels were captured in responsive mobile/touch browser emulation, not an installed physical iPhone PWA.",
+    "The lifestyle opening retains its original24fps frames; the60fps export duplicates those frames, without invented video frames.",
+    "Independent visual frame review and signal checks are not full perceptual listening approval."
+  ],
+  "cleanup": "All render/verification Python and FFmpeg subprocesses finished; no browser tab, server or persistent helper started for this edit."
+}

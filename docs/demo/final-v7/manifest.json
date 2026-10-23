@@ -1,0 +1,82 @@
+{
+  "status": "approved_for_handoff_not_published_or_submitted",
+  "approvedRevision": "v7",
+  "approvalEvidence": "Primary agent relayed explicit Damian approval on 23 October 2026; only this final film is approved for handoff.",
+  "film": "WearAgain-smooth-final-v7.mp4",
+  "sha256": "0af4fbaca6bf98cf0463f4fcc68ff861338cbf61e8b1aeb416f074ced2331fe1",
+  "durationSeconds": 74.5,
+  "width": 1080,
+  "height": 1920,
+  "fps": 60,
+  "publicVideoUrl": null,
+  "privateSourceRecipient": "contact_event@PerfectCorp.com",
+  "sourceAccessConfirmed": false,
+  "sourceRecipientEvidence": "Exact visible address in official Devpost rules section4, confirmed by primary agent23October2026; text tools mask the link.",
+  "files": [
+    {
+      "name": ".gitattributes",
+      "bytes": 8,
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+    },
+    {
+      "name": "captions.en.srt",
+      "bytes": 1270,
+      "sha256": "6e3fe720a8b6ea0978a7deb94da1c649f7f2db974a3485bb4fc14b7e46acc240"
+    },
+    {
+      "name": "captions.en.vtt",
+      "bytes": 1241,
+      "sha256": "e93957d180433da4b78c09e5fd0ac81f622140acf287d6f51f81bf4c72681889"
+    },
+    {
+      "name": "film-final-v5-PROVENANCE.json",
+      "bytes": 5828,
+      "sha256": "e5aeacbfa85a85b93751012c2e05f09f0ccf8dca2cea1f4048ff0e7ef05b26ea"
+    },
+    {
+      "name": "film-sample-v3-PROVENANCE.json",
+      "bytes": 4165,
+      "sha256": "bd3df9db3cc0376d61536a804eba851bf506ba5be0fab59b3a97e1d07443f9e6"
+    },
+    {
+      "name": "motion-ledger.json",
+      "bytes": 6854,
+      "sha256": "007c287faaba45d1a51711c0f8f82a4ddcb5eb309912043c59332eb716726329"
+    },
+    {
+      "name": "motion-review.json",
+      "bytes": 3815,
+      "sha256": "47f594dc13c59b31a29160ef2b108a19871ac2e13486450a5086058aeac2880d"
+    },
+    {
+      "name": "poster.jpg",
+      "bytes": 123271,
+      "sha256": "ef0702e1e366dc93f3ee04c113eb730df222f976dfccee28ed4a8f1178d0903c"
+    },
+    {
+      "name": "PROVENANCE.json",
+      "bytes": 7603,
+      "sha256": "a701e39344659c8f07ca42f734d0df8e1c6fa6eabfecd1a36f6dd41fc8f4bd1d"
+    },
+    {
+      "name": "QA.json",
+      "bytes": 2684,
+      "sha256": "a6cafd7db3f712d8ee681101c334d14da292dda84fbeec1b6b2a3801d867b05c"
+    },
+    {
+      "name": "transcript.en.md",
+      "bytes": 1454,
+      "sha256": "b7a2fb8cbe9bd5617097f994bec211b8fbca020b6d7b079b1f6ca31bef94aec3"
+    },
+    {
+      "name": "WearAgain-smooth-final-v7.mp4",
+      "bytes": 16691255,
+      "sha256": "0af4fbaca6bf98cf0463f4fcc68ff861338cbf61e8b1aeb416f074ced2331fe1"
+    }
+  ],
+  "boundaries": [
+    "No provider job, film upload, Devpost submission, repository invitation, visibility change or production deployment.",
+    "Motion is editorial interpolation of actual UI captures, not deployed app animation.",
+    "No installed physical-phone recording or full independent listening approval."
+  ]
+}
