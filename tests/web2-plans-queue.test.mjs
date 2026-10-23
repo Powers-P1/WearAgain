@@ -30,6 +30,16 @@ test('reload resumes a known render by GET under its exact live capability witho
  const other=new queue.PreviewQueue(store,()=>{},api,photos);assert.equal(other.jobs[0].status,'unknown');await other.enable();assert.equal(polls,1);other.dispose();
 });
 
+test('a failed status GET remains recoverable after reload and by explicit check, with exactly one submit',async()=>{
+ const store=memory(),credential={sessionToken:'same-private-capability',expiresAt:Date.now()+3600000};store.setItem('wearagain:agent:credential:v1',JSON.stringify(credential));
+ let posts=0,polls=0,outputs=0,fail=true;
+ const api={...client(),submit:async()=>{posts++;return {...record,status:'pending'};},poll:async()=>{polls++;if(fail)throw new TypeError('Temporary offline');return record;}};
+ const q=new queue.PreviewQueue(store,()=>{},api,{...photos,output:async()=>{outputs++;}});q.enqueue('recover_me');await q.enable();
+ for(let n=0;n<800&&q.jobs[0].status!=='unknown';n++)await new Promise(r=>setTimeout(r,5));assert.equal(q.jobs[0].status,'unknown');assert.equal(q.canCheckExisting('recover_me'),true);q.dispose();
+ const restored=new queue.PreviewQueue(store,()=>{},api,{...photos,output:async()=>{outputs++;}});assert.equal(restored.jobs[0].status,'processing');assert.equal(restored.canCheckExisting('recover_me'),true);restored.checkExisting('recover_me');await until(()=>restored.jobs[0].status==='unknown');
+ fail=false;restored.checkExisting('recover_me');await until(()=>restored.jobs[0].status==='ready');assert.equal(posts,1);assert.equal(polls,3);assert.equal(outputs,1);restored.dispose();
+});
+
 test('trip dates shift existing occasions and clamp a shorter trip without losing selected outfits',()=>{
  const wardrobe=state.initialState(),look=stylist.demoLooks(wardrobe).looks[0];
  let trip=plans.initialTrip(new Date(2026,9,22,23));

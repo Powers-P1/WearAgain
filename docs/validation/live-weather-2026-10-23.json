@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-22T23:49:51.849Z",
+  "workerVersion": "0.4.2-agent-weather",
+  "sessionId": "3a7dff1c-a909-4583-93af-732f58bf4c33",
+  "status": "completed",
+  "model": "claude-sonnet-5-5",
+  "usage": {
+    "inputTokens": 19948,
+    "outputTokens": 844,
+    "modelCalls": 4,
+    "toolCalls": 6
+  },
+  "evidence": [
+    {
+      "tool": "lookup_city",
+      "status": "UNKNOWN",
+      "subject": "Warsaw Poland",
+      "capturedAt": "2026-10-22T23:49:44.705Z",
+      "detail": "0 matching cities from Open-Meteo."
+    },
+    {
+      "tool": "lookup_city",
+      "status": "known",
+      "subject": "Warsaw",
+      "capturedAt": "2026-10-22T23:49:46.208Z",
+      "detail": "3 matching cities from Open-Meteo."
+    },
+    {
+      "tool": "get_weather",
+      "status": "known",
+      "subject": "Warsaw 2026-10-23",
+      "capturedAt": "2026-10-22T23:49:47.863Z",
+      "detail": "{\"status\":\"known\",\"city\":{\"id\":\"756135\",\"label\":\"Warsaw\",\"countryCode\":\"PL\",\"latitude\":52.22977,\"longitude\":21.01178},\"date\":\"2026-10-23\",\"source\":\"https://open-meteo.com/\",\"capturedAt\":\"2026-10-22T23:49:47.863Z\",\"temperatureMinC\":{\"status\":\"known\",\"value\":7.1},\"temperatureMaxC\":{\"status\":\"known\",\"value\":13.8},\"rainProbabilityPercent\":{\"status\":\"known\",\"value\":99}}"
+    }
+  ],
+  "newYouCamTasks": 0,
+  "youCamCredits": 0,
+  "sessionSpentUnits": 0,
+  "sessionReservedUnits": 0,
+  "note": "Actual deployed Worker lookup and dated Open-Meteo forecast, after fixing unsupported redirect:error. No private user data, photos or saves. This is not a consumer outcome study."
+}

@@ -13,7 +13,9 @@ type Actions = { readonly wardrobe: WardrobeState; readonly storage: Store; read
 let trip: TripPlan | null = null, surprise: SurprisePreferences | null = null, needs: WardrobeNeed[] | null = null;
 let shared = false, editTrip = false, selectedEvent = '', choosingCompanion = false, balanceCategory: Category = 'tops';
 let balanceExpanded = false;
-function initialise(store: Store): void { trip ??= readTrip(store); surprise ??= readSurprise(store); needs ??= readNeeds(store); }
+// AI saves and other views write to the same profile store. Re-read before a
+// render or edit so a stale module cache cannot overwrite a newer plan/list.
+function initialise(store: Store): void { trip = readTrip(store); surprise = readSurprise(store); needs = readNeeds(store); }
 const heading = (title: string, subtitle: string) => '<header class="feature-heading"><h1>' + esc(title) + '</h1><p>' + esc(subtitle) + '</p></header>';
 const dateLabel = (date: string) => new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(date));
 const choices = (wardrobe: WardrobeState, store: Store): readonly OccasionSuggestion[] => [

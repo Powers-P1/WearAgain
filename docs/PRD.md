@@ -1,6 +1,6 @@
 # WearAgain product requirements
 
-Status: PR2 domain and tool contracts, 2026-10-21. This document implements the approved [brief](BRIEF.md) and Damian's later decisions: separate garment previews and an AI Stylist in PR4b. Historical nine-layered-image and zero-LLM descriptions are superseded. Remaining product policies marked UNKNOWN do not acquire invented defaults.
+Current implementation update (23 October 2026): PR21–23 are merged. The v2 app has the real Sonnet tool loop, private editable device profiles/memory, own-data purchase certificates, feedback, save tools and mobile PWA. See [AGENT_RUNTIME.md](AGENT_RUNTIME.md) for the current numeric limits and adapters, [UX_V2_GAPS.md](UX_V2_GAPS.md) for shipped scope, and [validation](validation/agent-v2-2026-10-23.md) for evidence. Personal-photo try-on remains optional and disabled; local file transfer is implemented rather than cloud accounts. The PR2–PR4b milestones below preserve the original requirements history. Future-tense descriptions there are not claims that the merged agent is still pending. Product facts without evidence remain UNKNOWN.
 
 ## Outcome and boundaries
 

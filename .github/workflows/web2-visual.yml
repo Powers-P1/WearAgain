@@ -49,6 +49,10 @@ jobs:
           done
           npm run qa:web2
           npm run qa:web2:states
+          node tests/browser/web2-agent-flows.mjs
+          node tests/browser/web2-final-review.mjs
+          node tests/browser/web2-production-fixes.mjs
+          node tests/browser/web2-pwa.mjs
           mkdir -p screenshots
           for viewport in '390 844' '1280 800'; do
             read -r width height <<<"$viewport"
@@ -136,5 +140,7 @@ jobs:
             screenshots/
             test-results/web2/
             test-results/web2-states/
+            test-results/agent-flows/
+            test-results/final-review/
           if-no-files-found: warn
           retention-days: 14
