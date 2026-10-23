@@ -1,13 +1,13 @@
 {
-  "pagesDeployment": "728f5a25-1ac7-48c8-a667-7785d98449aa",
-  "deploymentUrl": "https://728f5a25.wearagain.pages.dev",
+  "pagesDeployment": "8ec5205e-026f-4556-ab61-dd820527884f",
+  "deploymentUrl": "https://8ec5205e.wearagain.pages.dev",
   "workerVersion": "968cb720-c11a-4df0-81fc-731f73403dde",
-  "checkedAt": "2026-10-23T00:31:10.928957+00:00",
+  "checkedAt": "2026-10-23T00:51:54.280822+00:00",
   "production": "https://wearagain.pages.dev",
-  "frontendSource": "8764bf6",
-  "mergedMain": "0ce278f",
+  "frontendSource": "5a8604fae8f7c7ed8c30b57b566adda9047e4c53",
+  "mergedMain": "4fdb54befe0fce41b1d621a7f939982242078272",
   "apiVersion": "0.4.3-review",
-  "preview": "https://c99f8543.wearagain.pages.dev",
+  "preview": "https://2f1513f9.wearagain.pages.dev",
   "rollbackBeforeNight": {
     "pages": "3ed2e330-2eea-41b5-ae96-541c5c89a5c2",
     "workerVersion": "69a3d986-989b-4825-913e-898484110ab4"
@@ -35,5 +35,11 @@
     "YouTube/Vimeo publication and final Devpost submission"
   ],
   "deploymentPolicy": "Same account, Worker addresses/routes and secrets. No existing legacy UNKNOWN holds released. Preview checked before production.",
-  "videoStatus": "Unapproved draft. User deferred revision until tomorrow on 23 October. Do not submit/publish the current draft."
+  "videoStatus": "Unapproved draft. User deferred revision until tomorrow on 23 October. Do not submit/publish the current draft.",
+  "previousVerificationRelease": {
+    "pagesDeployment": "728f5a25-1ac7-48c8-a667-7785d98449aa",
+    "frontendSource": "8764bf6",
+    "mergedMain": "0ce278f"
+  },
+  "finalAppPolish": "Truthful pending first-look state and separate 44px refinement/next-look rows; browser verified at 390/1280 on preview and production."
 }
