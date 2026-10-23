@@ -40,7 +40,14 @@ try{
  }
  const page=await context.newPage();await page.goto(base+'/app/#trip');
  assert.match(await page.locator('.trip-example-note').innerText(),/sample occasions/);
- await page.goto(base+'/judges/');assert.equal(await page.locator('video').getAttribute('poster'),null);
+ await page.goto(base+'/judges/');
+ const film=page.locator('.mkt-walkthrough video');
+ assert.equal(await film.getAttribute('poster'),'/video/wearagain-final-v7-poster.jpg');
+ assert.equal(await film.locator('source').getAttribute('src'),'/video/wearagain-final-v7.mp4');
+ assert.equal(await film.locator('source').getAttribute('type'),'video/mp4');
+ assert.equal(await film.locator('track').getAttribute('src'),'/video/wearagain-final-v7.en.vtt');
+ const poster=await context.request.get(base+'/video/wearagain-final-v7-poster.jpg');
+ assert.equal(poster.status(),200);assert.match(poster.headers()['content-type'],/^image\/jpeg/);
  await context.close();
  await writeFile(out+'/report.json',JSON.stringify(rows,null,2));console.log(JSON.stringify(rows));
 }finally{await browser.close();}
