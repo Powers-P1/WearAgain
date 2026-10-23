@@ -40,7 +40,7 @@ jobs:
       - name: Capture actual built screens
         shell: bash
         run: |
-          python3 -m http.server 8788 --directory web2/dist >/tmp/wearagain-web2-http.log 2>&1 &
+          node node_modules/wrangler/bin/wrangler.js pages dev web2/dist --ip 127.0.0.1 --port 8788 --log-level error >/tmp/wearagain-web2-http.log 2>&1 &
           qa_server_pid=$!
           trap 'kill "$qa_server_pid" 2>/dev/null || true' EXIT
           for attempt in $(seq 1 30); do
