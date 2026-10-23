@@ -100,6 +100,7 @@ function briefForm(wardrobe: WardrobeState): string {
 }
 function lookPreview(wardrobe: WardrobeState, selection: StylistResult): string {
   const look = selection.looks[selected];
+  if(!look&&agentMode==='live')return '<section class="stylist-empty"'+(agentBusy?' aria-busy="true"':'')+'><h2>'+escapeHtml(agentBusy?'Your stylist is preparing your looks.':latestAgent?.answer?'Your stylist needs more information for a complete look.':wardrobe.items.length?'Start with what you own.':'Add your first wardrobe pieces.')+'</h2><p>'+escapeHtml(agentBusy?'Checking your current clothes, availability and preferences. You can reopen this same session after leaving the screen.':latestAgent?.answer?'Review the stylist’s notes above, or update your available clothes.':wardrobe.items.length?'Describe the occasion. Your stylist will check your actual wardrobe before proposing a look.':'Add the clothes you want your stylist to use, then describe the occasion.')+'</p>'+(!agentBusy?'<button class="button button-outline" type="button" data-nav="wardrobe">'+escapeHtml(t('goBackWardrobe'))+'</button>':'')+'</section>';
   if (!look) return '<section class="stylist-empty"><h2>' + escapeHtml(t('stylistUnavailable')) + '</h2>' +
     '<button class="button button-outline" type="button" data-nav="wardrobe">' + escapeHtml(t('goBackWardrobe')) + '</button></section>';
   const owned = look.itemIds

@@ -1,6 +1,6 @@
 # WearAgain
 
-[Jury demo](https://wearagain.pages.dev/judges/) · [Submission handoff](docs/HACKATHON_HANDOFF.md) · [136-second mobile demonstration](docs/demo/README.md)
+[Jury demo](https://wearagain.pages.dev/judges/) · [Submission handoff](docs/HACKATHON_HANDOFF.md) · [121-second mobile demonstration](docs/demo/README.md)
 
 WearAgain helps a shopper find the cheapest additional outerwear purchase that meets her declared outfit needs using tops she already owns. She judges pairs of separate garment previews; a deterministic solver chooses the basket and explains why every cheaper basket fails. The answer may be to buy nothing.
 
