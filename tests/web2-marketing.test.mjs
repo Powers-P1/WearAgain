@@ -90,7 +90,7 @@ test('built jury media matches approved v7 and excludes the rejected walkthrough
   const bytes=await readFile(new URL('../web2/dist/video/wearagain-final-v7.mp4',import.meta.url));
   assert.equal(createHash('sha256').update(bytes).digest('hex'),manifest.sha256);
   assert.deepEqual((await readdir(new URL('../web2/dist/video/',import.meta.url))).sort(),[
-    'transcript.txt','wearagain-final-v7-poster.jpg','wearagain-final-v7.en.vtt','wearagain-final-v7.mp4',
+    'transcript.txt','wearagain-final-v7-poster.jpg','wearagain-final-v7.en.srt','wearagain-final-v7.en.vtt','wearagain-final-v7.mp4',
   ]);
   for(const [published,canonical] of [
     ['wearagain-final-v7.en.vtt','captions.en.vtt'],
@@ -171,6 +171,7 @@ test('judges pages and each guided step include implementation, concept and quan
     assert.match(html,/Style preview, not size fit/);
     assert.match(html,/2 units/);
     assert.match(html,/24 hours/);
+    assert.doesNotMatch(html,/provider retains uploaded and generated images for 24 hours/);
     assert.match(html,/no fresh tasks|not live YouCam calls/i);
     assert.match(html,/No conversion, returns or impact improvements have been measured/);
     assert.match(html,/private.*reviewer access/);

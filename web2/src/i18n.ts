@@ -9,7 +9,7 @@ export type Locale = 'en' | 'pl';
 export const en = {
   mallLiveTitle: 'Create previews while I shop',
   mallGarmentConsent: 'My photos show tops, jackets or coats, with no people or faces. Use them for previews on the demo model.',
-  mallLiveRetention: 'Keep this tab open while previews finish. YouCam keeps uploaded and generated images for 24 hours. Each successful preview uses 2 units of the shared demo allowance.',
+  mallLiveRetention: 'Internet and available demo units are required. Keep this app open while previews finish; your phone may pause it in the background. Photos go to YouCam only after you enable previews. Each successful preview uses 2 units of the shared demo allowance.',
   mallLiveEnabled: 'Previews are on. Take photos and keep shopping.',
   mallLiveConnecting: 'Connecting…',
   mallStartPreviews: 'Start live previews',
@@ -189,7 +189,7 @@ export const en = {
   mktJudgeConceptHeading: 'Concept / not yet',
   mktJudgeConceptBody: 'Layered full-outfit rendering, size fitting, personal-model uploads, retailer checkout and cross-device sync are not implemented here. No conversion, returns or impact improvements have been measured.',
   mktJudgeLimitsHeading: 'Limits of this demo',
-  mktJudgeLimitsBody: 'Style preview, not size fit. Each successful YouCam image costs 2 units from a fixed server-side budget; the provider retains uploaded and generated images for 24 hours per the documented integration. This hosted replay uses saved recordings, not live YouCam calls. The repository is private and requires reviewer access.',
+  mktJudgeLimitsBody: 'Style preview, not size fit. Each successful YouCam image costs 2 units from a fixed server-side budget. Upload and result links are temporary (24 hours in the documented integration); this does not establish deletion of all provider copies. This hosted replay uses saved recordings, not live YouCam calls. The repository is private and requires reviewer access.',
   mktJudgeNoCheaper: 'No cheaper basket exists; buying nothing is the cheapest.',
 
   // PR-E: consumer, retailer and judge routes. All product-visible text stays in i18n.

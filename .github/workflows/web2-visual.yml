@@ -55,6 +55,7 @@ jobs:
           node tests/browser/web2-final-review.mjs
           node tests/browser/web2-production-fixes.mjs
           node tests/browser/web2-pwa.mjs
+          node tests/browser/web2-walkthrough.mjs
           mkdir -p screenshots
           for viewport in '390 844' '1280 800'; do
             read -r width height <<<"$viewport"
@@ -145,5 +146,6 @@ jobs:
             test-results/agent-flows/
             test-results/final-review/
             test-results/production-fixes/
+            test-results/walkthrough/
           if-no-files-found: warn
           retention-days: 14
