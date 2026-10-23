@@ -1,4 +1,6 @@
-# Mobile demonstration
+# Mobile demonstration — unapproved draft
+
+User review rejected these films on 23 October. Keep them as working drafts for tomorrow; do not publish or submit them. The runtime test receipt remains valid independently of the film quality.
 
 - [121-second MP4](wearagain-mobile.mp4), 1920×1080 H.264/AAC, 6.8 MB.
 - [English transcript](wearagain-mobile-transcript.md), [WebVTT captions](wearagain-mobile.vtt) and [poster](wearagain-mobile-poster.png).

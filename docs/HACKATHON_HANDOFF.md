@@ -2,7 +2,7 @@
 
 Entry owner: Oliwia. Internal target: 31 October. [Official YouCam rules](https://youcam-api-skin-ai-ecommerce.devpost.com/rules), checked 23 October 2026: submission closes 2 November at 11:45 EST, or 17:45 in Warsaw. The app must remain available free for judging through 20 November. Source can be public with suitable licensing or private with the judging access specified in the rules. This repository remains private; its access and licence have not been changed.
 
-The rules require a publicly accessible 1–3 minute YouTube or Vimeo demonstration with the intended device experience and YouCam integration. A Pages-hosted file alone does not satisfy that hosting requirement. The prepared English recording is a handoff asset; publishing its final URL, granting the required private-source judging access, checking eligibility/rights and submitting Devpost remain with Oliwia. No entry or terms have been accepted on her behalf.
+The rules require a publicly accessible 1–3 minute YouTube or Vimeo demonstration with the intended device experience and YouCam integration. A Pages-hosted file alone does not satisfy that hosting requirement. The current English recording is an unapproved working draft, deferred by the user for revision tomorrow; publishing its final URL, granting the required private-source judging access, checking eligibility/rights and submitting Devpost remain with Oliwia. No entry or terms have been accepted on her behalf.
 
 ## Links and short judge journey
 
@@ -30,4 +30,4 @@ The single authorized production YouCam task completed through the actual fronte
 
 Physical Android/iPhone installation and real garment-fitting trials remain manual; their worksheet is in verification. The demo does not claim authenticated cloud sync, personal-photo try-on, merchant checkout, recurring payments or physical size validation. The agent inspects enabled clothing input photos, not the resulting YouCam image.
 
-For the final submission, use the English recording/transcript, current demo URL and private-source instructions. State observed results only; do not claim measured time savings, reduced returns or conversion uplift without an actual study.
+Video is not submission-ready: the user rejected the current draft and deferred revision until tomorrow. Before final submission, replace/approve it, then use the approved English recording/transcript, current demo URL and private-source instructions. State observed results only; do not claim measured time savings, reduced returns or conversion uplift without an actual study.

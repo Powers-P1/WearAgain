@@ -34,5 +34,6 @@
     "Consumer garment fitting trial",
     "YouTube/Vimeo publication and final Devpost submission"
   ],
-  "deploymentPolicy": "Same account, Worker addresses/routes and secrets. No existing legacy UNKNOWN holds released. Preview checked before production."
+  "deploymentPolicy": "Same account, Worker addresses/routes and secrets. No existing legacy UNKNOWN holds released. Preview checked before production.",
+  "videoStatus": "Unapproved draft. User deferred revision until tomorrow on 23 October. Do not submit/publish the current draft."
 }
