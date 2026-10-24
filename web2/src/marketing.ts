@@ -137,7 +137,7 @@ function judgesLanding():string{
   return '<div class="mkt-site mkt-judges"><div class="mkt-judges-band">'+h('mktJudgesOverline')+'</div>'+
     siteHeader('judges')+'<main id="main-content" tabindex="-1">'+
     '<section class="mkt-hero mkt-judges-hero"><div class="mkt-hero-copy">'+
-    '<p class="mkt-eyebrow">MOBILE FIRST · INSTALLABLE APP · NO SIGN-IN</p>'+
+    '<p class="mkt-judges-platform">'+h('mktJudgesPlatform')+'</p>'+
     '<h1>'+h('mktJudgesHero1')+'<em>'+h('mktJudgesHero2')+'</em></h1>'+
     '<p>'+h('mktJudgesHeroBody')+'</p><p class="mkt-judges-role">'+h('mktJudgesHeroRoles')+'</p>'+
     link('/judges/demo/',h('mktJudgesPrimary'),'mkt-button mkt-button-dark')+

@@ -117,6 +117,19 @@ test('all three jury replay steps keep the solved Nova candidate and disclose pr
  marketing.handleMarketingClick({dataset:{guideStep:'wardrobe'}},()=>{});
 });
 
+test('jury hero introduces mobile-first PWA and desktop support with an installation entry',()=>{
+ const html=marketing.marketingPage('/judges');
+ const hero=html.slice(html.indexOf('mkt-hero mkt-judges-hero'),html.indexOf('<section class="mkt-moments"'));
+ const platform='MOBILE-FIRST PWA · FULL DESKTOP WORKSPACE';
+ assert.ok(hero.includes(platform));
+ assert.ok(hero.indexOf(platform)<hero.indexOf('<h1>'),'platform context appears above the purchase headline');
+ const install=hero.match(/<button\b[^>]*data-install-app[^>]*>Install WearAgain<\/button>/)?.[0];
+ assert.ok(install,'installation has a real button in the hero');
+ assert.doesNotMatch(install,/\s(?:disabled|hidden)(?:[\s=>])/);
+ assert.match(hero,/href="\/app\/#wardrobe">Open wardrobe dashboard/);
+ assert.doesNotMatch(marketing.marketingPage('/'),new RegExp(platform));
+});
+
 test('returning from the zero-purchase verdict never reuses the Nova preview for the separate fixture',()=>{
  marketing.handleMarketingClick({dataset:{judgeMode:'zero'}},()=>{});
  for(const step of ['wardrobe','preview','verdict']){

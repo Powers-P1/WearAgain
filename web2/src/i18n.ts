@@ -272,6 +272,7 @@ export const en = {
   mktRetailDemoPrivacy: 'The store page uses example garments only. No user wardrobe or private photo is sent to a merchant.',
   mktRetailDemoNotIntegrated: 'Demonstration layout, not an installed retailer plugin or live checkout.',
   mktJudgesOverline: 'YouCam API Hackathon · eCommerce VTO',
+  mktJudgesPlatform: 'MOBILE-FIRST PWA · FULL DESKTOP WORKSPACE',
   mktJudgesHero1: 'Check before',
   mktJudgesHero2: 'you buy.',
   mktJudgesHeroBody: 'Considering one purchase? Check it with a few clothes you own, rate the pairings and see whether it earns a place. Buying nothing is a valid answer.',
