@@ -37,7 +37,12 @@
 .purchase-rating-buttons button:disabled{opacity:.45}
 .purchase-unsure{min-height:44px;border:0;background:none;color:var(--muted);text-decoration:underline;display:block;margin:3px auto;font-size:12px}
 .purchase-fit-note{color:var(--muted);font-size:12px;line-height:1.5;text-align:center}
+.purchase-rating-source{color:var(--muted);font-size:12px;line-height:1.4;margin:8px 0}
 .purchase-verdict{border-left:1px solid var(--line);padding-left:26px}
+.purchase-selected{font-size:13px;line-height:1.5;margin-bottom:14px;color:var(--olive)}
+.purchase-scope{font-size:12px;line-height:1.5;color:var(--muted);margin-top:12px}
+.purchase-rating-impact{border-left:3px solid var(--olive);background:var(--olive-soft);padding:12px;margin-top:16px;font-size:12px;line-height:1.5}
+.purchase-rating-impact strong{font-weight:500}.purchase-rating-impact p{margin-top:6px}
 .purchase-verdict h2{font-size:clamp(36px,3.4vw,52px);line-height:1;letter-spacing:-.02em}
 .purchase-summary{margin-top:18px;font-size:15px;line-height:1.55}
 .purchase-basket{border-top:1px solid var(--line);padding-top:18px;margin-top:22px}

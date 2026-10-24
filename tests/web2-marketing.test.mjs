@@ -32,12 +32,16 @@ test('guided saved evidence comes from immutable YouCam manifest, never a new ta
   assert.equal(e.api,'cloth-v4');
   assert.equal(e.avatarId,'woman_neutral_01');
   assert.equal(e.liveTaskStatus,'not_submitted');
-  assert.match(e.candidate.imagePath,/^\/demo\/renders\/outerwear-cheap-a/);
+  assert.equal(e.product.id,'all-round');
+  assert.equal(e.product.label,'Nova jacket');
+  assert.equal(e.product.priceMinor,9000);
+  assert.equal(e.candidateElement.id,e.product.id);
+  assert.match(e.candidate.imagePath,/^\/demo\/renders\/outerwear-all-round/);
   assert.match(e.top.imagePath,/^\/demo\/renders\/top-work/);
   assert.ok(Number.isFinite(Date.parse(e.candidate.recordedAt)));
 });
 test('retailer demo price, label and sample wardrobe originate from fixture and matching recorded candidate',()=>{
-  const x=model.retailExample(),e=model.demoEvidence();
+  const x=model.retailExample(),e=model.demoEvidence('cheap-a');
   assert.equal(x.id,'cheap-a');
   assert.equal(x.priceMinor,4000);
   assert.equal(x.currency,'PLN');
@@ -71,8 +75,12 @@ test('public routes render English links with no invented task identifiers or re
     assert.ok(marketing.marketingTitle(route).includes('WearAgain'));
   }
   const judges=marketing.marketingPage('/judges');
-  assert.match(judges,/Try it on/);
-  assert.match(judges,/in your pocket/);
+  assert.match(judges,/Check before<em>you buy/);
+  assert.match(judges,/Considering one purchase/);
+  const hero=judges.slice(judges.indexOf('mkt-hero mkt-judges-hero'),judges.indexOf('<section class="mkt-moments"'));
+  assert.match(hero,/\/demo\/renders\/outerwear-all-round-woman-neutral-01.jpg/);
+  assert.match(hero,/Nova jacket · Demo model · one garment at a time/);
+  assert.doesNotMatch(hero,/editorial-judges|in your pocket/);
   assert.match(judges,/<video controls playsinline/);
   assert.match(judges,/preload="metadata" poster="\/video\/wearagain-final-v7-poster\.jpg"/);
   assert.match(judges,/src="\/video\/wearagain-final-v7\.mp4" type="video\/mp4"/);
@@ -82,6 +90,60 @@ test('public routes render English links with no invented task identifiers or re
   assert.match(marketing.marketingPage('/retail'),/Pilot measurement plan only/);
   assert.match(marketing.marketingPage('/retail/demo'),/Fictional retailer/);
   assert.match(marketing.marketingPage('/judges/demo'),/No account needed/);
+});
+
+test('all three jury replay steps keep the solved Nova candidate and disclose preset ratings',()=>{
+ marketing.handleMarketingClick({dataset:{judgeMode:'minimum'}},()=>{});
+ for(const step of ['wardrobe','preview','verdict']){
+  marketing.handleMarketingClick({dataset:{guideStep:step}},()=>{});
+  const html=marketing.marketingPage('/judges/demo');
+  assert.match(html,/data-judge-candidate="all-round">Selected candidate: Nova jacket · PLN\s*90\.00/);
+  assert.match(html,/Guided replay uses preset example ratings/);
+  assert.match(html,/Preview images never create a human rating/);
+  if(step==='wardrobe'){
+   for(const label of ['Cream shirt','Navy knit','Striped tee'])assert.match(html,new RegExp(label));
+  }
+  if(step==='preview'){
+   assert.match(html,/outerwear-all-round-woman-neutral-01.jpg/);
+   assert.match(html,/outerwear:all-round/);
+   assert.doesNotMatch(html,/outerwear-cheap-a/);
+   assert.match(html,/Give your own rating in the purchase checker/);
+  }
+  if(step==='verdict'){
+   assert.match(html,/<strong>Nova jacket<\/strong><span>PLN\s*90\.00/);
+   assert.match(html,/For the selected clothes, needs and your ratings/);
+  }
+ }
+ marketing.handleMarketingClick({dataset:{guideStep:'wardrobe'}},()=>{});
+});
+
+test('jury hero introduces mobile-first PWA and desktop support with an installation entry',()=>{
+ const html=marketing.marketingPage('/judges');
+ const hero=html.slice(html.indexOf('mkt-hero mkt-judges-hero'),html.indexOf('<section class="mkt-moments"'));
+ const platform='MOBILE-FIRST PWA · FULL DESKTOP WORKSPACE';
+ assert.ok(hero.includes(platform));
+ assert.ok(hero.indexOf(platform)<hero.indexOf('<h1>'),'platform context appears above the purchase headline');
+ const install=hero.match(/<button\b[^>]*data-install-app[^>]*>Install WearAgain<\/button>/)?.[0];
+ assert.ok(install,'installation has a real button in the hero');
+ assert.doesNotMatch(install,/\s(?:disabled|hidden)(?:[\s=>])/);
+ assert.match(hero,/href="\/app\/#wardrobe">Open wardrobe dashboard/);
+ assert.doesNotMatch(marketing.marketingPage('/'),new RegExp(platform));
+});
+
+test('returning from the zero-purchase verdict never reuses the Nova preview for the separate fixture',()=>{
+ marketing.handleMarketingClick({dataset:{judgeMode:'zero'}},()=>{});
+ for(const step of ['wardrobe','preview','verdict']){
+  marketing.handleMarketingClick({dataset:{guideStep:step}},()=>{});
+  const html=marketing.marketingPage('/judges/demo');
+  assert.match(html,/Separate buy-nothing example/);
+  assert.doesNotMatch(html,/data-judge-candidate="all-round"|outerwear-all-round/);
+  if(step!=='verdict'){
+   assert.match(html,/Existing coat · example/);
+   assert.match(html,/No matching saved previews are available/);
+  }
+ }
+ marketing.handleMarketingClick({dataset:{judgeMode:'minimum'}},()=>{});
+ marketing.handleMarketingClick({dataset:{guideStep:'wardrobe'}},()=>{});
 });
 test('built jury media matches approved v7 and excludes the rejected walkthrough and PWA cache',async()=>{
   const root=fileURLToPath(new URL('../',import.meta.url));

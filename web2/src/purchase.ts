@@ -24,6 +24,12 @@ export interface PurchaseSession {
   readonly topId: string;
   readonly decisions: Readonly<Record<string, PurchaseDecision>>;
   readonly ratingsOrigin: 'example' | 'edited';
+  readonly editedOutfitIds: readonly string[];
+  readonly lastRatingChange: {
+    readonly outfitId: string;
+    readonly status: Rating;
+    readonly before: SolveResult;
+  } | null;
 }
 
 const exampleInputs = { minimum: minimum.scenario, zero: zero.scenario } as const;
@@ -69,12 +75,16 @@ export function scenarioForDemo(demo: PurchaseDemo): Scenario {
 }
 export function initialPurchase(demo: PurchaseDemo = 'minimum'): PurchaseSession {
   const scenario = scenarioForDemo(demo);
+  const result = solveBasket(scenario);
   return {
     demo, scenario,
-    candidateId: scenario.outerwear.find(item => item.kind === 'candidate')?.id ?? '',
+    candidateId: (result.status === 'solved' ? result.basket.candidateIds[0] : undefined)
+      ?? scenario.outerwear.find(item => item.kind === 'candidate')?.id ?? '',
     topId: scenario.tops[0]?.id ?? '',
     decisions: {},
     ratingsOrigin: 'example',
+    editedOutfitIds: [],
+    lastRatingChange: null,
   };
 }
 export function choosePurchaseDemo(_session: PurchaseSession, demo: PurchaseDemo): PurchaseSession {
@@ -108,17 +118,21 @@ export function rateSelected(session: PurchaseSession, status: Rating): Purchase
     ratings: session.scenario.ratings.map(rating =>
       rating.outfitId === pair.id ? status==='render_error'?{outfitId:pair.id,status,reason:'User reported a preview error; this pair stays unresolved'}:{ outfitId: pair.id, status } : rating),
   });
-  return { ...session, scenario, ratingsOrigin: 'edited' };
+  return {
+    ...session, scenario, ratingsOrigin: 'edited',
+    editedOutfitIds: [...new Set([...session.editedOutfitIds, pair.id])],
+    lastRatingChange: { outfitId: pair.id, status, before: computeDecision(session) },
+  };
 }
 export function clearRatings(session: PurchaseSession): PurchaseSession {
   const scenario = parseScenario({
     ...session.scenario,
     ratings: session.scenario.outfits.map(pair => ({ outfitId: pair.id, status: 'unrated' })),
   });
-  return { ...session, scenario, decisions: {}, ratingsOrigin: 'edited' };
+  return { ...session, scenario, decisions: {}, ratingsOrigin: 'edited', editedOutfitIds: [], lastRatingChange: null };
 }
 export function replayRatings(session: PurchaseSession): PurchaseSession {
-  return { ...session, scenario: scenarioForDemo(session.demo), decisions: {}, ratingsOrigin: 'example' };
+  return { ...session, scenario: scenarioForDemo(session.demo), decisions: {}, ratingsOrigin: 'example', editedOutfitIds: [], lastRatingChange: null };
 }
 export function recordDecision(session: PurchaseSession, candidateId: string, choice: PurchaseDecision): PurchaseSession {
   if (!['skip', 'save'].includes(choice) || !session.scenario.outerwear.some(item => item.kind === 'candidate' && item.id === candidateId)) {

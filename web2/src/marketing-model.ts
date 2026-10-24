@@ -1,4 +1,4 @@
-import { scenarioForDemo, recordingFor, type PurchaseDemo } from './purchase.js';
+import { initialPurchase, scenarioForDemo, recordingFor, type PurchaseDemo } from './purchase.js';
 import { solveBasket, type SolveResult } from '../../src/core/index.js';
 import { initialState, type WardrobeItem } from './state.js';
 import manifest from '../../fixtures/youcam/demo-manifest.json' with { type: 'json' };
@@ -21,15 +21,18 @@ export function sampleWardrobe():readonly WardrobeItem[] {
   const ids=['recorded-work','trousers','loafers','blazer','coat','cashmere'];
   return ids.flatMap(id=>state.items.filter(item=>item.id===id));
 }
-export function demoEvidence(){
-  const candidate=recordingFor('outerwear','cheap-a');
+export function demoEvidence(candidateId=initialPurchase('minimum').candidateId){
+  const scenario=scenarioForDemo('minimum');
+  const product=scenario.outerwear.find(item=>item.kind==='candidate'&&item.id===candidateId);
+  const candidate=recordingFor('outerwear',candidateId);
   const top=recordingFor('top','work');
-  if(!candidate||!top) throw Error('Recorded manifest is incomplete: cannot claim a saved YouCam demo.');
+  if(!candidate||!top||!product||product.kind!=='candidate') throw Error('Recorded manifest is incomplete: cannot claim a saved YouCam demo.');
   const raw=manifest.renders.find(entry=>entry.id===candidate.id);
   if(!raw||raw.syntheticAvatarOnly!==true||raw.api!=='cloth-v4') throw Error('Unverified recording metadata.');
   return {
     candidate,
     top,
+    product:{id:product.id,label:product.label,priceMinor:product.priceMinor,currency:scenario.currency,imagePath:candidate.imagePath},
     avatarId:raw.avatarId,
     api:raw.api,
     candidateElement:{kind:raw.element.kind,id:raw.element.id},
@@ -58,7 +61,7 @@ export function retailExample(){
   const scenario=scenarioForDemo('minimum');
   const product=scenario.outerwear.find(item=>item.kind==='candidate'&&item.id==='cheap-a');
   if(!product||product.kind!=='candidate')throw Error('The recorded demo candidate is missing.');
-  const evidence=demoEvidence();
+  const evidence=demoEvidence(product.id);
   return {id:product.id,label:product.label,priceMinor:product.priceMinor,currency:scenario.currency,
     imagePath:evidence.candidate.imagePath,recordedAt:evidence.candidate.recordedAt};
 }
