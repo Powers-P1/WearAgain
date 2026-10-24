@@ -1,15 +1,15 @@
 # WearAgain — submission handoff
 
-Entry owner: Oliwia. Internal target: 31 October. [Official YouCam rules](https://youcam-api-skin-ai-ecommerce.devpost.com/rules), checked 23 October 2026: submission closes 2 November at 11:45 EST, or 17:45 in Warsaw. The app must remain available free for judging through 20 November. Source can be public with suitable licensing or private with the judging access specified in the rules. This repository remains private; its access and licence have not been changed.
+Entry owner: Oliwia. Internal target: 31 October. [Official YouCam rules](https://youcam-api-skin-ai-ecommerce.devpost.com/rules), checked 24 October 2026: submission closes 2 November at 11:45 EST, or 17:45 in Warsaw. The app must remain available free for judging through 20 November. This repository remains private. Invitation 339415895 was sent to the official address, resolved by GitHub to YouCamAPI, and is awaiting acceptance. The personal-account collaborator role is read/write, explicitly authorized after explaining GitHub's lack of read-only access here. The licence remains unchanged.
 
-The rules require a publicly visible 1–3 minute YouTube or Vimeo demonstration with the intended device experience and YouCam integration. A Pages-hosted file alone does not satisfy that hosting requirement. Damian approved the English **v7** film for handoff on 23 October; publication and submission remain separate owner actions. No entry or terms have been accepted on Oliwia's behalf.
+The rules require a publicly visible 1–3 minute YouTube or Vimeo demonstration with the intended device experience and YouCam integration. Approved English **v7** was published on Oliwia's channel on 24 October after explicit authorization, with prepared English captions. No Devpost entry or declarations have been accepted on the entrant's behalf.
 
 ## Approved final film
 
 - [WearAgain-smooth-final-v7.mp4](demo/final-v7/WearAgain-smooth-final-v7.mp4): 74.5 seconds, 1080x1920, H.264/AAC, 60 fps; English Jessica narration and original generated music.
 - SHA-256: `0af4fbaca6bf98cf0463f4fcc68ff861338cbf61e8b1aeb416f074ced2331fe1`.
 - [Transcript](demo/final-v7/transcript.en.md), [WebVTT](demo/final-v7/captions.en.vtt), [SRT](demo/final-v7/captions.en.srt), [poster](demo/final-v7/poster.jpg), [manifest](demo/final-v7/manifest.json), [QA](demo/final-v7/QA.json), [provenance](demo/final-v7/PROVENANCE.json) and [independent motion review](demo/final-v7/motion-review.json).
-- **Public YouTube/Vimeo URL: pending owner publication.** Earlier 93/121-second films and versions v2-v6 are superseded; do not upload them as the final.
+- **Public YouTube URL: https://youtube.com/shorts/HLbEffHG95E** (Oliwia). Earlier 93/121-second films and versions v2-v6 are superseded; do not upload them as the final.
 
 The app pixels are actual responsive mobile/touch browser captures. Eased scrolling and transitions were edited for the film; these animations were not deployed to the app. The film is not an installed physical iPhone PWA recording. The separate brown-coat API test, saved examples and illustrative generated lifestyle opening remain identified.
 
@@ -45,8 +45,8 @@ Workerd tests intercept external traffic. The final focus changes add direct reg
 
 ## Remaining owner actions
 
-1. Upload the approved v7 to publicly visible YouTube or Vimeo, attach English captions, and put the final URL into Devpost and this handoff.
-2. Share private source with **contact_event@PerfectCorp.com**, the exact recipient in section 4 of the official rules, and verify accepted/read access. The primary agent confirmed the visible Devpost rules text on 23 October; the text extractor masks this address. No invitation or visibility change has been made here.
+1. Use the published v7 URL above in Devpost; English captions are uploaded. Confirm the public link in the final entry.
+2. Verify acceptance of the already sent private-source invitation to **contact_event@PerfectCorp.com** / **YouCamAPI**. Sending is confirmed; recipient acceptance/effective access is still pending. Do not describe the invitation as already accepted.
 3. Review the [rights/source notes](SUBMISSION_PACKAGE.md#rights-and-source-notes), confirm team eligibility and authority to represent it, and maintain free judging access through 20 November. Keep live capacity available without presenting unlimited provider usage.
 4. Submit the English description, testing instructions, app/source/video URLs as Oliwia, then retain the Devpost confirmation before the deadline. The signed-in account on the audit computer is Damian's; no account switch or submission was attempted.
 

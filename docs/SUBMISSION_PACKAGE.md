@@ -1,6 +1,6 @@
 # WearAgain - copy-ready submission package
 
-Prepared 24 October 2026. [Handoff](HACKATHON_HANDOFF.md) tracks release status; [approved media](demo/README.md) identifies v7. Publication, source invitation and submission remain owner actions.
+Prepared 24 October 2026. [Handoff](HACKATHON_HANDOFF.md) tracks release status; [approved media](demo/README.md) identifies v7. The public film is published on Oliwia's channel. The official source invitation is sent and awaits the recipient's acceptance. Devpost remains the entrant's final action.
 
 ## Submission fields
 
@@ -8,8 +8,8 @@ Prepared 24 October 2026. [Handoff](HACKATHON_HANDOFF.md) tracks release status;
 - Tagline: **Does this purchase earn a place in your wardrobe?**
 - Working demo: https://wearagain.pages.dev/judges/
 - App: https://wearagain.pages.dev/app/#wardrobe
-- Source: https://github.com/Powers-P1/WearAgain (private; judge access pending confirmation)
-- Public video: **pending owner publication of approved v7 on YouTube or Vimeo**.
+- Source: https://github.com/Powers-P1/WearAgain (private; invitation sent to the official recipient, acceptance pending)
+- Public video: **https://youtube.com/shorts/HLbEffHG95E** — approved v7 on Oliwia's channel, with uploaded English captions.
 - Built with: YouCam AI Clothes Try-On API (`cloth-v4`), TypeScript, Cloudflare Pages, Workers, SQLite Durable Objects, Claude Sonnet 5.5, IndexedDB and a scoped service worker.
 
 ## Description
@@ -54,11 +54,11 @@ PWA hooks/offline behavior have earlier automated browser evidence. Physical And
 
 ## Source access and release fields
 
-The [official rules, section 4](https://youcam-api-skin-ai-ecommerce.devpost.com/rules) allow private source shared with **contact_event@PerfectCorp.com**. This exact address was confirmed in the visible official rules by the primary agent on 23 October; text tools mask it. Oliwia must grant the corresponding recipient read access and confirm acceptance/access before submission. No invitation or visibility change occurred here.
+The [official rules, section 4](https://youcam-api-skin-ai-ecommerce.devpost.com/rules) allow private source shared with **contact_event@PerfectCorp.com**. The exact address was confirmed in the visible official rules. On 24 October GitHub resolved that email to **YouCamAPI** and sent invitation **339415895**. It is awaiting the recipient's response; effective access is not yet independently confirmed. The repository remains private. This personal GitHub repository cannot assign read-only collaborators: Damian explicitly delegated the choice after that limitation was explained, and the invitation uses standard collaborator read/write access. No account transfer, public exposure or additional recipient was introduced.
 
-Upload the exact approved v7 with English captions, make it publicly visible on YouTube or Vimeo, and copy the resulting URL into Devpost. Keep the project free for judging through 20 November. Confirm eligibility/team representation and submit before **2 November 2026, 11:45 EST / 17:45 Warsaw**. Retain the confirmation receipt. Optional special-award eligibility must be declared truthfully by the entrant.
+The exact approved v7 is public on Oliwia's YouTube channel **UCJJAXaPIrLu0Hp3Ll_Q_3Ig**, with the prepared English SRT imported. Copy the video URL above into Devpost. YouTube's automated copyright check reported no issues; that is not an independent rights certificate. Keep the project free for judging through 20 November. Confirm eligibility/team representation and submit before **2 November 2026, 11:45 EST / 17:45 Warsaw**. Retain the receipt. The **Women in Tech** special award is USD 1,000 for a team declaring at least one member who self-identifies as a woman; the entrant must make that declaration truthfully. This is additional award eligibility, not a different product-testing standard.
 
-The audit computer's current Devpost account belongs to Damian; the WearAgain representative is Oliwia. This package neither switches accounts nor accepts terms for her. The prepared jury player references approved v7, copied from the canonical documentation package at build time. A separately reviewed preview/production release is still required; merging this package does not deploy the direct-upload Pages project.
+The audit computer's Devpost account belongs to Damian; WearAgain's representative is Oliwia. No Devpost account switch, submission or legal declaration was performed. YouTube publication used the already signed-in profile Oliwia, as explicitly authorized. The in-app jury player keeps approved v7, copied from the canonical documentation package at build time. The final focus acceptance and owner kit record the tested preview/production release; merging alone does not deploy this direct-upload Pages project.
 
 ## Why this entry fits the judging criteria
 
