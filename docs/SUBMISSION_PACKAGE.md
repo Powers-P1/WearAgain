@@ -36,7 +36,7 @@ English [VTT captions](https://wearagain.pages.dev/video/wearagain-final-v7.en.v
 
 The decision links a proposed purchase to clothes and needs the shopper supplied. An independently tested deterministic solver produces the certificate. We verified the working API path and actual app flows; we have not measured reduced returns, spending, time savings or conversion uplift.
 
-Previews illustrate style, not size fit. Merchant stock, delivery and fees remain unknown without evidence. There is no merchant checkout, automated recurring order, personal-photo model try-on or authenticated cloud sync. Film motion is editorial polish; the shown app states and results are actual captures.
+Previews illustrate style, not size fit. Merchant stock, delivery and fees remain unknown without evidence. There is no merchant checkout, automated recurring order, personal-photo model try-on or authenticated cloud sync. Film motion is editorial polish; the shown app states and results are actual captures. Approved v7 records the earlier working UI; the current judging replay now follows Nova consistently and labels human versus preset ratings more clearly.
 
 ## Testing instructions
 
@@ -48,7 +48,7 @@ No sign-in is needed for the public demo. The private source needs the judging a
 4. In Check purchase -> Use my wardrobe, declare needs, shop candidates, prices and human ratings. Changing inputs recomputes the certificate; unresolved cheaper pairings leave it provisional.
 5. Explore Stylist, saved looks, trip packing and return lists in saved-example mode. Live AI/YouCam are separately opt-in and consume a limited team allowance; the initial safe journey does not need them.
 
-For a local check use Node 24, `npm ci --ignore-scripts`, then `npm run check`. The final release report records the exact commit and test count. Workerd tests intercept network traffic; no production key is required.
+For a local check use Node 24, `npm ci --ignore-scripts`, then `npm run check`. The focused UI revision `6d4b35e` passes **348 offline tests**, strict types and both builds in Linux/Windows CI. The final release report ties the released commit, preview and independent reviews together. Workerd tests intercept network traffic; no production key is required.
 
 PWA hooks/offline behavior have earlier automated browser evidence. Physical Android/iPhone installation remains a manual check. The film used responsive mobile/touch browser emulation, not an installed physical iPhone.
 
